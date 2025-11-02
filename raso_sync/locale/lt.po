@@ -1,0 +1,282 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: raso_sync\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-01 00:00+0000\n"
+"PO-Revision-Date: 2025-11-01 00:00\n"
+"Last-Translator: \n"
+"Language-Team: Lithuanian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: lt\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%10<=9 || n%100>=20) ? 1 : 2);\n"
+
+msgid "Raso Sync"
+msgstr "RASO sinchronizacija"
+
+msgid "Manage and monitor RASO Sync status from this overview page."
+msgstr "Tvarkykite ir stebėkite RASO sinchronizacijos būseną šiame puslapyje."
+
+# API Messages
+
+msgid "Database connection settings are incomplete"
+msgstr "Duomenų bazės prisijungimo nustatymai neišsamūs"
+
+msgid "Connection successful"
+msgstr "Prisijungimas sėkmingas"
+
+msgid "Connection test failed: {0}"
+msgstr "Prisijungimo testas nepavyko: {0}"
+
+msgid "Synchronization is already running. Please wait for it to complete."
+msgstr "Sinchronizacija jau vykdoma. Palaukite, kol ji baigsis."
+
+msgid "Uploaded {0} using {1} mode"
+msgstr "Įkelta {0} naudojant {1} režimą"
+
+msgid "Fetched {0}"
+msgstr "Gauta {0}"
+
+msgid "Manual upload failed: {0}"
+msgstr "Rankinis įkėlimas nepavyko: {0}"
+
+msgid "Manual fetch failed: {0}"
+msgstr "Rankinis gavimas nepavyko: {0}"
+
+msgid "Unknown data type: {0}"
+msgstr "Nežinomas duomenų tipas: {0}"
+
+# DocType Labels - RASO Sync Settings
+msgid "RASO Sync Settings"
+msgstr "RASO sinchronizacijos nustatymai"
+
+msgid "Accounting Settings"
+msgstr "Apskaitos nustatymai"
+
+msgid "Warehouse"
+msgstr "Sandėlis"
+
+msgid "Default POS Profile"
+msgstr "Numatytasis POS profilis"
+
+msgid "Sales Tax Template"
+msgstr "Pardavimų mokesčių šablonas"
+
+msgid "Default Item (When Not Found)"
+msgstr "Numatytasis prekės kodas (kai nerastas)"
+
+msgid "Package Deposit Item"
+msgstr "Pakuotės užstato prekė"
+
+msgid "Item used to account for package deposits in RASO. When deposit_package_count is greater than zero, this item will be used."
+msgstr "Prekė naudojama pakuočių užstatams RASO sistemoje apskaityti. Kai deposit_package_count yra didesnis už nulį, bus naudojama ši prekė."
+
+msgid "Sync Status"
+msgstr "Sinchronizacijos būsena"
+
+msgid "Last Sale Import"
+msgstr "Paskutinis pardavimų importas"
+
+msgid "Last Data Export"
+msgstr "Paskutinis duomenų eksportas"
+
+msgid "Microsoft SQL Client Connection"
+msgstr "Microsoft SQL kliento prisijungimas"
+
+msgid "Server IP Address"
+msgstr "Serverio IP adresas"
+
+msgid "Port"
+msgstr "Prievadas"
+
+msgid "Database Name"
+msgstr "Duomenų bazės pavadinimas"
+
+msgid "Usually MS3_TOPSHOP_IMG"
+msgstr "Paprastai MS3_TOPSHOP_IMG"
+
+msgid "Database Username"
+msgstr "Duomenų bazės vartotojo vardas"
+
+msgid "Database Password"
+msgstr "Duomenų bazės slaptažodis"
+
+msgid "Database Encryption"
+msgstr "Duomenų bazės šifravimas"
+
+msgid "Encryption mode for database connection (off: disabled, request: use if available, require: encrypted only)"
+msgstr "Šifravimo režimas duomenų bazės prisijungimui (off: išjungta, request: naudoti jei galima, require: tik šifruota)"
+
+msgid "Synchronization Settings"
+msgstr "Sinchronizacijos nustatymai"
+
+msgid "Full Sync Export Time"
+msgstr "Pilno sinchronizavimo eksporto laikas"
+
+msgid "Time of night when all ERPNext item data is sent to RASO"
+msgstr "Nakties laikas, kada visi ERPNext prekių duomenys siunčiami į RASO"
+
+msgid "Fetch Sales Interval (Minutes)"
+msgstr "Pardavimų gavimo intervalas (minutės)"
+
+msgid "Cron job interval to fetch sales documents from RASO to ERPNext"
+msgstr "Cron užduoties intervalas pardavimų dokumentų gavimui iš RASO į ERPNext"
+
+msgid "Enqueue Sending Delay (Seconds)"
+msgstr "Siuntimo į eilę vėlavimas (sekundės)"
+
+msgid "Delay between enqueuing item sends to RASO to avoid API overload"
+msgstr "Vėlavimas tarp prekių siuntimo į RASO eilę, siekiant išvengti API perkrovos"
+
+msgid "Auto Submit Sales Documents"
+msgstr "Automatiškai pateikti pardavimų dokumentus"
+
+msgid "Synchronization is running"
+msgstr "Sinchronizacija vykdoma"
+
+msgid "System flag indicating if synchronization is currently in progress"
+msgstr "Sistemos vėliavėlė, rodanti ar sinchronizacija šiuo metu vykdoma"
+
+msgid "Working Hours"
+msgstr "Darbo valandos"
+
+msgid "Working Hours From"
+msgstr "Darbo valandos nuo"
+
+msgid "Start time to fetch sales documents when business hours begin"
+msgstr "Pradžios laikas pardavimų dokumentų gavimui, kai prasideda darbo valandos"
+
+msgid "Working Hours To"
+msgstr "Darbo valandos iki"
+
+msgid "End time to stop fetching sales documents when business hours end"
+msgstr "Pabaigos laikas pardavimų dokumentų gavimo sustabdymui, kai baigiasi darbo valandos"
+
+msgid "Payment Method Mapping"
+msgstr "Mokėjimo metodų siejimas"
+
+msgid "Payment Mappings"
+msgstr "Mokėjimų siejimai"
+
+msgid "Employee to Sales Person Mapping"
+msgstr "Darbuotojų ir pardavėjų siejimas"
+
+msgid "Employee Mappings"
+msgstr "Darbuotojų siejimai"
+
+# Page - RASO Sync Overview
+msgid "RASO Sync Overview"
+msgstr "RASO apžvalga"
+
+msgid "Manage and monitor your RASO Sync settings and synchronization status from this overview page."
+msgstr "Tvarkykite ir stebėkite RASO sinchronizacijos nustatymus ir sinchronizacijos būseną šiame apžvalgos puslapyje."
+
+msgid "Open Settings"
+msgstr "Atidaryti nustatymus"
+
+msgid "Synchronization is idle"
+msgstr "Sinchronizacija neaktyvi"
+
+msgid "Synchronization is currently running"
+msgstr "Sinchronizacija šiuo metu vykdoma"
+
+msgid "Refresh Status"
+msgstr "Atnaujinti būseną"
+
+msgid "Test Connection"
+msgstr "Testuoti prisijungimą"
+
+msgid "Check Logs"
+msgstr "Tikrinti žurnalus"
+
+msgid "Upload Data"
+msgstr "Įkelti duomenis"
+
+msgid "Data Type:"
+msgstr "Duomenų tipas:"
+
+msgid "Goods (Items)"
+msgstr "Prekės (Items)"
+
+msgid "Good Prices"
+msgstr "Prekių kainos"
+
+msgid "Customers"
+msgstr "Klientai"
+
+msgid "All Data Types"
+msgstr "Visi duomenų tipai"
+
+msgid "Sync Mode:"
+msgstr "Sinchronizavimo režimas:"
+
+msgid "Full Sync (takes a long time - sends all data)"
+msgstr "Pilnas sinchronizavimas (užtrunka ilgai - siunčia visus duomenis)"
+
+msgid "Send all changes of today"
+msgstr "Siųsti visus šiandienos pakeitimus"
+
+msgid "Execute Upload"
+msgstr "Vykdyti įkėlimą"
+
+msgid "Cancel"
+msgstr "Atšaukti"
+
+msgid "Manual Sync"
+msgstr "Rankinis sinchronizavimas"
+
+msgid "Get Data"
+msgstr "Gauti duomenis"
+
+msgid "Sale Invoices"
+msgstr "Pardavimų sąskaitos"
+
+msgid "Execute Fetch"
+msgstr "Vykdyti gavimą"
+
+msgid "Are you sure you want to upload {0} using {1} mode?"
+msgstr "Ar tikrai norite įkelti {0} naudojant {1} režimą?"
+
+msgid "Starting upload..."
+msgstr "Pradedamas įkėlimas..."
+
+msgid "Upload completed successfully"
+msgstr "Įkėlimas sėkmingai baigtas"
+
+msgid "Upload failed: {0}"
+msgstr "Įkėlimas nepavyko: {0}"
+
+msgid "Unknown error"
+msgstr "Nežinoma klaida"
+
+msgid "Are you sure you want to fetch {0} from RASO?"
+msgstr "Ar tikrai norite gauti {0} iš RASO?"
+
+msgid "Starting fetch..."
+msgstr "Pradedamas gavimas..."
+
+msgid "Fetch completed successfully"
+msgstr "Gavimas sėkmingai baigtas"
+
+msgid "Fetch failed: {0}"
+msgstr "Gavimas nepavyko: {0}"
+
+msgid "Testing connection to RASO..."
+msgstr "Testuojamas prisijungimas prie RASO..."
+
+msgid "Connection test completed successfully"
+msgstr "Prisijungimo testas sėkmingai baigtas"
+
+msgid "Connection test failed"
+msgstr "Prisijungimo testas nepavyko"
+
+msgid "Never"
+msgstr "Niekada"
+
+# Common terms
+msgid "System Manager"
+msgstr "Sistemos administratorius"
+
+msgid "Loading..."
+msgstr "Kraunama..."

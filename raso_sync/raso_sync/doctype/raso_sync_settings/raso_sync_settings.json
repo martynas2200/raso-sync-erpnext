@@ -1,0 +1,283 @@
+{
+  "actions": [],
+  "allow_rename": 0,
+  "creation": "2025-10-20 10:00:00.000000",
+  "doctype": "DocType",
+  "editable_grid": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "general_section",
+    "warehouse_name",
+    "pos_profile",
+    "column_break_4",
+    "sales_tax_template",
+    "default_item",
+    "column_break_5",
+    "deposit_package_item",
+    "sync_status_section",
+    "last_sale_import",
+    "column_break_6",
+    "last_data_export",
+    "sql_client_section",
+    "ip",
+    "port",
+    "database_name",
+    "column_break_7",
+    "database_username",
+    "database_password",
+    "encryption",
+    "sql_client_settings_section",
+    "full_sync_export_time",
+    "fetch_sales_interval_minutes",
+    "column_break_8",
+    "enqueue_sending_delay_seconds",
+    "submit_sales_documents",
+    "synchronization_is_running",
+    "working_hours_section",
+    "working_hours_from",
+    "column_break_9",
+    "working_hours_to",
+    "item_mapping_section",
+    "payment_mapping_section",
+    "payment_mappings",
+    "employee_mapping_section",
+    "employee_mappings"
+  ],
+  "fields": [
+    {
+      "fieldname": "general_section",
+      "fieldtype": "Section Break",
+      "label": "Accounting Settings"
+    },
+    {
+      "fieldname": "warehouse_name",
+      "fieldtype": "Link",
+      "label": "Warehouse",
+      "options": "Warehouse",
+      "reqd": 1
+    },
+    {
+      "fieldname": "pos_profile",
+      "fieldtype": "Link",
+      "label": "Default POS Profile",
+      "options": "POS Profile",
+      "reqd": 0
+    },
+    {
+      "fieldname": "column_break_4",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "sales_tax_template",
+      "fieldtype": "Link",
+      "label": "Sales Tax Template",
+      "options": "Sales Taxes and Charges Template"
+    },
+        {
+      "fieldname": "default_item",
+      "fieldtype": "Link",
+      "label": "Default Item (When Not Found)",
+      "options": "Item",
+      "reqd": 1
+    },
+    {
+      "fieldname": "column_break_5",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "deposit_package_item",
+      "fieldtype": "Link",
+      "label": "Package Deposit Item",
+      "options": "Item",
+      "description": "Item used to account for package deposits in RASO. When deposit_package_count is greater than zero, this item will be used."
+    },
+    {
+      "fieldname": "sync_status_section",
+      "fieldtype": "Section Break",
+      "label": "Sync Status"
+    },
+    {
+      "fieldname": "last_sale_import",
+      "fieldtype": "Datetime",
+      "label": "Last Sale Import",
+      "read_only": 1
+    },
+    {
+      "fieldname": "column_break_6",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "last_data_export",
+      "fieldtype": "Datetime",
+      "label": "Last Data Export",
+      "read_only": 1
+    },
+    {
+      "fieldname": "sql_client_section",
+      "fieldtype": "Section Break",
+      "label": "Microsoft SQL Client Connection"
+    },
+    {
+      "fieldname": "ip",
+      "fieldtype": "Data",
+      "label": "Server IP Address",
+      "reqd": 1
+    },
+    {
+      "fieldname": "port",
+      "fieldtype": "Int",
+      "label": "Port",
+      "default": 8181,
+      "reqd": 1
+    },
+    {
+      "fieldname": "database_name",
+      "fieldtype": "Data",
+      "label": "Database Name",
+      "reqd": 1,
+      "description": "Usually MS3_TOPSHOP_IMG"
+    },
+    {
+      "fieldname": "column_break_7",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "database_username",
+      "fieldtype": "Data",
+      "label": "Database Username",
+      "reqd": 1
+    },
+    {
+      "fieldname": "database_password",
+      "fieldtype": "Password",
+      "label": "Database Password",
+      "reqd": 1
+    },
+    {
+      "fieldname": "encryption",
+      "fieldtype": "Select",
+      "label": "Database Encryption",
+      "options": "off\nrequest\nrequire",
+      "default": "off",
+      "description": "Encryption mode for database connection (off: disabled, request: use if available, require: encrypted only)"
+    },
+    {
+      "fieldname": "sql_client_settings_section",
+      "fieldtype": "Section Break",
+      "label": "Synchronization Settings"
+    },
+    {
+      "fieldname": "full_sync_export_time",
+      "fieldtype": "Time",
+      "label": "Full Sync Export Time",
+      "default": "06:30",
+      "description": "Time of night when all ERPNext item data is sent to RASO"
+    },
+    {
+      "fieldname": "fetch_sales_interval_minutes",
+      "fieldtype": "Int",
+      "label": "Fetch Sales Interval (Minutes)",
+      "default": "30",
+      "description": "Cron job interval to fetch sales documents from RASO to ERPNext. If set to 0, then automatic fetching is turned off"
+    },
+    {
+      "fieldname": "column_break_8",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "enqueue_sending_delay_seconds",
+      "fieldtype": "Int",
+      "label": "Enqueue Sending Delay (Seconds)",
+      "default": "180",
+      "description": "Delay between enqueuing item sends to RASO to avoid API overload"
+    },
+    {
+      "fieldname": "submit_sales_documents",
+      "fieldtype": "Check",
+      "label": "Auto Submit Sales Documents",
+      "default": 1
+    },
+    {
+      "fieldname": "synchronization_is_running",
+      "fieldtype": "Check",
+      "label": "Synchronization Is Running",
+      "read_only": 1,
+      "description": "System flag indicating if synchronization is currently in progress"
+    },
+    {
+      "fieldname": "working_hours_section",
+      "fieldtype": "Section Break",
+      "label": "Working Hours"
+    },
+    {
+      "fieldname": "working_hours_from",
+      "fieldtype": "Time",
+      "label": "Working Hours From",
+      "description": "Start time to fetch sales documents when business hours begin"
+    },
+    {
+      "fieldname": "column_break_9",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "working_hours_to",
+      "fieldtype": "Time",
+      "label": "Working Hours To",
+      "description": "End time to stop fetching sales documents when business hours end"
+    },
+    {
+      "fieldname": "payment_mapping_section",
+      "fieldtype": "Section Break",
+      "label": "Payment Method Mapping"
+    },
+    {
+      "fieldname": "payment_mappings",
+      "fieldtype": "Table",
+      "label": "Payment Mappings",
+      "options": "RASO Payment Mapping"
+    },
+    {
+      "fieldname": "employee_mapping_section",
+      "fieldtype": "Section Break",
+      "label": "Employee to Sales Person Mapping"
+    },
+    {
+      "fieldname": "employee_mappings",
+      "fieldtype": "Table",
+      "label": "Employee Mappings",
+      "options": "RASO Employee Mapping"
+    }
+  ],
+  "issingle": 1,
+  "links": [],
+  "modified": "2025-10-20 10:00:00.000000",
+  "modified_by": "Administrator",
+  "module": "Raso Sync",
+  "name": "RASO Sync Settings",
+  "owner": "Administrator",
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "print": 1,
+      "read": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    },
+    {
+      "create": 0,
+      "delete": 0,
+      "email": 1,
+      "print": 1,
+      "read": 1,
+      "role": "Raso Sync User",
+      "share": 0,
+      "write": 0
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "track_changes": 1
+}

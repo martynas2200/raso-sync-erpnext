@@ -1,0 +1,9 @@
+{
+ "desk_access": 1,
+ "disabled": 0,
+ "doctype": "Role",
+ "name": "Raso Sync User",
+ "role_name": "Raso Sync User",
+ "search_bar": 1,
+ "two_factor_auth": 0
+}

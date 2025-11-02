@@ -1,0 +1,151 @@
+
+.overview-description {
+	margin-bottom: 20px;
+}
+
+.raso-sync-overview {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 15px;
+}
+
+.sync-status-banner {
+	padding: 15px 20px;
+	margin-bottom: 25px;
+	border-radius: 6px;
+	border-left: 5px solid;
+	font-size: 14px;
+	font-weight: 500;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.sync-status-banner.running {
+	background-color: #fff3cd;
+	border-color: #ffc107;
+	color: #856404;
+}
+
+.sync-status-banner.idle {
+	background-color: #d4edda;
+	border-color: #28a745;
+	color: #155724;
+}
+
+.sync-status-banner .indicator {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	animation: pulse 2s infinite;
+}
+
+.sync-status-banner.running .indicator {
+	background-color: #ffc107;
+}
+
+.sync-status-banner.idle .indicator {
+	background-color: #28a745;
+}
+
+@keyframes pulse {
+
+	0%,
+	100% {
+		opacity: 1;
+	}
+
+	50% {
+		opacity: 0.5;
+	}
+}
+
+.status-cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	gap: 20px;
+	margin-bottom: 30px;
+}
+
+.status-card {
+	background: white;
+	border: 1px solid #d1d8dd;
+	border-radius: 6px;
+	padding: 20px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.status-card h5 {
+	margin: 0 0 10px 0;
+	font-size: 13px;
+	font-weight: 600;
+	color: #6c757d;
+	text-transform: uppercase;
+}
+
+.status-card .value {
+	font-size: 16px;
+	font-weight: 500;
+	color: #1f272e;
+}
+
+.action-section {
+	background: white;
+	border: 1px solid #d1d8dd;
+	border-radius: 6px;
+	padding: 20px;
+	margin-bottom: 20px;
+}
+
+.action-section h4 {
+	margin: 0 0 15px 0;
+	font-size: 16px;
+	font-weight: 600;
+	color: #1f272e;
+	border-bottom: 2px solid #f0f4f7;
+	padding-bottom: 10px;
+}
+
+.action-group {
+	margin-bottom: 15px;
+}
+
+.action-group:last-child {
+	margin-bottom: 0;
+}
+
+.action-buttons {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+	margin-top: 10px;
+}
+
+.sync-options {
+	background: #f8f9fa;
+	border-radius: 4px;
+	padding: 15px;
+	margin-top: 10px;
+	display: none;
+}
+
+.sync-options.show {
+	display: block;
+}
+
+.sync-options label {
+	display: block;
+	margin-bottom: 8px;
+	font-weight: 500;
+	font-size: 13px;
+}
+
+.sync-options select,
+.sync-options .checkbox-group {
+	margin-bottom: 15px;
+}
+
+.checkbox-group label {
+	font-weight: normal;
+	margin-bottom: 5px;
+}

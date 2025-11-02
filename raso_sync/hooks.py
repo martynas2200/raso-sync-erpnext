@@ -1,10 +1,16 @@
 app_name = "raso_sync"
-app_title = "Raso Sync"
-app_publisher = "MArtin"
-app_description = "API"
+app_title = "RASO Sync"
+app_publisher = "Martynas Miliauskas"
+app_description = "RASO POS System Sync API for ERPNext"
+app_icon = "refresh-cw"
+app_color = "grey"
 app_email = "raso@ekranas.info"
-app_license = "mit"
+app_license = "MIT"
 
+# After app install/update, create custom fields
+# If we define it in the fixtures, they will be deleted on uninstall
+after_install = "raso_sync.custom_fields.create_custom_fields"
+after_migrate = "raso_sync.custom_fields.create_custom_fields"
 # Apps
 # ------------------
 
@@ -40,7 +46,9 @@ app_license = "mit"
 # webform_include_css = {"doctype": "public/css/doctype.css"}
 
 # include js in page
-# page_js = {"page" : "public/js/file.js"}
+# page_js = {
+# 	"raso-sync-overview": "public/js/raso-sync-overview.js",
+# }
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
@@ -158,7 +166,15 @@ app_license = "mit"
 # 	],
 # 	"monthly": [
 # 		"raso_sync.tasks.monthly"
-# 	],
+#   ],
+#   "cron": {
+#       "*/10 * * * *": [
+#           "raso_sync.tasks.fetch.execute_fetch_task"
+#       ],
+#       "0 6 * * *": [
+#           "raso_sync.tasks.send.execute_sent_task"
+#       ],
+#   },
 # }
 
 # Testing
@@ -244,4 +260,3 @@ app_license = "mit"
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
-
