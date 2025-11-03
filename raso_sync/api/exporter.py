@@ -20,7 +20,7 @@ def format_xml_response(root):
 
 
 @frappe.whitelist(allow_guest=True, methods=["GET", "POST"])
-def export():
+def get():
 	"""
 	Main API endpoint for RASO sync data - Returns XML directly
 
@@ -31,42 +31,57 @@ def export():
 
 	Returns XML document directly
 	"""
+	# Get parameters
+	data_type = frappe.form_dict.get("DataType")
+	full_sync = int(frappe.form_dict.get("FullSync", 1))
+	date_from = frappe.form_dict.get("recentModified")
+
+	# Validate parameters
+	if not data_type:
+		frappe.throw("DataType parameter is required")
+
+	if full_sync == 0 and not date_from:
+		frappe.throw("recentModified parameter is required when FullSync=0")
+	root = export_for_raso(data_type=data_type, full_sync=full_sync, date_from=date_from)
+	if not list(root):
+		return Response(status=204)
+
+	return Response(
+		format_xml_response(root),
+		content_type="application/xml; charset=utf-8",
+		status=200 if root.tag != "Error" else 500,
+	)
+
+
+def export_for_raso(data_type, full_sync=1, date_from=None):
+	"""
+	Export data for RASO sync based on DataType.
+
+	Returns XML Element root, or Error tag in XML if an error occurs.
+	"""
 	try:
-		# Get parameters
-		data_type = frappe.form_dict.get("DataType")
-		full_sync = int(frappe.form_dict.get("FullSync", 1))
-		recent_modified = frappe.form_dict.get("recentModified")
+		data_type = int(data_type)
 
-		# Validate parameters
-		if not data_type:
-			frappe.throw("DataType parameter is required")
-
-		if full_sync == 0 and not recent_modified:
-			frappe.throw("recentModified parameter is required when FullSync=0")
-
-		# Route to appropriate sync function
-		if data_type == "1":
-			root = partners_internal(full_sync, recent_modified)
-		elif data_type == "2":
-			root = good_groups_internal(full_sync, recent_modified)
-		elif data_type == "3":
-			root = goods_internal(full_sync, recent_modified)
-		elif data_type == "4":
-			root = good_prices_internal(full_sync, recent_modified)
+		if data_type == 1:
+			root = partners_internal(full_sync, date_from)
+		elif data_type == 2:
+			root = good_groups_internal(full_sync, date_from)
+		elif data_type == 3:
+			root = goods_internal(full_sync, date_from)
+		elif data_type == 4:
+			root = good_prices_internal(full_sync, date_from)
 		else:
 			frappe.throw(
 				f"Invalid DataType '{data_type}'. Supported values: 1 (Partners), 2 (GoodsGroups), 3 (Goods), 4 (GoodsPrices)"
 			)
 
-		if not list(root):
-			return Response(status=204)
-
-		return Response(format_xml_response(root), content_type="application/xml; charset=utf-8", status=200)
+		return root
 
 	except Exception as e:
+		error_root = Element("Error")
 		frappe.log_error(
-			f"RASO sync API Type {data_type} error: {str(e) if e else 'Unknown'}",
 			"RASO Sync API Export Error",
+			f"RASO sync API Type {data_type} error: {e!s}",
 		)
 
 		# Return error as XML
@@ -74,6 +89,4 @@ def export():
 		error_elem = SubElement(error_root, "Message")
 		error_elem.text = str(e) if e is not None else "Unknown error"
 
-		return Response(
-			format_xml_response(error_root), content_type="application/xml; charset=utf-8", status=500
-		)
+		return error_root

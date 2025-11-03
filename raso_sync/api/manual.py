@@ -1,9 +1,11 @@
 import time
+from datetime import datetime
 
 import frappe
 from frappe import _
+from frappe.utils.background_jobs import is_job_enqueued
 
-from raso_sync.tasks.connection import MSSQLConnectionManager
+from ..db.connection import MSSQLConnectionManager
 
 
 @frappe.whitelist()
@@ -45,17 +47,13 @@ def test_connection():
 		return {"success": False, "error": str(e) if str(e) else "Unknown error"}
 
 
-# Use frappe background jobs, and enqueue long tasks to avoid request timeouts with a flag of
-# enqueue_after_commit=True
-
-
 @frappe.whitelist()
 def manual_upload(data_type, mode):
 	"""
 	Manually trigger upload of data to RASO
 	Args:
-	    data_type: Type of data to upload (goods, good_prices, customers, all)
-	    mode: Sync mode (fullsync or today)
+		data_type: Type of data to upload (goods, good_prices, good_groups, partners, all)
+		mode: Sync mode (fullsync or today)
 	"""
 	time.sleep(0.5)
 
@@ -68,20 +66,31 @@ def manual_upload(data_type, mode):
 				"error": _("Synchronization is already running. Please wait for it to complete."),
 			}
 
+		date_from = None
+		if mode == "today":
+			date_from = datetime.now().strftime("%Y-%m-%d 00:00:00")
+
 		job = frappe.enqueue(
-			"raso_sync.tasks.send.execute_task",
+			"raso_sync.tasks.send.execute_send_task_worker",
 			queue="long",
+			job_id="raso_sync_send_task_worker",
 			enqueue_after_commit=True,
 			at_front=True,
-			arguments=[data_type, mode],
+			arguments=[data_type, date_from],
 			on_success=frappe.msgprint(_("RASO Upload task is completed successfully.")),
 			on_failure=frappe.msgprint(_("RASO Upload task failed. Please check error logs.")),
 		)
 
-		return {
-			"success": True,
-			"message": _("RASO Upload task has been enqueued. Job ID: {0}").format(job.name),
-		}
+		# TODO: set a button to possibly view the job status
+		frappe.msgprint(
+			msg=_("Upload task has been enqueued. Job ID: {0}").format(job.name),
+			primary_action={
+				"label": _("View Job Status"),
+				"action": f"frappe.show_job_status('{job.name}')",
+			},
+		)
+
+		return {"success": True}
 
 	except Exception as e:
 		frappe.log_error(
@@ -108,15 +117,25 @@ def manual_fetch(data_type):
 			}
 
 		job = frappe.enqueue(
-			"raso_sync.tasks.fetch.execute_task",
+			"raso_sync.tasks.fetch.execute_fetch_task_worker",
 			queue="long",
+			job_id="raso_sync_fetch_task_worker",
 			enqueue_after_commit=True,
 			at_front=True,
 			on_success=frappe.msgprint(_("Fetch task is completed successfully.")),
 			on_failure=frappe.msgprint(_("Fetch task failed. Please check error logs.")),
 		)
 
-		return {"success": True, "message": _("Fetch task has been enqueued. Job ID: {0}").format(job.name)}
+		# TODO: set a button to possibly view the job status
+		frappe.msgprint(
+			msg=_("Fetch task has been enqueued. Job ID: {0}").format(job.name),
+			primary_action={
+				"label": _("View Job Status"),
+				"action": f"frappe.show_job_status('{job.name}')",
+			},
+		)
+
+		return {"success": True}
 
 	except Exception as e:
 		frappe.log_error(

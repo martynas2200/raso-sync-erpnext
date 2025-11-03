@@ -4,20 +4,20 @@ from xml.etree.ElementTree import Element, SubElement
 import frappe
 
 
-def partners_internal(full_sync, recent_modified):
+def partners_internal(full_sync, date_from):
 	"""
 	Partners (Clients) sync endpoint - DataType 1
 
 	Parameters:
 	- FullSync: 1 for full sync, 0 for incremental
-	- recentModified: Required when FullSync=0, ISO datetime string
+	- date_from: Required when FullSync=0, ISO datetime string
 
 	Returns XML document directly
 	"""
 	filters = {"disabled": 0}  # Only enabled customers
 
-	if full_sync == 0 and recent_modified:
-		modified_date = datetime.fromisoformat(recent_modified)
+	if full_sync == 0 and date_from:
+		modified_date = datetime.fromisoformat(date_from)
 		filters["modified"] = (">", modified_date)
 
 	# Fetch customers

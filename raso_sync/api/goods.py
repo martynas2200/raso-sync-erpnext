@@ -4,7 +4,7 @@ from xml.etree.ElementTree import Element, SubElement
 import frappe
 
 
-def goods_internal(full_sync, recent_modified):
+def goods_internal(full_sync, date_from):
 	"""
 	Goods (Items) sync endpoint - DataType 3
 
@@ -15,8 +15,8 @@ def goods_internal(full_sync, recent_modified):
 	Returns XML document directly
 	"""
 	filters = {}
-	if full_sync == 0 and recent_modified:
-		modified_date = datetime.fromisoformat(recent_modified)
+	if full_sync == 0 and date_from:
+		modified_date = datetime.fromisoformat(date_from)
 		filters["modified"] = (">", modified_date)
 
 	items = frappe.get_all(

@@ -177,19 +177,20 @@
       "fieldname": "fetch_sales_interval_minutes",
       "fieldtype": "Int",
       "label": "Fetch Sales Interval (Minutes)",
-      "default": "30",
-      "description": "Cron job interval to fetch sales documents from RASO to ERPNext. If set to 0, then automatic fetching is turned off"
+      "default": "15",
+      "description": "Cron job interval to fetch sales documents from RASO to ERPNext. If set to 0, then automatic fetching is turned off",
+      "non_negative": 1
     },
     {
       "fieldname": "column_break_8",
       "fieldtype": "Column Break"
     },
     {
-      "fieldname": "enqueue_sending_delay_seconds",
+      "fieldname": "enqueue_sending_delay_minutes",
       "fieldtype": "Int",
-      "label": "Enqueue Sending Delay (Seconds)",
-      "default": "180",
-      "description": "Delay between enqueuing item sends to RASO to avoid API overload"
+      "label": "Enqueue Sending Minimum Delay (Minutes)",
+      "default": "1",
+      "description": "Delay between enqueuing item sends to RASO to avoid API overload, if set to 0, then automatic sending is turned off"
     },
     {
       "fieldname": "submit_sales_documents",

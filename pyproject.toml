@@ -1,9 +1,9 @@
 [project]
 name = "raso_sync"
 authors = [
-    { name = "MArtin", email = "raso@ekranas.info"}
+    { name = "Martynas Miliauskas", email = "raso_sync@ekranas.info"}
 ]
-description = "API"
+description = "API endpoints to sync ERPNext with RASO Retail POS system"
 requires-python = ">=3.10"
 readme = "README.md"
 dynamic = ["version"]

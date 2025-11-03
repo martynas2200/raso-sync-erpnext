@@ -1,6 +1,8 @@
 // Page API documentation: https://frappeframework.com/docs/user/en/api/page
 // https://github.com/frappe/erpnext/blob/version-15/erpnext/stock/page/warehouse_capacity_summary/warehouse_capacity_summary.js
 
+// Also consider using frappe.cache to report on the last sync times without querying the database
+
 frappe.pages["raso-sync-overview"].on_page_load = function (wrapper) {
     var page = frappe.ui.make_app_page({
         parent: wrapper,
@@ -8,7 +10,6 @@ frappe.pages["raso-sync-overview"].on_page_load = function (wrapper) {
         single_column: true,
     });
 
-    // The full script is loaded via hooks: page_js)
     $(frappe.render_template("raso_sync_overview")).appendTo(page.main);
 
     frappe.raso_sync_overview && frappe.raso_sync_overview.setup(page);
@@ -23,10 +24,11 @@ frappe.raso_sync_overview = {
         this.page = page;
         this.load_settings();
         this.attach_event_handlers();
+        setInterval(() => this.load_settings(false), 10000); // Refresh every 10 seconds
+        // NOTE: implement real-time updates using websockets for efficiency
     },
 
-    load_settings: function () {
-        $(".raso-sync-overview").fadeOut();
+    load_settings: function (notification = true) {
         var me = this;
         frappe.call({
             method: "frappe.client.get",
@@ -37,7 +39,14 @@ frappe.raso_sync_overview = {
                 if (response.message) {
                     me.settings = response.message;
                     me.update_ui();
-                    $(".raso-sync-overview").fadeIn(200);
+                    if (notification)
+                        frappe.show_alert(
+                            {
+                                message: __("Settings loaded successfully"),
+                                indicator: "green",
+                            },
+                            3
+                        );
                 }
             },
         });
@@ -166,7 +175,7 @@ frappe.raso_sync_overview = {
             () => {
                 frappe.show_alert(
                     {
-                        message: "Starting upload...",
+                        message: __("Starting upload..."),
                         indicator: "blue",
                     },
                     3
@@ -182,7 +191,7 @@ frappe.raso_sync_overview = {
                         if (r.message && r.message.success) {
                             frappe.show_alert(
                                 {
-                                    message: "✓ Upload completed successfully",
+                                    message: r.message.message || __("Upload queued successfully"),
                                     indicator: "green",
                                 },
                                 5
@@ -192,7 +201,7 @@ frappe.raso_sync_overview = {
                             frappe.show_alert(
                                 {
                                     message:
-                                        "✗ Upload failed: " +
+                                        __("Upload queued failed: ") +
                                         (r.message?.error || "Unknown error"),
                                     indicator: "red",
                                 },
@@ -211,7 +220,7 @@ frappe.raso_sync_overview = {
         frappe.confirm(`Are you sure you want to fetch ${fetch_type} from RASO?`, () => {
             frappe.show_alert(
                 {
-                    message: "Starting fetch...",
+                    message: __("Starting fetch..."),
                     indicator: "blue",
                 },
                 3
@@ -226,7 +235,7 @@ frappe.raso_sync_overview = {
                     if (r.message && r.message.success) {
                         frappe.show_alert(
                             {
-                                message: "✓ Fetch completed successfully",
+                                message: r.message.message || __("Fetch queued successfully"),
                                 indicator: "green",
                             },
                             5
@@ -236,7 +245,8 @@ frappe.raso_sync_overview = {
                         frappe.show_alert(
                             {
                                 message:
-                                    "✗ Fetch failed: " + (r.message?.error || "Unknown error"),
+                                    __("Fetch queued failed: ") +
+                                    (r.message?.error || "Unknown error"),
                                 indicator: "red",
                             },
                             5

@@ -4,19 +4,19 @@ from xml.etree.ElementTree import Element, SubElement
 import frappe
 
 
-def good_groups_internal(full_sync, last_update):
+def good_groups_internal(full_sync=1, date_from=None):
 	"""
 	GoodsGroups (Item Groups) sync endpoint - DataType 2
 
 	Parameters:
 	- FullSync: 1 for full sync, 0 for incremental
-	- recentModified: Required when FullSync=0, ISO datetime string
+	- date_from: Required when FullSync=0, ISO datetime string
 
-	Returns XML document directly
+	Returns XML Element object
 	"""
 	filters = {}
-	if full_sync == 0 and last_update:
-		modified_date = datetime.fromisoformat(last_update)
+	if full_sync == 0 and date_from:
+		modified_date = datetime.fromisoformat(date_from)
 		filters["modified"] = (">", modified_date)
 
 	# item_groups = frappe.get_all(

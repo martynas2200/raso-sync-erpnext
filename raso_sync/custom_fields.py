@@ -42,7 +42,7 @@ def create_custom_fields():
 	"""Create custom fields for RASO integration and POS-related Item/Item Group fields."""
 	definitions = {
 		"Sales Invoice": [
-			{
+			{  # NOTE: Might be unnecessary
 				"fieldname": "raso_receipt_no",
 				"label": "RASO Receipt No",
 				"fieldtype": "Data",
