@@ -8,12 +8,15 @@
   "field_order": [
     "general_section",
     "warehouse_name",
-    "pos_profile",
+    "debit_to_account",
+    "vat_account",
     "column_break_4",
-    "sales_tax_template",
+    "default_customer",
     "default_item",
+    "default_naming_series",
     "column_break_5",
     "deposit_package_item",
+    "use_shop_no_and_pos_no",
     "sync_status_section",
     "last_sale_import",
     "column_break_6",
@@ -27,11 +30,12 @@
     "database_password",
     "encryption",
     "sql_client_settings_section",
-    "full_sync_export_time",
+    "full_sync_time",
     "fetch_sales_interval_minutes",
-    "column_break_8",
-    "enqueue_sending_delay_seconds",
     "submit_sales_documents",
+    "column_break_8",
+    "sending_delay_minutes",
+    "send_check_interval_minutes",
     "synchronization_is_running",
     "working_hours_section",
     "working_hours_from",
@@ -39,6 +43,8 @@
     "working_hours_to",
     "item_mapping_section",
     "payment_mapping_section",
+    "add_payments_to_invoices",
+    "rounding_codes",
     "payment_mappings",
     "employee_mapping_section",
     "employee_mappings"
@@ -57,28 +63,43 @@
       "reqd": 1
     },
     {
-      "fieldname": "pos_profile",
+      "fieldname": "debit_to_account",
       "fieldtype": "Link",
-      "label": "Default POS Profile",
-      "options": "POS Profile",
-      "reqd": 0
+      "label": "Default Debit To Account",
+      "options": "Account",
+      "reqd": 1
+    },
+    {
+      "fieldname": "vat_account",
+      "fieldtype": "Link",
+      "label": "VAT account",
+      "options": "Account",
+      "description": "Please note that when importing, by using actual amount of tax, tax breakup per item table shows misleading values."
     },
     {
       "fieldname": "column_break_4",
       "fieldtype": "Column Break"
     },
     {
-      "fieldname": "sales_tax_template",
+      "fieldname": "default_customer",
       "fieldtype": "Link",
-      "label": "Sales Tax Template",
-      "options": "Sales Taxes and Charges Template"
+      "label": "Default Customer",
+      "options": "Customer",
+      "reqd": 1
     },
-        {
+    {
       "fieldname": "default_item",
       "fieldtype": "Link",
       "label": "Default Item (When Not Found)",
       "options": "Item",
       "reqd": 1
+    },
+    {
+      "fieldname": "default_naming_series",
+      "fieldtype": "Data",
+      "label": "Default Naming Series",
+      "default": "EKA-.YYYY.-",
+      "description": "Naming series for Sales Invoices created from RASO sales (e.g., EKA-.YYYY.- for EKA-2025-0001)"
     },
     {
       "fieldname": "column_break_5",
@@ -90,6 +111,13 @@
       "label": "Package Deposit Item",
       "options": "Item",
       "description": "Item used to account for package deposits in RASO. When deposit_package_count is greater than zero, this item will be used."
+    },
+    {
+      "fieldname": "use_shop_no_and_pos_no",
+      "fieldtype": "Check",
+      "label": "Use ShopNo and PosNo",
+      "default": 0,
+      "description": "If checked, receipt_no field will contain ShopNo and PosNo, used in preventing duplicate receipts."
     },
     {
       "fieldname": "sync_status_section",
@@ -164,39 +192,48 @@
     {
       "fieldname": "sql_client_settings_section",
       "fieldtype": "Section Break",
-      "label": "Synchronization Settings"
+      "label": "Synchronization Settings",
+      "description": "These settings define synchronization intervals and behavior on the <b>ERPNext side only</b>. RASO RETAIL (RR) has its own independent schedulers.<br>In other words, ERPNext sends data to the secondary RR database, and RR updates its main database within 10 (default setting) minutes. <br>RR exports new data to the secondary database every 20 (default setting) minutes, meaning if a sale is made in RR, it may take up to 20 minutes before it exported, and then an additional interval defined here before it appears in ERPNext."
     },
     {
-      "fieldname": "full_sync_export_time",
+      "fieldname": "full_sync_time",
       "fieldtype": "Time",
-      "label": "Full Sync Export Time",
-      "default": "06:30",
-      "description": "Time of night when all ERPNext item data is sent to RASO"
+      "label": "Full Sync Time",
+      "default": "06:23",
+      "description": "Time of night when full sync is performed with RASO, if set to 00:00, then full sync is turned off."
     },
     {
       "fieldname": "fetch_sales_interval_minutes",
       "fieldtype": "Int",
       "label": "Fetch Sales Interval (Minutes)",
-      "default": "15",
-      "description": "Cron job interval to fetch sales documents from RASO to ERPNext. If set to 0, then automatic fetching is turned off",
+      "default": "0",
+      "description": "Cron job interval to fetch sales documents from RASO to ERPNext. If set to 0, then automatic fetching is turned off.",
       "non_negative": 1
-    },
-    {
-      "fieldname": "column_break_8",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "enqueue_sending_delay_minutes",
-      "fieldtype": "Int",
-      "label": "Enqueue Sending Minimum Delay (Minutes)",
-      "default": "1",
-      "description": "Delay between enqueuing item sends to RASO to avoid API overload, if set to 0, then automatic sending is turned off"
     },
     {
       "fieldname": "submit_sales_documents",
       "fieldtype": "Check",
       "label": "Auto Submit Sales Documents",
       "default": 1
+    },
+    {
+      "fieldname": "column_break_8",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "sending_delay_minutes",
+      "fieldtype": "Int",
+      "label": "Enqueue Sending Minimum Delay (Minutes)",
+      "default": "1",
+      "description": "Delay between enqueuing item sends to RASO to avoid multiple records and overload, in minutes."
+    },
+    {
+      "fieldname": "send_check_interval_minutes",
+      "fieldtype": "Int",
+      "label": "Send Check Interval (Minutes)",
+      "default": "0",
+      "description": "Cron job interval to check for data to send to RASO. If set to 0, then automatic sending is turned off. If it more than 60 minutes, it will be rounded down to hourly intervals.",
+      "non_negative": 1
     },
     {
       "fieldname": "synchronization_is_running",
@@ -230,6 +267,19 @@
       "fieldname": "payment_mapping_section",
       "fieldtype": "Section Break",
       "label": "Payment Method Mapping"
+    },
+    {
+      "fieldname": "add_payments_to_invoices",
+      "fieldtype": "Check",
+      "label": "Add Payments to Invoices",
+      "default": 1,
+      "description": "If checked, payments imported from RASO will be linked to their corresponding Sales Invoices in ERPNext."
+    },
+    {
+      "fieldname": "rounding_codes",
+      "fieldtype": "Data",
+      "label": "Rounding Codes",
+      "description": "Comma-separated list of RASO payment codes that are used to indicate rounding."
     },
     {
       "fieldname": "payment_mappings",

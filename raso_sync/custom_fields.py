@@ -44,9 +44,9 @@ def create_custom_fields():
 		"Sales Invoice": [
 			{  # NOTE: Might be unnecessary
 				"fieldname": "raso_receipt_no",
-				"label": "RASO Receipt No",
+				"label": "Receipt No",
 				"fieldtype": "Data",
-				"insert_after": "title",
+				"insert_after": "paid_amount",
 				"read_only": 1,
 				"translatable": 0,
 			},

@@ -3,12 +3,12 @@
 import frappe
 from frappe.utils.background_jobs import is_job_enqueued
 
-from raso_sync.api.importer import import_raso_data
+from raso_sync.api.importer import import_data_internal
+from raso_sync.utils.working_hours import is_within_working_hours
 
 from ..db.executor import ProcedureBuilder
 
 logger = frappe.logger("raso_sync_fetch", allow_site=True, file_count=30)
-# TODO: Check the how long is it retained by default.
 # https://docs.frappe.io/framework/user/en/api/logging
 
 
@@ -44,7 +44,11 @@ def execute_fetch_task_worker(type=None):
 	Args:
 	    type: Optional filter for data type
 	"""
-	# TODO: Argument check --- not needed, we only support a single type
+	if not is_within_working_hours():
+		logger.info("Fetch Task: Skipped due to outside of working hours.")
+		return {"status": "skipped", "message": "Outside of working hours"}
+
+	# POSSIBLE TODO: Argument check --- not needed, we only support a single type
 
 	results = {"total_processed": 0, "successful": 0, "failed": 0, "errors": []}
 
@@ -54,10 +58,10 @@ def execute_fetch_task_worker(type=None):
 		results["total_processed"] = len(new_exports)
 
 		if not new_exports:
-			frappe.logger().info("Fetch Task: No new data exports to process")
+			logger.info("Fetch Task: No new data exports to process")
 			return results
 
-		frappe.logger().info(f"Fetch Task: Found {len(new_exports)} new export records to process")
+		logger.info(f"Fetch Task: Found {len(new_exports)} new export records to process")
 
 		# Process each export record
 		for export_record in new_exports:
@@ -67,11 +71,11 @@ def execute_fetch_task_worker(type=None):
 			except Exception as e:
 				results["failed"] += 1
 				results["errors"].append({"sync_id": export_record.get("SyncDataExportId"), "error": str(e)})
-				frappe.logger().error(
+				logger.error(
 					f"Fetch Task: Error processing export {export_record.get('SyncDataExportId')}: {e!s}"
 				)
 				if export_record.get("SyncData"):
-					frappe.logger().debug(export_record.get("SyncData"))
+					logger.debug(export_record.get("SyncData"))
 				ui_error_msg = f"Error processing export: {e!s}"
 				frappe.msgprint(ui_error_msg)
 				document = frappe.log_error("execute_fetch_task", ui_error_msg)
@@ -81,12 +85,12 @@ def execute_fetch_task_worker(type=None):
 					status=3,  # Error
 					message="See error log: " + document.name + " for details in ERPNext logs.",
 				)
-		frappe.logger().info(f"Fetch Task Completed. Successful: {results['successful']}")
+		logger.info(f"Fetch Task Completed. Successful: {results['successful']}")
 		if results["failed"] > 0:
-			frappe.logger().info(f"Fetch Task Completed. Failed: {results['failed']}")
+			logger.info(f"Fetch Task Completed. Failed: {results['failed']}")
 
 	except Exception as e:
-		frappe.logger().error(f"Fetch Task: Fatal error - {e!s}")
+		logger.error(f"Fetch Task: Fatal error - {e!s}")
 		raise
 
 	return results
@@ -123,7 +127,7 @@ def get_new_exports(data_type=None, data_provider=None):
 		return result if result else []
 
 	except Exception as e:
-		frappe.logger().error(f"Error retrieving new exports: {e!s}")
+		logger.error(f"Error retrieving new exports: {e!s}")
 		raise
 
 
@@ -132,7 +136,7 @@ def process_export_record(export_record):
 	Process a single export record from RASO.
 
 	1. Extract and parse SyncData
-	2. Call import_raso_data to save to ERPNext
+	2. Call import_data to save to ERPNext
 	3. Update status to 1 (success)
 
 	Args:
@@ -151,7 +155,7 @@ def process_export_record(export_record):
 	sync_data_str = export_record.get("SyncData")
 	shop_no = export_record.get("ShopNo")
 
-	frappe.logger().info(f"Processing export {sync_id} (Type: {data_type}, Shop: {shop_no})")
+	logger.info(f"Processing export {sync_id} (Type: {data_type}, Shop: {shop_no})")
 
 	# Get full SyncData from the database record
 	if sync_data_str.endswith("..."):
@@ -164,7 +168,7 @@ def process_export_record(export_record):
 		raise Exception(f"Empty SyncData for export {sync_id}")
 
 	# Import data to ERPNext
-	import_result = import_raso_data(type=data_type, xml_data=sync_data_str)
+	import_result = import_data_internal(type=data_type, xml_data=sync_data_str)
 
 	# Update status to success
 	update_export_status(
@@ -189,8 +193,6 @@ def update_export_status(sync_id, status, message=None):
 	    Exception: If database update fails
 	"""
 
-	return
-
 	try:
 		params = {
 			"SyncDataExportId": sync_id,
@@ -202,8 +204,8 @@ def update_export_status(sync_id, status, message=None):
 
 		ProcedureBuilder.execute_procedure("ie.usp_SyncDataExport_u", params)
 
-		frappe.logger().debug(f"Updated export {sync_id} status to {status}")
+		logger.debug(f"Updated export {sync_id} status to {status}")
 
 	except Exception as e:
-		frappe.logger().error(f"Error updating export status: {e!s}")
+		logger.error(f"Error updating export status: {e!s}")
 		raise

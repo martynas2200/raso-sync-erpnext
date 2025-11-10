@@ -1,5 +1,4 @@
 """Sent Task (ERPNext -> RASO)"""
-# NOTE: We rely on Redis-backed site cache via frappe.cache() for debouncing
 
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -8,10 +7,13 @@ from typing import Any
 import frappe
 from frappe.utils.background_jobs import is_job_enqueued
 
-from ..api.exporter import export_for_raso
-from ..db.executor import ProcedureBuilder
+logger = frappe.logger("raso_sync_send", allow_site=True)
 
-logger = frappe.logger("raso_sync_send", allow_site=True, file_count=30)
+from raso_sync.api.exporter import export_for_raso
+from raso_sync.raso_sync.doctype.raso_sync_settings.raso_sync_settings import RASOSyncSettings
+from raso_sync.utils.working_hours import is_within_working_hours
+
+from ..db.executor import ProcedureBuilder
 
 # Supported export data types
 RASO_TYPES = {
@@ -52,7 +54,7 @@ def _export_type_to_code(exp_t):
 
 def get_delay_minutes() -> int:
 	settings = frappe.get_single("RASO Sync Settings") or {}
-	delay_minutes = settings.get("enqueue_sending_delay_minutes") or 0
+	delay_minutes = settings.get("sending_delay_minutes") or 0
 	try:
 		delay_minutes = int(delay_minutes)
 	except Exception:
@@ -65,8 +67,8 @@ def execute_send_task(export_type=None, date_from=None):
 	Enqueue the send task to export data to RASO.
 
 	Returns:
-	    status: str: 'queued' if enqueued, 'skipped' if already running
-	    job_id: str: ID of the enqueued job
+		status: str: 'queued' if enqueued, 'skipped' if already running
+		job_id: str: ID of the enqueued job
 
 	"""
 	# Define unique job ID to prevent parallel execution
@@ -87,21 +89,23 @@ def execute_send_task(export_type=None, date_from=None):
 	return {"status": "queued", "job_id": job_id}
 
 
-def execute_send_task_on_doc_event(doc, method):
+def mark_doctype_needs_attention(doc, method):
 	"""
 	Enqueue send task triggered by document event hooks.
 
 	Args:
-	    doc (Document): The document that triggered the event
-	    method (str): The method that was called (not used here)
+		doc (Document): The document that triggered the event
+		method (str): The method that was called (not used here)
 
 	Returns:
-	    dict: Result of enqueue operation
+		dict: Result of enqueue operation
 	"""
 	# Only consider supported doctypes
 	if doc.doctype not in DOCTYPE_TO_RASO_TYPE:
 		logger.debug(f"RASO Sync: Ignoring document event for unsupported doctype: {doc.doctype}")
-		return {"status": "skipped", "reason": "unsupported doctype"}
+
+	# TODO: Check if sending is enabled
+	# NOTE: Once again, it is unnecessary since it is less intensive to create a cache mark than to avoid it by checking DB.
 
 	# Mark needs-attention entry in cache with last event and timestamp
 	key = _needs_attention_key(doc.doctype)
@@ -129,14 +133,19 @@ def process_debounced_sends():
 	- Clears processed cache marks after enqueuing.
 	"""
 	settings = () or {}
-	delay_minutes = settings.get("enqueue_sending_delay_minutes") or 0
+	delay_minutes = settings.get("sending_delay_minutes") or 0
 	try:
 		delay_minutes = int(delay_minutes)
 	except Exception:
 		delay_minutes = 0
 
-	if delay_minutes <= 0:
-		logger.debug("RASO Sync: Debounced send scheduler is disabled")
+	# NECESSARY CHECK
+	# send_check_interval_minutes > 0
+	if (
+		settings.get("send_check_interval_minutes") is None
+		or int(settings.get("send_check_interval_minutes")) <= 0
+	):
+		logger.debug("RASO Sync: Sending disabled, skipping debounced send processing")
 		return {"status": "disabled"}
 
 	now = datetime.now()
@@ -212,9 +221,13 @@ def execute_send_task_worker(export_type=None | [str] | str, date_from=None):
 	Worker function that performs the actual export and sending.
 
 	Args:
-	    export_type (str | list[str] | None): Type(s) of data to export, or None for all types
-	    date_from (str, optional): Start date filter (YYYY-MM-DD format)
+		export_type (str | list[str] | None): Type(s) of data to export, or None for all types
+		date_from (str, optional): Start date filter (YYYY-MM-DD format)
 	"""
+	if not is_within_working_hours():
+		logger.info("Send Task: Skipped due to outside of working hours.")
+		return {"status": "skipped", "message": "Outside of working hours"}
+
 	# TODO: Argument check ---
 	results = {
 		"total_exported": 0,
@@ -301,16 +314,16 @@ def export_and_send_type(export_type, date_from=None):
 	Export a single data type from ERPNext and send to RASO.
 
 	Args:
-	    export_type (str): Type of data to export RASO_TYPE
-	    date_from (str, optional): Start date filter
+		export_type (str): Type of data to export RASO_TYPE
+		date_from (str, optional): Start date filter
 
 	Returns:
-	    dict: Export result with keys:
-	        - count: Number of records exported
-	        - sync_import_id: ID returned from RASO database
+		dict: Export result with keys:
+			- count: Number of records exported
+			- sync_import_id: ID returned from RASO database
 
 	Raises:
-	    Exception: If export or send fails
+		Exception: If export or send fails
 	"""
 	# Parse and validate export_type argument
 	if isinstance(export_type, str):
@@ -351,15 +364,15 @@ def insert_to_raso(data_type, sync_data, data_provider=None):
 	Records are inserted with Status = 0 ("New Data").
 
 	Args:
-	    data_type (int): Data type identifier
-	    sync_data (str): Data payload
-	    data_provider (str, optional): Data provider name (defaults from settings)
+		data_type (int): Data type identifier
+		sync_data (str): Data payload
+		data_provider (str, optional): Data provider name (defaults from settings)
 
 	Returns:
-	    int: SyncDataImportId of the newly created record
+		int: SyncDataImportId of the newly created record
 
 	Raises:
-	    Exception: If database insert fails
+		Exception: If database insert fails
 	"""
 	try:
 		params = {

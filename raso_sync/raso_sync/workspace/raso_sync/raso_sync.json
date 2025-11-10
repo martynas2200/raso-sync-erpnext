@@ -1,7 +1,7 @@
 {
  "app": "raso_sync",
  "charts": [],
- "content": "[{\"id\":\"raso_overview\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RASO Sync Overview\",\"col\":6}},{\"id\":\"raso_settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RASO Sync Settings\",\"col\":6}},{\"id\":\"spacer1\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"main_card\",\"type\":\"card\",\"data\":{\"card_name\":\"RASO Sync\",\"col\":12}}]",
+ "content": "[{\"id\":\"raso_overview\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RASO Sync Overview\",\"col\":12}},{\"id\":\"raso_settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"RASO Sync Settings\",\"col\":12}},{\"id\":\"spacer1\",\"type\":\"spacer\",\"data\":{\"col\":12}}]",
  "creation": "2025-11-01 10:00:00",
  "custom_blocks": [],
  "docstatus": 0,
@@ -11,16 +11,8 @@
  "icon": "branch",
  "idx": 0,
  "is_hidden": 0,
- "label": "RASO Sync",
+ "label": "RASO",
  "links": [
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "RASO Sync",
-   "link_count": 0,
-   "onboard": 0,
-   "type": "Card Break"
-  },
   {
    "dependencies": "",
    "hidden": 0,
@@ -44,7 +36,7 @@
    "type": "Link"
   }
  ],
- "modified": "2025-11-02 18:58:53.919711",
+ "modified": "2025-11-07 12:05:34.372939",
  "modified_by": "Administrator",
  "module": "Raso Sync",
  "name": "RASO Sync",

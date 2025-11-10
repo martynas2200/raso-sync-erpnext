@@ -1,6 +1,6 @@
 {
   "name": "raso_sync",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "RASO POS System Sync API for ERPNext",
   "main": "raso_sync/public/js/raso_sync.js",
   "scripts": {

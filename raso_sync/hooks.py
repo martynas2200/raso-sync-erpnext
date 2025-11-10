@@ -138,15 +138,29 @@ after_migrate = "raso_sync.custom_fields.create_custom_fields"
 
 # Document Events
 # ---------------
-# Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"Item": {
+		"after_insert": "raso_sync.tasks.send.mark_doctype_needs_attention",
+		"after_update": "raso_sync.tasks.send.mark_doctype_needs_attention",
+		"after_delete": "raso_sync.tasks.send.mark_doctype_needs_attention",
+	},
+	"Item Price": {
+		"after_insert": "raso_sync.tasks.send.mark_doctype_needs_attention",
+		"after_update": "raso_sync.tasks.send.mark_doctype_needs_attention",
+		"after_delete": "raso_sync.tasks.send.mark_doctype_needs_attention",
+	},
+	"Item Group": {
+		"after_insert": "raso_sync.tasks.send.mark_doctype_needs_attention",
+		"after_update": "raso_sync.tasks.send.mark_doctype_needs_attention",
+		"after_delete": "raso_sync.tasks.send.mark_doctype_needs_attention",
+	},
+	"Customer": {
+		"after_insert": "raso_sync.tasks.send.mark_doctype_needs_attention",
+		"after_update": "raso_sync.tasks.send.mark_doctype_needs_attention",
+		"after_delete": "raso_sync.tasks.send.mark_doctype_needs_attention",
+	},
+}
 
 # Scheduled Tasks
 # ---------------

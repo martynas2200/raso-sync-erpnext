@@ -53,6 +53,7 @@ class MSSQLConnection:
 				port=self.port,
 				encryption=self.encryption,
 				as_dict=True,  # Return results as dictionaries
+				autocommit=True,
 				timeout=30,
 			)
 			self._is_connected = True

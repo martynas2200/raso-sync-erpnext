@@ -3,7 +3,7 @@ from datetime import datetime
 
 import frappe
 from frappe import _
-from frappe.utils.background_jobs import is_job_enqueued
+from frappe.utils.background_jobs import get_job_status, is_job_enqueued
 
 from ..db.connection import MSSQLConnectionManager
 
@@ -23,10 +23,8 @@ def test_connection():
 			return {"success": False, "error": _("Database connection settings are incomplete")}
 
 		try:
-			# Get connection (this automatically connects)
 			connection = MSSQLConnectionManager.get_connection()
 
-			# Test the connection by executing a simple query
 			with connection.cursor() as cursor:
 				cursor.execute("SELECT 1")
 				cursor.fetchone()
@@ -142,3 +140,21 @@ def manual_fetch(data_type):
 			f"Manual fetch failed: {str(e) if str(e) else 'Unknown error'}", "RASO Sync Manual Fetch"
 		)
 		return {"success": False, "error": _("The enqueue failed: {0}").format(str(e) if str(e) else "")}
+
+
+@frappe.whitelist()
+def get_scheduler_status():
+	"""
+	Get the status of fetch and send schedulers
+	"""
+	fetch_enqueued = is_job_enqueued("raso_sync_fetch_task_worker")
+	send_enqueued = is_job_enqueued("raso_sync_send_task_worker")
+	send = get_job_status("raso_sync_send_task_worker")
+	fetch = get_job_status("raso_sync_fetch_task_worker")
+
+	return {
+		"fetch_scheduler_enqueued": fetch_enqueued,
+		"send_scheduler_enqueued": send_enqueued,
+		"send_scheduler_status": send,
+		"fetch_scheduler_status": fetch,
+	}

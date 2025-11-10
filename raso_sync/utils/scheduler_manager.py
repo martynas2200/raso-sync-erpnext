@@ -24,13 +24,9 @@ def cron_format_every_n_minutes(n):
 	else:
 		hours = n // 60
 		minutes = n % 60
-
-		if minutes == 0:
-			return f"0 */{hours} * * *"
-		else:
-			# Approximate: run every N hours at a specific minute
-			# NOTE: not perfect here.
-			return f"{minutes} */{hours} * * *"
+		# Approximate: run every N hours
+		# NOTE: not perfect here.
+		return f"{minutes} */{hours} * * *"
 
 
 def create_or_update_scheduled_job(job_name, method, interval, description, enabled=True):

@@ -15,10 +15,17 @@ msgstr ""
 msgid "Raso Sync"
 msgstr "RASO sinchronizacija"
 
+msgid "Save"
+msgstr "Išsaugoti"
+
+msgid "Open Settings"
+msgstr "Atidaryti nustatymus"
+
+msgid "RASO Sync Overview"
+msgstr "RASO sinchronizacijos apžvalga"
+
 msgid "Manage and monitor RASO Sync status from this overview page."
 msgstr "Tvarkykite ir stebėkite RASO sinchronizacijos būseną šiame puslapyje."
-
-# API Messages
 
 msgid "Database connection settings are incomplete"
 msgstr "Duomenų bazės prisijungimo nustatymai neišsamūs"
@@ -47,7 +54,6 @@ msgstr "Rankinis gavimas nepavyko: {0}"
 msgid "Unknown data type: {0}"
 msgstr "Nežinomas duomenų tipas: {0}"
 
-# DocType Labels - RASO Sync Settings
 msgid "RASO Sync Settings"
 msgstr "RASO sinchronizacijos nustatymai"
 
@@ -57,20 +63,39 @@ msgstr "Apskaitos nustatymai"
 msgid "Warehouse"
 msgstr "Sandėlis"
 
-msgid "Default POS Profile"
-msgstr "Numatytasis POS profilis"
+msgid "Default Customer"
+msgstr "Numatytasis Klientas"
 
-msgid "Sales Tax Template"
-msgstr "Pardavimų mokesčių šablonas"
+msgid "VAT account"
+msgstr "PVM kor. sąskaita"
+
+msgid "Default Debit To Account"
+msgstr "Numatyta debeto kor. sąskaita"
+
+msgid "Please note that when importing, by using actual amount of tax, tax breakup per item table shows misleading values."
+msgstr "Atkreipkite dėmesį, kad importuojant naudojant faktinę mokesčio sumą, mokesčių pasiskirstymo pagal prekę lentelė rodo klaidinančias reikšmes."
 
 msgid "Default Item (When Not Found)"
 msgstr "Numatytasis prekės kodas (kai nerastas)"
+
+msgid "Default Naming Series"
+msgstr "Numatytasis pavadinimų serijos kodas"
+
+msgid "Naming series for Sales Invoices created from RASO sales (e.g., EKA-.YYYY.- for EKA-2025-0001)"
+msgstr "Pavadinimų serija pardavimų sąskaitoms, sukurtoms iš RASO pardavimų (pvz., EKA-.YYYY.- skirtas EKA-2025-0001)"
 
 msgid "Package Deposit Item"
 msgstr "Pakuotės užstato prekė"
 
 msgid "Item used to account for package deposits in RASO. When deposit_package_count is greater than zero, this item will be used."
 msgstr "Prekė naudojama pakuočių užstatams RASO sistemoje apskaityti. Kai deposit_package_count yra didesnis už nulį, bus naudojama ši prekė."
+
+msgid "Use ShopNo and PosNo"
+msgstr "Naudoti Parduotuvės numerį ir POS numerį"
+
+msgid "If checked, receipt_no field will contain ShopNo and PosNo, used in preventing duplicate receipts."
+msgstr "Jei pažymėta, receipt_no laukas turės Parduotuvės numerį ir POS numerį, naudojamus siekiant išvengti pasikartojančių kvitų."
+
 
 msgid "Sync Status"
 msgstr "Sinchronizacijos būsena"
@@ -111,28 +136,34 @@ msgstr "Šifravimo režimas duomenų bazės prisijungimui (off: išjungta, reque
 msgid "Synchronization Settings"
 msgstr "Sinchronizacijos nustatymai"
 
-msgid "Full Sync Export Time"
-msgstr "Pilno sinchronizavimo eksporto laikas"
+msgid "Full Sync Time"
+msgstr "Pilno sinchronizavimo laikas"
 
-msgid "Time of night when all ERPNext item data is sent to RASO"
-msgstr "Nakties laikas, kada visi ERPNext prekių duomenys siunčiami į RASO"
+msgid "Time of night when full sync is performed with RASO, if set to 00:00, then full sync is turned off."
+msgstr "Nakties laikas, kada pilnas sinchronizavimas vykdomas su RASO, jei nustatytas 00:00, tada pilnas sinchronizavimas yra išjungtas."
 
 msgid "Fetch Sales Interval (Minutes)"
 msgstr "Pardavimų gavimo intervalas (minutės)"
 
-msgid "Cron job interval to fetch sales documents from RASO to ERPNext"
-msgstr "Cron užduoties intervalas pardavimų dokumentų gavimui iš RASO į ERPNext"
+msgid "Cron job interval to fetch sales documents from RASO to ERPNext. If set to 0, then automatic fetching is turned off."
+msgstr "Cron užduoties intervalas pardavimų dokumentų gavimui iš RASO į ERPNext. Jei nustatytas 0, automatinis gavimas bus išjungtas."
 
-msgid "Enqueue Sending Delay (Seconds)"
-msgstr "Siuntimo į eilę vėlavimas (sekundės)"
+msgid "Cron job interval to check for data to send to RASO. If set to 0, then automatic sending is turned off. If it more than 60 minutes, it will be rounded down to hourly intervals."
+msgstr "Cron užduoties intervalas duomenų tikrinimui, kurie turi būti siunčiami į RASO. Jei nustatytas 0, automatinis siuntimas bus išjungtas. Jei jis viršija 60 minučių, jis bus suapvalintas iki valandinių intervalų."
 
-msgid "Delay between enqueuing item sends to RASO to avoid API overload"
-msgstr "Vėlavimas tarp prekių siuntimo į RASO eilę, siekiant išvengti API perkrovos"
+msgid "Send Check Interval (Minutes)"
+msgstr "Siuntimų tikrinimo intervalas (minutės)"
+
+msgid "Enqueue Sending Minimum Delay (Minutes)"
+msgstr "Minimalaus siuntimo į eilę vėlavimas (minutės)"
+
+msgid "Delay between enqueuing item sends to RASO to avoid multiple records and overload, in minutes."
+msgstr "Vėlavimas tarp prekių siuntimo į RASO eilę, siekiant išvengti kelių įrašų ir perkrovos, minutėmis."
 
 msgid "Auto Submit Sales Documents"
-msgstr "Automatiškai pateikti pardavimų dokumentus"
+msgstr "Automatiškai patvirtinti pardavimų dokumentus"
 
-msgid "Synchronization is running"
+msgid "Synchronization is Running"
 msgstr "Sinchronizacija vykdoma"
 
 msgid "System flag indicating if synchronization is currently in progress"
@@ -156,8 +187,23 @@ msgstr "Pabaigos laikas pardavimų dokumentų gavimo sustabdymui, kai baigiasi d
 msgid "Payment Method Mapping"
 msgstr "Mokėjimo metodų siejimas"
 
+msgid "Add Payments to Invoices"
+msgstr "Pridėti mokėjimus prie sąskaitų faktūrų"
+
+msgid "If checked, payments imported from RASO will be linked to their corresponding Sales Invoices in ERPNext."
+msgstr "Jei pažymėta, iš RASO importuoti mokėjimai bus susieti su atitinkamomis pardavimų sąskaitomis faktūromis ERPNext."
+
 msgid "Payment Mappings"
 msgstr "Mokėjimų siejimai"
+
+msgid "Rounding Codes"
+msgstr "Suapvalinimo kodai"
+
+msgid "Comma-separated list of RASO payment codes that are used to indicate rounding."
+msgstr "Kableliais atskirtas RASO mokėjimo kodų sąrašas, kuris naudojamas suapvalinimui nurodyti."
+
+msgid "Disable Rounding"
+msgstr "Išjungti suapvalinimą"
 
 msgid "Employee to Sales Person Mapping"
 msgstr "Darbuotojų ir pardavėjų siejimas"
@@ -181,6 +227,9 @@ msgstr "Sinchronizacija neaktyvi"
 msgid "Synchronization is currently running"
 msgstr "Sinchronizacija šiuo metu vykdoma"
 
+msgid "System Actions"
+msgstr "Sistemos veiksmai"
+
 msgid "Refresh Status"
 msgstr "Atnaujinti būseną"
 
@@ -201,6 +250,9 @@ msgstr "Prekės (Items)"
 
 msgid "Good Prices"
 msgstr "Prekių kainos"
+
+msgid "Good Groups"
+msgstr "Prekių grupės"
 
 msgid "Customers"
 msgstr "Klientai"
@@ -280,3 +332,33 @@ msgstr "Sistemos administratorius"
 
 msgid "Loading..."
 msgstr "Kraunama..."
+
+msgid "RASO Employee Code"
+msgstr "RASO darbuotojo kodas"
+
+msgid "RASO Employee Name"
+msgstr "RASO darbuotojo vardas"
+
+msgid "Sales Person"
+msgstr "Pardavėjas"
+
+msgid "No."
+msgstr "Nr."
+
+msgid "RASO Payment Code"
+msgstr "RASO mokėjimo kodas"
+
+msgid "RASO Payment Description"
+msgstr "RASO mokėjimo aprašymas"
+
+msgid "Frappe Payment Method"
+msgstr "Frappe mokėjimo metodas"
+
+msgid "Add Row"
+msgstr "Pridėti eilutę"
+
+msgid "Delete"
+msgstr "Ištrinti"
+
+msgid "Duplicate row"
+msgstr "Dublikuoti eilutę"

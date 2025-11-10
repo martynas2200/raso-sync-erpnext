@@ -1,6 +1,3 @@
-# raso-sync in development
-
-**This application is currently under development and is not yet used**
 
 A custom Frappe app that enables ERPNext integration with the RASO RETAIL POS system.
 It also provides XML API endpoints to use a custom client to sync data from RASO POS system.
@@ -16,14 +13,19 @@ It also provides XML API endpoints to use a custom client to sync data from RASO
 
 ## Installation
 
+1. Make sure the environment has pymssql installed, if it is production environment, it is highly recommended to use custom docker image. More  [Frappe Docker documentation](https://github.com/frappe/frappe_docker/blob/main/docs/container-setup/02-build-setup.md).
+2. Scheduler must be enabled in Frappe/ERPNext to run background jobs.
+
+### Bench Commands for local development
+<!-- TODO: Make sure that setup.py is configured correctly -->
 1. Install the app `bench get-app <repository-url>`
 2. Enable scheduler: `bench config set-common-config --key enable_scheduler --value true`
 
 ## Pages
 
-`/app/raso-sync` - RASO Sync Home (workspace, only shortcuts)
-`/app/raso-sync-overview` - RASO Sync Dashboard
-`/app/raso-sync-settings` - RASO Sync Settings document
+- `/app/raso-sync` - RASO Sync Home (workspace, only shortcuts)
+- `/app/raso-sync-overview` - RASO Sync Dashboard
+- `/app/raso-sync-settings` - RASO Sync Settings document
 
 ## Background Jobs & Task Logs
 
@@ -35,10 +37,10 @@ It also provides XML API endpoints to use a custom client to sync data from RASO
 ### Scheduler
 
 - Fetch Task (`raso_sync_fetch_task_worker` at `raso_sync.tasks.fetch.execute_fetch_task_worker`): runs every x minutes, configured by `fetch_interval_minutes` setting
-- Cache Task (`raso_sync_send_debounced` at `raso_sync.tasks.send.process_debounced_sends`): variable interval based on `enqueue_sending_delay_minutes` setting
-- If hooks are enabled (`enqueue_sending_delay_minutes > 0`),
+<!-- - Cache Task (`raso_sync_send_debounced` at `raso_sync.tasks.send.process_debounced_sends`): variable interval based on `sending_delay_minutes` setting
+- If hooks are enabled (`sending_delay_minutes > 0`),
   - each time a relevant document is saved, a cache mark is created
-  - periodically, a Cache Task will processes marks, and based on delay, will schedule `raso_sync_send_task_worker` task.
+  - periodically, a Cache Task will processes marks, and based on delay, will schedule `raso_sync_send_task_worker` task. -->
 <!-- ### Viewing Job Logs
 1. Go to Frappe Desk -> Tools -> Background Jobs
 2. Look for jobs `raso_sync.tasks.fetch.execute` or `raso_sync.tasks.send.execute` -->
@@ -65,7 +67,7 @@ It also provides XML API endpoints to use a custom client to sync data from RASO
 
 ### Importing to ERPNext
 
-**URL**: `/api/method/raso_sync.api.importer.import_raso_data`
+**URL**: `/api/method/raso_sync.api.importer.import_data`
 **Method**: POST
 **Content-Type**: application/xml
 **Request Body**: XML data in SalesSync format
@@ -74,7 +76,6 @@ It also provides XML API endpoints to use a custom client to sync data from RASO
 <!-- TODO: DECIDE Response status is crucial here
 
 
-- Sales invoices are created with title "EKA" + ReceiptNo
 - Items are matched by VCODE if it starts with 'P', otherwise by barcode (CODE field)
 - Regular quantities/amounts use QTY and AMOUNT fields
 - Manual quantities/amounts (QTYMANUAL, AMOUNTMANUAL) are used when provided

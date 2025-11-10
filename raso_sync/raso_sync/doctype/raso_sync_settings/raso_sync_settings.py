@@ -23,8 +23,8 @@ class RASOSyncSettings(Document):
 		Update scheduler jobs when settings are saved
 		"""
 		self.update_fetch_scheduler()
-		self.update_send_hooks()
 		self.update_send_scheduler()
+		# TODO: set up a scheduler for full sync
 
 	@staticmethod
 	def get_settings():
@@ -59,7 +59,7 @@ class RASOSyncSettings(Document):
 		settings.save(ignore_permissions=True)
 
 	@staticmethod
-	def get_payment_method_mapping(payment_code):
+	def get_payment_method_mapping(payment_code: str):
 		"""
 		Get the Frappe payment method for a RASO payment code
 		"""
@@ -68,7 +68,7 @@ class RASOSyncSettings(Document):
 		# Check if there's a custom mapping
 		for mapping in settings.payment_mappings:
 			if mapping.raso_payment_code == payment_code:
-				return mapping.frappe_payment_method
+				return mapping
 
 		frappe.log_error("Missing payment mapping", f"RASO payment code: {payment_code}")
 
@@ -84,16 +84,14 @@ class RASOSyncSettings(Document):
 		frappe_payment_methods = [pm.name for pm in frappe.get_all("Payment Method")]
 		if frappe_payment_methods:
 			if default_payment_method in frappe_payment_methods:
-				return default_payment_method
+				return {"frappe_payment_method": default_payment_method}
 			else:
 				frappe.log_error(
 					"Fallback failed - missing Payment Method",
 					f"Payment Method '{default_payment_method}' for RASO code '{payment_code}' is missing. Using first available payment method.",
 				)
-				return frappe_payment_methods[0]
-		else:
-			frappe.log_error("No payment methods found in the system", "Returning 'Other' as fallback")
-			return "Other"
+				return {"frappe_payment_method": frappe_payment_methods[0]}
+		return None
 
 	@staticmethod
 	def get_sales_person_from_employee(employee_code):
@@ -129,48 +127,23 @@ class RASOSyncSettings(Document):
 			if disable_scheduled_job(job_name):
 				frappe.logger().info("Disabled fetch scheduler")
 
-	def update_send_hooks(self):
-		"""
-		Setup or remove document event hooks on Item, Item Price, Item Group, and Customer.
-		If enqueue_sending_delay_minutes is 0, disables the hooks on these doctypes.
-		Otherwise, enables the hooks to trigger sending to RASO.
-		"""
-
-		doctypes_to_hook = ["Item", "Item Price", "Item Group", "Customer"]
-
-		if self.enqueue_sending_delay_minutes and self.enqueue_sending_delay_minutes > 0:
-			for doctype in doctypes_to_hook:
-				# Use debounced marking handler; actual enqueue will be scheduled
-				send_method = "raso_sync.tasks.send.execute_send_task_on_doc_event"
-				self.setup_doc_event_hook(doctype, send_method)
-			# frappe.logger().info(f"Send hooks enabled with delay: {self.enqueue_sending_delay_minutes} minutes")
-		else:
-			# Disable hooks
-			for doctype in doctypes_to_hook:
-				self.remove_doc_event_hook(doctype)
-			frappe.logger().info("Send hooks disabled")
-
 	def update_send_scheduler(self):
 		"""
 		Create or update the scheduler that processes debounced send events.
-		Runs every 5 minutes when enqueue_sending_delay_minutes > 0.
 		"""
 		job_name = "raso_sync_send_debounced"
 		method = "raso_sync.tasks.send.process_debounced_sends"
 
-		if self.enqueue_sending_delay_minutes and self.enqueue_sending_delay_minutes > 0:
+		if self.send_check_interval_minutes and self.send_check_interval_minutes > 0:
 			result = create_or_update_scheduled_job(
 				job_name=job_name,
 				method=method,
-				interval=5
-				if self.enqueue_sending_delay_minutes <= 5
-				else 5 + int(self.enqueue_sending_delay_minutes * 0.3),
-				# NOTE: The formula above is a random one, need to think on it.
+				interval=self.send_check_interval_minutes,
 				description="Process debounced send events for RASO export",
 				enabled=True,
 			)
 			frappe.logger().info(
-				f"Send scheduler {result['status']}: every 5 minutes (debounce delay {self.enqueue_sending_delay_minutes}m)"
+				f"Send scheduler {result['status']}: every {self.send_check_interval_minutes}m (debounce delay {self.sending_delay_minutes}m)"
 			)
 		else:
 			if disable_scheduled_job(job_name):
