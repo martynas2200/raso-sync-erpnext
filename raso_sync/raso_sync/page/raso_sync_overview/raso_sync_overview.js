@@ -12,7 +12,13 @@ frappe.pages["raso-sync-overview"].on_page_load = function (wrapper) {
 
     $(frappe.render_template("raso_sync_overview")).appendTo(page.main);
 
-    frappe.raso_sync_overview && frappe.raso_sync_overview.setup(page);
+    if (frappe.raso_sync_overview) {
+        frappe.raso_sync_overview.setup(page);
+        // Ensure interval cleanup when page is unloaded (navigated away)
+        $(wrapper).on("remove", function () {
+            frappe.raso_sync_overview.cleanup && frappe.raso_sync_overview.cleanup();
+        });
+    }
 
     page.set_primary_action("Open Settings", () => {
         frappe.set_route("Form", "RASO Sync Settings");
@@ -24,8 +30,20 @@ frappe.raso_sync_overview = {
         this.page = page;
         this.load_settings();
         this.attach_event_handlers();
-        setInterval(() => this.load_settings(false), 10000); // Refresh every 10 seconds
-        // NOTE: implement real-time updates using websockets for efficiency
+        // Clear existing interval if setup re-runs for any reason
+        if (this.refresh_interval) {
+            clearInterval(this.refresh_interval);
+        }
+        this.refresh_interval = setInterval(() => {
+            this.load_settings(false);
+        }, 10000);
+    },
+
+    cleanup: function () {
+        if (this.refresh_interval) {
+            clearInterval(this.refresh_interval);
+            this.refresh_interval = null;
+        }
     },
 
     load_settings: function (notification = true) {
@@ -56,9 +74,16 @@ frappe.raso_sync_overview = {
         var me = this;
 
         // System Actions
-        $("#refresh-btn").on("click", () => me.load_settings());
+        $("#refresh-btn").on("click", () => {
+            me.load_settings();
+        });
         $("#test-connection-btn").on("click", () => me.test_connection());
         $("#check-logs-btn").on("click", () => me.check_logs());
+        $("#open-scheduled-jobs-btn").on("click", function () {
+            frappe.set_route("List", "Scheduled Job Type", {
+                method: ["like", "%raso%"],
+            });
+        });
 
         // Upload Actions
         $("#upload-btn").on("click", function () {

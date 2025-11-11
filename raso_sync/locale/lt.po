@@ -33,6 +33,9 @@ msgstr "Duomenų bazės prisijungimo nustatymai neišsamūs"
 msgid "Connection successful"
 msgstr "Prisijungimas sėkmingas"
 
+msgid "Failed to connect to RASO database: {0}"
+msgstr "Nepavyko prisijungti prie RASO duomenų bazės: {0}"
+
 msgid "Connection test failed: {0}"
 msgstr "Prisijungimo testas nepavyko: {0}"
 
@@ -187,8 +190,8 @@ msgstr "Pabaigos laikas pardavimų dokumentų gavimo sustabdymui, kai baigiasi d
 msgid "Payment Method Mapping"
 msgstr "Mokėjimo metodų siejimas"
 
-msgid "Add Payments to Invoices"
-msgstr "Pridėti mokėjimus prie sąskaitų faktūrų"
+msgid "Add Payments to Imported Records"
+msgstr "Pridėti mokėjimus prie importuotų įrašų"
 
 msgid "If checked, payments imported from RASO will be linked to their corresponding Sales Invoices in ERPNext."
 msgstr "Jei pažymėta, iš RASO importuoti mokėjimai bus susieti su atitinkamomis pardavimų sąskaitomis faktūromis ERPNext."
@@ -238,6 +241,9 @@ msgstr "Testuoti prisijungimą"
 
 msgid "Check Logs"
 msgstr "Tikrinti žurnalus"
+
+msgid "Scheduled jobs"
+msgstr "Suplanuotos užduotys"
 
 msgid "Upload Data"
 msgstr "Įkelti duomenis"

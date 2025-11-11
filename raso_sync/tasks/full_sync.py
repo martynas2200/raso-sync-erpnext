@@ -37,8 +37,8 @@ def execute_full_sync_task_worker():
 	"""
 	NEEDS TO BE ENQUEUED WITH JOB-ID: raso_sync_full_sync_task_worker
 
-	Worker function that performs the full sync fetching and importing.
-	Task list (just recreating what I see in logs of previous integration, seems like an overkill to me, but no documentation, perhaps there is a reason for that, like deleted records):
+	Worker function that performs the full sync importing and fetching.
+	Task list (just recreating what I see in logs of previous integration, seems like an overkill to me, but no documentation, perhaps there is a reason for that, like deleted records, each send sends full data set):
 	    1. Send: Partners
 	    2. Send: Partners (FullSync)
 	    3. Send: GoodsGroups

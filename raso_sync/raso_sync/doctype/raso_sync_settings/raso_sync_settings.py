@@ -22,9 +22,25 @@ class RASOSyncSettings(Document):
 		"""
 		Update scheduler jobs when settings are saved
 		"""
-		self.update_fetch_scheduler()
-		self.update_send_scheduler()
-		# TODO: set up a scheduler for full sync
+		self.update_scheduler(
+			interval_field="fetch_sales_interval_minutes",
+			method="raso_sync.tasks.fetch.execute_fetch_task",
+			description="Fetch sales documents from RASO to ERPNext",
+			name="fetch",
+		)
+		self.update_scheduler(
+			interval_field="send_check_interval_minutes",
+			method="raso_sync.tasks.send.process_debounced_sends",
+			description="Process debounced send events for RASO export",
+			name="send",
+		)
+		self.update_scheduler(
+			interval_field="",
+			cron_field="full_sync_time",
+			method="raso_sync.tasks.full_sync.execute_full_sync_task",
+			description="Execute full sync from RASO to ERPNext",
+			name="full_sync",
+		)
 
 	@staticmethod
 	def get_settings():
@@ -106,76 +122,30 @@ class RASOSyncSettings(Document):
 
 		return None
 
-	def update_fetch_scheduler(self):
+	def update_scheduler(
+		self, interval_field: str, method: str, description: str, name: str, cron_field: str | None
+	):
 		"""
-		Create or update the scheduler for fetching sales from RASO.
-		If fetch_sales_interval_minutes is 0, disables the scheduler.
-		"""
-		job_name = "raso_sync_fetch_sales"
-		method = "raso_sync.tasks.fetch.execute_fetch_task"
-
-		if self.fetch_sales_interval_minutes and self.fetch_sales_interval_minutes > 0:
-			result = create_or_update_scheduled_job(
-				job_name=job_name,
-				method=method,
-				interval=self.fetch_sales_interval_minutes,
-				description="Fetch sales documents from RASO to ERPNext",
-				enabled=True,
-			)
-			frappe.logger().info(f"Fetch scheduler {result['status']}: {self.fetch_sales_interval_minutes}")
-		else:
-			if disable_scheduled_job(job_name):
-				frappe.logger().info("Disabled fetch scheduler")
-
-	def update_send_scheduler(self):
-		"""
-		Create or update the scheduler that processes debounced send events.
-		"""
-		job_name = "raso_sync_send_debounced"
-		method = "raso_sync.tasks.send.process_debounced_sends"
-
-		if self.send_check_interval_minutes and self.send_check_interval_minutes > 0:
-			result = create_or_update_scheduled_job(
-				job_name=job_name,
-				method=method,
-				interval=self.send_check_interval_minutes,
-				description="Process debounced send events for RASO export",
-				enabled=True,
-			)
-			frappe.logger().info(
-				f"Send scheduler {result['status']}: every {self.send_check_interval_minutes}m (debounce delay {self.sending_delay_minutes}m)"
-			)
-		else:
-			if disable_scheduled_job(job_name):
-				frappe.logger().info("Disabled send scheduler")
-
-	def setup_doc_event_hook(self, doctype, method):
-		"""
-		Setup document event hooks for after_insert, after_update, and after_delete events.
+		Create or update a scheduler job.
+		If the interval is 0 or None, disables the scheduler.
 
 		Args:
-		    doctype (str): DocType name
-		    method (str): Method path to call on the events
+			interval_field: Name of the field containing the interval in minutes
+			method: The method to be called by the scheduler
+			description: Description of the scheduler job
+			name: Human-readable name for logging purposes
 		"""
-		events = ["after_insert", "after_update", "after_delete"]
-		for event in events:
-			hook_name = f"raso_sync_{doctype.lower().replace(' ', '_')}_{event}"
-			if not frappe.db.exists("Document Event Hook", hook_name):
-				hook = frappe.new_doc("Document Event Hook")
-				hook.update(
-					{"name": hook_name, "doctype": doctype, "event": event, "method": method, "enabled": 1}
-				)
-				hook.insert(ignore_permissions=True)
+		interval = getattr(self, interval_field, None)
 
-	def remove_doc_event_hook(self, doctype):
-		"""
-		Remove document event hooks for a doctype.
-
-		Args:
-		    doctype (str): DocType name
-		"""
-		events = ["after_insert", "after_update", "after_delete"]
-		for event in events:
-			hook_name = f"raso_sync_{doctype.lower().replace(' ', '_')}_{event}"
-			if frappe.db.exists("Document Event Hook", hook_name):
-				frappe.delete_doc("Document Event Hook", hook_name, ignore_permissions=True)
+		if interval and interval > 0:
+			result = create_or_update_scheduled_job(
+				method=method,
+				interval=interval,
+				description=description,
+				enabled=True,
+				cron_format=getattr(self, cron_field, None),
+			)
+			frappe.logger().info(f"{name.capitalize()} scheduler {result['status']}: {interval} minutes")
+		else:
+			if disable_scheduled_job(method):
+				frappe.logger().info(f"Disabled {name} scheduler")

@@ -1,5 +1,7 @@
 """Sent Task (ERPNext -> RASO)"""
 
+import logging
+import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -7,7 +9,10 @@ from typing import Any
 import frappe
 from frappe.utils.background_jobs import is_job_enqueued
 
-logger = frappe.logger("raso_sync_send", allow_site=True)
+from . import MsgprintHandler
+
+logger = frappe.logger("raso_sync_send")
+logger.setLevel("DEBUG")
 
 from raso_sync.api.exporter import export_for_raso
 from raso_sync.raso_sync.doctype.raso_sync_settings.raso_sync_settings import RASOSyncSettings
@@ -214,7 +219,11 @@ def process_debounced_sends():
 	return {"status": result.get("status") if isinstance(result, dict) else "unknown", "result": result}
 
 
-def execute_send_task_worker(export_type=None | [str] | str, date_from=None):
+def execute_send_task_worker(
+	export_type: str | list[str] | None = None,
+	date_from: str | None = None,
+	inform_user: bool = False,
+):
 	"""
 	NEEDS TO BE ENQUEUED WITH JOB-ID: raso_sync_send_task_worker
 
@@ -224,21 +233,28 @@ def execute_send_task_worker(export_type=None | [str] | str, date_from=None):
 		export_type (str | list[str] | None): Type(s) of data to export, or None for all types
 		date_from (str, optional): Start date filter (YYYY-MM-DD format)
 	"""
+	msgprint_handler = None
+	if inform_user:
+		msgprint_handler = MsgprintHandler()
+		msgprint_handler.setLevel(logging.INFO)
+		logger.addHandler(msgprint_handler)
+
 	if not is_within_working_hours():
 		logger.info("Send Task: Skipped due to outside of working hours.")
-		return {"status": "skipped", "message": "Outside of working hours"}
+		return
 
 	# TODO: Argument check ---
 	results = {
 		"total_exported": 0,
 		"types_processed": [],
 		"failed": 0,
+		"successful": 0,
 		"errors": [],
 	}
 
 	try:
 		# Read debounce delay to decide whether to clean cache at the end
-		delay_minutes = get_delay_minutes
+		delay_minutes = get_delay_minutes()
 		now = datetime.now()
 
 		if export_type is None or export_type == "all":
@@ -267,6 +283,7 @@ def execute_send_task_worker(export_type=None | [str] | str, date_from=None):
 
 				results["types_processed"].append(exp_type)
 				results["total_exported"] += type_result.get("count", 0)
+				results["successful"] += 1
 
 			except Exception as e:
 				results["failed"] += 1
@@ -275,8 +292,12 @@ def execute_send_task_worker(export_type=None | [str] | str, date_from=None):
 				logger.error(f"Sent Task: Error exporting {exp_type}: {error_msg}")
 
 		logger.info(
-			f"Sent Task: Completed. Exported: {results['total_exported']}, "
-			f"Successful: {results['successful']}, Failed: {results['failed']}"
+			"Sent Task: Completed. Exported: %s, Successful: %s, Failed: %s"
+			% (
+				results["total_exported"],
+				results["successful"],
+				results["failed"],
+			)
 		)
 
 		# Clean debounce marks only for successfully processed doctypes that are past delay
@@ -305,8 +326,10 @@ def execute_send_task_worker(export_type=None | [str] | str, date_from=None):
 	except Exception as e:
 		logger.error(f"Sent Task: Fatal error - {e!s}")
 		raise
-
-	return results
+	finally:
+		# Remove msgprint handler after task completion
+		if msgprint_handler:
+			logger.removeHandler(msgprint_handler)
 
 
 def export_and_send_type(export_type, date_from=None):

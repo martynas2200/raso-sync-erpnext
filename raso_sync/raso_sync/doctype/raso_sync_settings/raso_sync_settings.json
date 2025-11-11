@@ -271,7 +271,7 @@
     {
       "fieldname": "add_payments_to_invoices",
       "fieldtype": "Check",
-      "label": "Add Payments to Invoices",
+      "label": "Add Payments to Imported Records",
       "default": 1,
       "description": "If checked, payments imported from RASO will be linked to their corresponding Sales Invoices in ERPNext."
     },

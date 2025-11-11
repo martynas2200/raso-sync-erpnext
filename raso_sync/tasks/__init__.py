@@ -14,6 +14,22 @@ Background Tasks
 
 """
 
+import logging
+
+import frappe
+
+
+class MsgprintHandler(logging.Handler):
+	"""Custom logging handler that sends log messages to frappe.msgprint"""
+
+	def emit(self, record):
+		try:
+			msg = self.format(record)
+			frappe.publish_realtime(event="msgprint", message=msg)
+		except Exception:
+			self.handleError(record)
+
+
 from .fetch import (
 	execute_fetch_task,
 	get_new_exports,
@@ -31,6 +47,7 @@ from .send import (
 
 __all__ = [
 	"RASO_TYPES",
+	"MsgprintHandler",
 	"execute_fetch_task",
 	"execute_send_task",
 	"export_and_send_type",

@@ -1,5 +1,7 @@
 """Fetch Task (RASO -> ERPNext)"""
 
+import logging
+
 import frappe
 from frappe.utils.background_jobs import is_job_enqueued
 
@@ -7,8 +9,10 @@ from raso_sync.api.importer import import_data_internal
 from raso_sync.utils.working_hours import is_within_working_hours
 
 from ..db.executor import ProcedureBuilder
+from . import MsgprintHandler
 
-logger = frappe.logger("raso_sync_fetch", allow_site=True, file_count=30)
+logger = frappe.logger("raso_sync_fetch")
+logger.setLevel("DEBUG")
 # https://docs.frappe.io/framework/user/en/api/logging
 
 
@@ -35,7 +39,7 @@ def execute_fetch_task(type=None):
 	return {"status": "queued", "job_id": job_id}
 
 
-def execute_fetch_task_worker(type=None):
+def execute_fetch_task_worker(type=None, inform_user=False):
 	"""
 	NEEDS TO BE ENQUEUED WITH JOB-ID: raso_sync_fetch_task_worker
 
@@ -43,57 +47,69 @@ def execute_fetch_task_worker(type=None):
 
 	Args:
 	    type: Optional filter for data type
+	    inform_user: If True, sends log messages to users via frappe.msgprint
 	"""
-	if not is_within_working_hours():
-		logger.info("Fetch Task: Skipped due to outside of working hours.")
-		return {"status": "skipped", "message": "Outside of working hours"}
-
-	# POSSIBLE TODO: Argument check --- not needed, we only support a single type
-
-	results = {"total_processed": 0, "successful": 0, "failed": 0, "errors": []}
-
+	# Add msgprint handler to send log messages to user interface
+	msgprint_handler = None
+	if inform_user:
+		msgprint_handler = MsgprintHandler()
+		msgprint_handler.setLevel(logging.INFO)
+		logger.addHandler(msgprint_handler)
 	try:
-		# Retrieve all new data exports (Status = 0)
-		new_exports = get_new_exports()
-		results["total_processed"] = len(new_exports)
+		if not is_within_working_hours():
+			logger.info("Fetch Task: Skipped due to outside of working hours.")
+			return
 
-		if not new_exports:
-			logger.info("Fetch Task: No new data exports to process")
-			return results
+		# POSSIBLE TODO: Argument check --- not needed, we only support a single type
 
-		logger.info(f"Fetch Task: Found {len(new_exports)} new export records to process")
+		results = {"total_processed": 0, "successful": 0, "failed": 0, "errors": []}
 
-		# Process each export record
-		for export_record in new_exports:
-			try:
-				process_export_record(export_record)
-				results["successful"] += 1
-			except Exception as e:
-				results["failed"] += 1
-				results["errors"].append({"sync_id": export_record.get("SyncDataExportId"), "error": str(e)})
-				logger.error(
-					f"Fetch Task: Error processing export {export_record.get('SyncDataExportId')}: {e!s}"
-				)
-				if export_record.get("SyncData"):
-					logger.debug(export_record.get("SyncData"))
-				ui_error_msg = f"Error processing export: {e!s}"
-				frappe.msgprint(ui_error_msg)
-				document = frappe.log_error("execute_fetch_task", ui_error_msg)
-				# NOTE: Not yet sure about best channel to inform user about errors.
-				update_export_status(
-					export_record.get("SyncDataExportId"),
-					status=3,  # Error
-					message="See error log: " + document.name + " for details in ERPNext logs.",
-				)
-		logger.info(f"Fetch Task Completed. Successful: {results['successful']}")
-		if results["failed"] > 0:
-			logger.info(f"Fetch Task Completed. Failed: {results['failed']}")
+		try:
+			# Retrieve all new data exports (Status = 0)
+			new_exports = get_new_exports()
+			results["total_processed"] = len(new_exports)
 
-	except Exception as e:
-		logger.error(f"Fetch Task: Fatal error - {e!s}")
-		raise
+			if not new_exports:
+				logger.info("Fetch Task: No new data exports to process")
+				return
 
-	return results
+			logger.info(f"Fetch Task: Found {len(new_exports)} new export records to process")
+
+			# Process each export record
+			for export_record in new_exports:
+				try:
+					process_export_record(export_record)
+					results["successful"] += 1
+				except Exception as e:
+					results["failed"] += 1
+					results["errors"].append(
+						{"sync_id": export_record.get("SyncDataExportId"), "error": str(e)}
+					)
+					logger.error(
+						f"Fetch Task: Error processing export {export_record.get('SyncDataExportId')}: {e!s}"
+					)
+					if export_record.get("SyncData"):
+						logger.debug(export_record.get("SyncData"))
+					ui_error_msg = f"Error processing export: {e!s}"
+					frappe.msgprint(ui_error_msg)
+					document = frappe.log_error("execute_fetch_task", ui_error_msg)
+					# NOTE: Not yet sure about best channel to inform user about errors.
+					update_export_status(
+						export_record.get("SyncDataExportId"),
+						status=3,  # Error
+						message="See error log: " + document.name + " for details in ERPNext logs.",
+					)
+			logger.info(f"Fetch Task Completed. Successful: {results['successful']}")
+			if results["failed"] > 0:
+				logger.info(f"Fetch Task Completed. Failed: {results['failed']}")
+
+		except Exception as e:
+			logger.error(f"Fetch Task: Fatal error - {e!s}")
+			raise
+	finally:
+		# Remove msgprint handler after task completion
+		if msgprint_handler:
+			logger.removeHandler(msgprint_handler)
 
 
 def get_new_exports(data_type=None, data_provider=None):
