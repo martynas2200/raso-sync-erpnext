@@ -124,7 +124,7 @@ def mark_doctype_needs_attention(doc, method):
 	return {"status": "marked", "doctype": doc.doctype, "event": method}
 
 
-def process_debounced_sends():
+def process_cache_marks():
 	"""
 	Scheduler worker that checks debounced DocType events and enqueues a send task
 	once the configured delay has elapsed.

@@ -30,7 +30,7 @@ class RASOSyncSettings(Document):
 		)
 		self.update_scheduler(
 			interval_field="send_check_interval_minutes",
-			method="raso_sync.tasks.send.process_debounced_sends",
+			method="raso_sync.tasks.send.process_cache_marks",
 			description="Process debounced send events for RASO export",
 			name="send",
 		)

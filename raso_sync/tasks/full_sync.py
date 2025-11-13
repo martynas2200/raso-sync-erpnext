@@ -2,11 +2,13 @@
 Nightly Full Sync Task
 """
 
-import frappe
+import time
 
-from raso_sync.raso_sync.tasks.fetch import get_new_exports, process_export_record
-from raso_sync.raso_sync.utils.job_utils import is_job_enqueued
-from raso_sync.raso_sync.utils.working_hours import is_within_working_hours
+import frappe
+from frappe.utils.background_jobs import is_job_enqueued
+
+from raso_sync.tasks.fetch import execute_fetch_task_worker
+from raso_sync.tasks.send import execute_send_task_worker
 
 logger = frappe.logger("raso_sync")
 
@@ -48,6 +50,19 @@ def execute_full_sync_task_worker():
 	    7. Send: GoodsPrices
 	    8. Fetch: Sales
 	"""
+	execute_fetch_task_worker()
+	time.sleep(10)
+	execute_send_task_worker("partners")
+	time.sleep(10)
+	execute_send_task_worker("good_groups", date_from="2000-01-01")
+	time.sleep(10)
+	execute_send_task_worker("good_groups")
+	time.sleep(10)
+	execute_send_task_worker("goods", date_from="2000-01-01")
+	time.sleep(10)
+	execute_send_task_worker("goods")
+	time.sleep(10)
+	execute_send_task_worker("goods_prices", date_from="2000-01-01")
 
 	logger.info("Full Sync Task Completed.")
 	return {"status": "completed"}

@@ -13,7 +13,7 @@ It also provides XML API endpoints to use a custom client to sync data from RASO
 
 ## Installation
 
-1. Make sure the environment has pymssql installed, if it is production environment, it is highly recommended to use custom docker image. More  [Frappe Docker documentation](https://github.com/frappe/frappe_docker/blob/main/docs/container-setup/02-build-setup.md).
+1. Make sure the environment has pymssql installed, if it is production environment, it is highly recommended to use custom docker image. More information can be found at [Frappe Docker documentation](https://github.com/frappe/frappe_docker/blob/main/docs/container-setup/02-build-setup.md).
 2. Scheduler must be enabled in Frappe/ERPNext to run background jobs.
 
 ### Bench Commands for local development
@@ -30,22 +30,17 @@ It also provides XML API endpoints to use a custom client to sync data from RASO
 ## Background Jobs & Task Logs
 
 ### One-Way Sync Tasks
-- **Fetch**: Receives exported data from RASO (reads `ie.usp_SyncDataExport`)
-- **Send**: Sends to RASO (writes to `ie.usp_SyncDataImport`)
+- **Fetch**: Receives exported data from RASO (reads `ie.usp_SyncDataExport` table)
+- **Send**: Sends to RASO (writes to `ie.usp_SyncDataImport` table)
 - No bidirectional conflict resolution needed
 
 ### Scheduler
 
-- Fetch Task (`raso_sync_fetch_task_worker` at `raso_sync.tasks.fetch.execute_fetch_task_worker`): runs every x minutes, configured by `fetch_interval_minutes` setting
-<!-- - Cache Task (`raso_sync_send_debounced` at `raso_sync.tasks.send.process_debounced_sends`): variable interval based on `sending_delay_minutes` setting
-- If hooks are enabled (`sending_delay_minutes > 0`),
-  - each time a relevant document is saved, a cache mark is created
-  - periodically, a Cache Task will processes marks, and based on delay, will schedule `raso_sync_send_task_worker` task. -->
-<!-- ### Viewing Job Logs
-1. Go to Frappe Desk -> Tools -> Background Jobs
-2. Look for jobs `raso_sync.tasks.fetch.execute` or `raso_sync.tasks.send.execute` -->
-
-
+- Enqueue Fetch Task (`raso_sync.tasks.fetch.execute_fetch_task`) configured by `fetch_interval_minutes` settings
+- Check cache for send markers (`raso_sync.tasks.send.process_cache_marks`) interval is configured by `sending_delay_minutes` settings. The task will:
+  - retrieve cache marks
+  - for each mark older than `sending_delay_minutes`, enqueue `raso_sync.tasks.send.execute_send_task` task to send relevant documents to RASO
+- Enqueue Full Sync Task (`raso_sync.tasks.full_sync.execute_full_sync_task`) once daily at configured time (`full_sync_time` setting)
 
 ## API Endpoints (optional unless using custom database client)
 
@@ -55,8 +50,7 @@ It also provides XML API endpoints to use a custom client to sync data from RASO
 **Parameters**:
 - `DataType` (required): 1, 2, 3, or 4
 - `FullSync` (optional): 1 for full sync, 0 for incremental
-<!-- NOTE: ? (default: 1) -->
-- `recentModified` (required when FullSync=0): ISO datetime (YYYY-MM-DDTHH:MM:SS)
+- `recentModified` (required when FullSync=0): ISO datetime
 
 | DataType | Description    | Frappe DocType    |
 |----------|----------------|-------------------|
@@ -65,6 +59,7 @@ It also provides XML API endpoints to use a custom client to sync data from RASO
 | 3        | Goods          | `Item`            |
 | 4        | GoodsPrices    | `Item Price`      |
 
+
 ### Importing to ERPNext
 
 **URL**: `/api/method/raso_sync.api.importer.import_data`
@@ -72,14 +67,22 @@ It also provides XML API endpoints to use a custom client to sync data from RASO
 **Content-Type**: application/xml
 **Request Body**: XML data in SalesSync format
 **Validation**: the sum of all individual `<Payment>` entries under each `<Sales>` node must match the corresponding `<Payments>` totals under `<SalesSync>`.
-**Response**:
-<!-- TODO: DECIDE Response status is crucial here
-
-
-- Items are matched by VCODE if it starts with 'P', otherwise by barcode (CODE field)
-- Regular quantities/amounts use QTY and AMOUNT fields
-- Manual quantities/amounts (QTYMANUAL, AMOUNTMANUAL) are used when provided
-- Payment codes 1001 and 1002 represent rounding adjustments (down/up)
+**Response**: JSON Object
+```json
+{
+  "status": "success" | "error",
+  "message": "...",
+  "results": [
+    {
+      "receipt_no": "12345",
+      "status": "success" | "accepted" | "skipped" | "error",
+      "message": "..."
+    }
+  ]
+}
+```
+<!-- TODO: needs more clarity on what constitutes status error -->
+- Items are matched by VCODE if it starts with 'P' or 'I', otherwise by barcode (CODE xml field)
 - Import status is tracked in a custom field on the Sales Invoice
-- Errors are added as comments to the Sales Invoice as well. -->
+- Errors are added as comments to the Sales Invoice as well.
 
