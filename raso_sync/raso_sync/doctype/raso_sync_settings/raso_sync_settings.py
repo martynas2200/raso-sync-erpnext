@@ -23,23 +23,16 @@ class RASOSyncSettings(Document):
 		Update scheduler jobs when settings are saved
 		"""
 		self.update_scheduler(
-			interval_field="fetch_sales_interval_minutes",
+			interval="fetch_sales_interval_minutes",
 			method="raso_sync.tasks.fetch.execute_fetch_task",
-			description="Fetch sales documents from RASO to ERPNext",
-			name="fetch",
 		)
 		self.update_scheduler(
-			interval_field="send_check_interval_minutes",
+			interval="send_check_interval_minutes",
 			method="raso_sync.tasks.send.process_cache_marks",
-			description="Process debounced send events for RASO export",
-			name="send",
 		)
 		self.update_scheduler(
-			interval_field="",
-			cron_field="full_sync_time",
+			time_string="full_sync_time",
 			method="raso_sync.tasks.full_sync.execute_full_sync_task",
-			description="Execute full sync from RASO to ERPNext",
-			name="full_sync",
 		)
 
 	@staticmethod
@@ -122,30 +115,42 @@ class RASOSyncSettings(Document):
 
 		return None
 
-	def update_scheduler(
-		self, interval_field: str, method: str, description: str, name: str, cron_field: str | None
-	):
+	def update_scheduler(self, method: str, interval: str | None = None, time_string: str | None = None):
 		"""
 		Create or update a scheduler job.
 		If the interval is 0 or None, disables the scheduler.
 
 		Args:
-			interval_field: Name of the field containing the interval in minutes
-			method: The method to be called by the scheduler
-			description: Description of the scheduler job
-			name: Human-readable name for logging purposes
+		    method: The method to be called by the scheduler
+		    interval: Field name containing the interval in minutes
+		    time_string: Field name containing the time string (HH:MM format) to convert to cron
 		"""
-		interval = getattr(self, interval_field, None)
+		# Get the actual value from the field name
+		time_value = getattr(self, time_string, None) if time_string else None
+		interval_value = getattr(self, interval, None) if interval else None
 
-		if interval and interval > 0:
+		if time_value and str(time_value).strip() and str(time_value)[0:5] != "00:00":
+			# Time string-based scheduling
+			try:
+				parts = str(time_value).split(":")
+				cron_expression = f"{parts[1]} {parts[0]} * * *"
+				result = create_or_update_scheduled_job(
+					method=method,
+					cron_format=cron_expression,
+				)
+				frappe.logger().info(f"{method.capitalize()} scheduler {result['status']}: {time_value}")
+			except Exception as e:
+				frappe.log_error(f"Error setting {method} scheduler: {e}", "Scheduler Update")
+				if disable_scheduled_job(method):
+					frappe.logger().info(f"Disabled {method} scheduler due to error")
+		elif interval_value and int(interval_value) > 0:
 			result = create_or_update_scheduled_job(
 				method=method,
-				interval=interval,
-				description=description,
-				enabled=True,
-				cron_format=getattr(self, cron_field, None),
+				interval=int(interval_value),
 			)
-			frappe.logger().info(f"{name.capitalize()} scheduler {result['status']}: {interval} minutes")
+			frappe.logger().info(
+				f"{method.capitalize()} scheduler {result['status']}: {interval_value} minutes"
+			)
 		else:
 			if disable_scheduled_job(method):
-				frappe.logger().info(f"Disabled {name} scheduler")
+				frappe.logger().info(f"Disabled {method} scheduler")

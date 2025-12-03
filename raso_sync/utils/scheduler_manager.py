@@ -36,7 +36,7 @@ def cron_format_every_n_minutes(n):
 		return f"{minutes} */{hours} * * *"
 
 
-def create_or_update_scheduled_job(method, interval, description, enabled=True, cron_format=None):
+def create_or_update_scheduled_job(method, interval=0, enabled=True, cron_format=None):
 	"""
 	Create or update a Scheduled Job Type with the given parameters.
 
@@ -45,7 +45,7 @@ def create_or_update_scheduled_job(method, interval, description, enabled=True, 
 		interval (str): Interval in minutes for the cron schedule
 		description (str): Human-readable description of the job
 		enabled (bool): Whether the job should be active
-
+	cron_format (str, optional): Custom cron format string. If provided, overrides interval.
 	Returns:
 		dict: Information about the created/updated job
 	"""
