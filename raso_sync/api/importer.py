@@ -79,12 +79,9 @@ def import_data_internal(type=None, xml_data=None):
 	if type != 0:
 		frappe.log_error(
 			"RASO Import - Unsupported DataType",
-			_("Received unsupported DataType {0}. XML Data:\n{1}").format(type, xml_data),
+			_("Received unsupported DataType. XML Data:") + f"\n{xml_data}",
 		)
-		return {
-			"status": "error",
-			"message": _("Unsupported DataType {0}. Only DataType 0 (Sales) is supported.").format(type),
-		}
+		return {"status": "error", "message": _("Unsupported DataType")}
 
 	try:
 		if xml_data is None:
@@ -118,10 +115,11 @@ def import_data_internal(type=None, xml_data=None):
 			result = process_sales(sales)
 			response["results"].append(result)
 
-		# NOTE: we need a text summary of errors and successes here as a single line, and status number to leave in the RASO database log
-		# TODO: status number logic or perhaps in the client side app. or by using http response codes
 		error_count = sum(1 for r in response["results"] if r["status"] == "error")
-		response["message"] = "Success!" if not error_count else f"Completed with {error_count} errors."
+		if not error_count:
+			response["message"] = f"{len(response['results'])} sales receipts imported successfully."
+		else:
+			response["message"] = f"Completed with {error_count} errors."
 
 		# Update the last import timestamp
 		RASOSyncSettings.update_last_sale_import()
@@ -211,6 +209,7 @@ def process_sales(sales_node):
 		pos_no = sales_node.get("PosNo") or ""
 
 		settings = RASOSyncSettings.get_settings()
+		company_uses_negative_stock = frappe.db.get_single_value("Stock Settings", "allow_negative_stock")
 		if not receipt_no or posting_date is None or posting_time is None:
 			return {
 				"receipt_no": "Unknown",
@@ -222,7 +221,7 @@ def process_sales(sales_node):
 		else:
 			receipt = f"{receipt_no}"
 
-		#! Check for existing invoice by checking invoice.raso_receipt_no = receipt
+		# Check for existing invoice with the same raso_receipt_no
 		existing_invoice = frappe.db.get_value("Sales Invoice", {"raso_receipt_no": receipt}, "name")
 		if existing_invoice:
 			return {
@@ -285,13 +284,14 @@ def process_sales(sales_node):
 			error_list = "<br>".join(invoice._item_lookup_errors)
 			can_submit = False
 
-		# TODO: add check if company does not use negative stock, check stock levels
-		# for item in invoice.items:
-		#     if flt(item.actual_qty) < flt(item.qty) and item.maintain_stock:
-		#         can_submit = False
-		#         error_list += (
-		#             _("Insufficient stock for item") + f"- {item.item_code}"
-		#         )
+		for item in invoice.items:
+			if (
+				not company_uses_negative_stock
+				and flt(item.actual_qty) < flt(item.qty)
+				and item.maintain_stock
+			):
+				can_submit = False
+				error_list += _("Insufficient stock for item") + f"- {item.item_code}"
 
 		if can_submit is False:
 			invoice.raso_import_status = "Missing Stock or Information"
@@ -378,9 +378,8 @@ def add_item_to_invoice(invoice, sale_node):
 	# Determine item
 	item_code = None
 
-	# If VCODE starts with P, use it directly as item_code
-	# TODO: finish making this logic more robust, add settings
-	if vcode and (vcode.startswith("P") or vcode.startswith("I")):
+	# If VCODE starts with uppercase letter, take it as item code
+	if vcode and vcode[0].isalpha():
 		item_code = vcode
 
 	if item_code:
@@ -396,8 +395,8 @@ def add_item_to_invoice(invoice, sale_node):
 		if item_code_from_barcode:
 			item_code = item_code_from_barcode
 
-	# Direct item barcode lookup
 	if not item_code:
+		# Direct item barcode lookup
 		item_code_from_barcode = frappe.db.get_value("Item Barcode", {"barcode": code}, "parent")
 		if item_code_from_barcode:
 			item_code = item_code_from_barcode
@@ -412,7 +411,6 @@ def add_item_to_invoice(invoice, sale_node):
 		else:
 			raise ValueError("No item found and no default item set in RASO Sync Settings.")
 
-	# TODO: when verifying that the item exists, also get the stock uom
 	item_doc = frappe.get_doc("Item", item_code)
 	stock_uom = item_doc.stock_uom if item_doc and item_doc.stock_uom else "Nos"
 	if not item_doc:
@@ -425,8 +423,7 @@ def add_item_to_invoice(invoice, sale_node):
 	else:
 		enhanced_description = ""
 
-	# TODO: Inspect records, it might be a good reason to split up records manual rate vs automatic rate
-	# Would be a good idea to wrap this in a try-except
+	# Not wrapping this in a try-except block; we either import the whole receipt or none of it
 	invoice.append(
 		"items",
 		{
@@ -467,7 +464,6 @@ def add_payment_to_invoice(settings, invoice, payment_node):
 		)
 		return 0
 
-	# TODO: seems like a hardcoded list
 	if code in settings.rounding_codes.split(","):
 		invoice.rounding_adjustment = amount
 		return amount

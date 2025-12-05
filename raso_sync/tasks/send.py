@@ -1,7 +1,6 @@
 """Sent Task (ERPNext -> RASO)"""
 
 import logging
-import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -108,9 +107,6 @@ def mark_doctype_needs_attention(doc, method):
 	# Only consider supported doctypes
 	if doc.doctype not in DOCTYPE_TO_RASO_TYPE:
 		logger.debug(f"RASO Sync: Ignoring document event for unsupported doctype: {doc.doctype}")
-
-	# TODO: Check if sending is enabled
-	# NOTE: Once again, it is unnecessary since it is less intensive to create a cache mark than to avoid it by checking DB.
 
 	# Mark needs-attention entry in cache with last event and timestamp
 	key = _needs_attention_key(doc.doctype)
@@ -239,10 +235,6 @@ def execute_send_task_worker(
 		msgprint_handler.setLevel(logging.INFO)
 		logger.addHandler(msgprint_handler)
 
-	if not is_within_working_hours():
-		logger.info("Send Task: Skipped due to outside of working hours.")
-		return
-
 	# TODO: Argument check ---
 	results = {
 		"total_exported": 0,
@@ -284,6 +276,14 @@ def execute_send_task_worker(
 				results["types_processed"].append(exp_type)
 				results["total_exported"] += type_result.get("count", 0)
 				results["successful"] += 1
+				frappe.msgprint(
+					message=frappe._("Sent Task: Exported {0} records of {1}").format(
+						type_result.get("count", 0),
+						frappe._(CODE_TO_DOCTYPE.get(_export_type_to_code(exp_type), exp_type)),
+					),
+					alert=True,
+					realtime=True,
+				)
 
 			except Exception as e:
 				results["failed"] += 1
@@ -299,7 +299,6 @@ def execute_send_task_worker(
 				results["failed"],
 			)
 		)
-
 		# Clean debounce marks only for successfully processed doctypes that are past delay
 		if delay_minutes > 0:
 			try:

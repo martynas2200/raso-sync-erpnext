@@ -368,3 +368,123 @@ msgstr "Ištrinti"
 
 msgid "Duplicate row"
 msgstr "Dublikuoti eilutę"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:168
+msgid "Connection test failed: "
+msgstr "Prisijungimo testas nepavyko: "
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:159
+msgid "Connection test successful"
+msgstr "Prisijungimo testas sėkmingas"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/api/importer.py:76
+msgid "DataType not specified and could not be inferred from XML."
+msgstr "Nenurodytas DataType ir jo negalima nustatyti iš XML."
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.py:18
+msgid "Fetch Sales Interval must be either 0 (disabled) or between 10 and 1440 minutes"
+msgstr "Pardavimų gavimo intervalas turi būti 0 (išjungta) arba tarp 10 ir 1440 minučių"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:273
+msgid "Fetch queued failed: "
+msgstr "Užklausa gavimui nepavyko įtraukti į eilę: "
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:263
+msgid "Fetch queued successfully"
+msgstr "Užklausa gavimui sėkmingai įtraukta į eilę"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/api/importer.py:293
+msgid "Insufficient stock for item"
+msgstr "Nepakanka atsargų prekei"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/api/importer.py:300
+msgid "Invoice Creation Failed"
+msgstr "Sąskaitos kūrimas nepavyko"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/api/importer.py:313
+msgid "Invoice created (not submitted as per settings)"
+msgstr "Sąskaita sukurta (nepateikta pagal nustatymus)"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/api/importer.py:323
+msgid "Invoice created and submitted"
+msgstr "Sąskaita sukurta ir pateikta"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/api/importer.py:305
+msgid "Invoice created but not submitted"
+msgstr "Sąskaita sukurta, bet nepateikta"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/api/importer.py:335
+msgid "Invoice created but submission failed"
+msgstr "Sąskaita sukurta, tačiau pateikimas nepavyko"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:fields:10:label
+msgid "Item Sync Settings"
+msgstr "Prekių sinchronizavimo nustatymai"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:fields:11:label
+msgid "Item Tax Template to Fiscal Module Mapping"
+msgstr "Prekės mokesčių šablono ir fiskalinio modulio siejimas"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/api/importer.py:99
+msgid "No data found in the request."
+msgstr "Užklausoje nerasta duomenų."
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:fields:12:label
+msgid "Parent Item Group"
+msgstr "Tėvinė prekių grupė"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/api/importer.py:184
+msgid "Payment validation failed"
+msgstr "Mokėjimo patvirtinimas nepavyko"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/api/importer.py:109
+msgid "Payment validation failed: The sum of individual payments does not match the total payments in the document."
+msgstr "Mokėjimo patvirtinimas nepavyko: atskirų mokėjimų suma nesutampa su bendru mokėjimų dokumente."
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:fields:14:label
+msgid "Price List"
+msgstr "Kainoraštis"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/api/importer.py:82
+msgid "Received unsupported DataType. XML Data:"
+msgstr "Gautas nepalaikomas DataType. XML duomenys:"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:fields:12:description
+msgid "Select the parent item group for sellable items. Only item groups under this parent will be synced to RASO."
+msgstr "Pasirinkite tėvinę prekių grupę parduodamoms prekėms. Tik prekių grupės priklausančios šiai grupei bus sinchronizuojamos su RASO."
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:fields:14:description
+msgid "Select the price list to use for syncing item prices to RASO. Only prices from this list will be exported."
+msgstr "Pasirinkite kainoraštį, kurį naudosite sinchronizuodami prekių kainas su RASO. Bus eksportuojamos tik kainos iš šio sąrašo."
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:63
+msgid "Settings loaded successfully"
+msgstr "Nustatymai sėkmingai įkelti"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:fields:35:label
+msgid "Synchronization Is Running"
+msgstr "Sinchronizacija vykdoma"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:123
+msgid "Synchronization is running"
+msgstr "Sinchronizacija vykdoma"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/api/manual.py:89
+msgid "The enqueue failed: {0}"
+msgstr "Į eilę įtraukti nepavyko: {0}"
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:fields:28:description
+msgid "These settings define synchronization intervals and behavior on the <b>ERPNext side only</b>. RASO RETAIL (RR) has its own independent schedulers.<br>In other words, ERPNext sends data to the secondary RR database, and RR updates its main database within 10 (default setting) minutes. <br>RR exports new data to the secondary database every 20 (default setting) minutes, meaning if a sale is made in RR, it may take up to 20 minutes before it exported, and then an additional interval defined here before it appears in ERPNext."
+msgstr "Šie nustatymai apibrėžia sinchronizavimo intervalus ir elgseną <b>tik ERPNext pusėje</b>. RASO RETAIL (RR) turi savo nepriklausomus planuotojus.<br>Kitais žodžiais tariant, ERPNext siunčia duomenis į antrinę RR duomenų bazę, o RR atnaujina savo pagrindinę duomenų bazę kas 10 (numatytasis nustatymas) minučių. <br>RR eksportuoja naujus duomenis į antrinę duomenų bazę kas 20 (numatytasis nustatymas) minučių, tai reiškia, kad jei RR buvo atliktas pardavimas, gali praeiti iki 20 minučių, kol jis bus eksportuotas, o tada dar papildomas čia apibrėžtas intervalas, kol jis pasirodys ERPNext."
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/api/importer.py:86
+msgid "Unsupported DataType. Only DataType 0 (Sales) is supported."
+msgstr "Nepalaikomas DataType. Palaikomas tik DataType 0 (pardavimai)."
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:229
+msgid "Upload queued failed: "
+msgstr "Įkėlimo užklausa į eilę nepavyko: "
+
+#: /Users/martin/frappe-bench/apps/raso_sync/raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:219
+msgid "Upload queued successfully"
+msgstr "Užklausa įkėlimui į eilę sėkminga"

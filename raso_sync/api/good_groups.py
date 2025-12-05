@@ -6,41 +6,36 @@ import frappe
 
 def good_groups_internal(full_sync=1, date_from=None):
 	"""
-	GoodsGroups (Item Groups) sync endpoint - DataType 2
+	Returns XML document of GoodsGroups - DataType 2 (Item Groups)
 
 	Parameters:
 	- FullSync: 1 for full sync, 0 for incremental
 	- date_from: Required when FullSync=0, ISO datetime string
-
-	Returns XML Element object
 	"""
-	filters = {}
-	if full_sync == 0 and date_from:
-		modified_date = datetime.fromisoformat(date_from)
-		filters["modified"] = (">", modified_date)
+	where_conditions = []
+	params = {}
+	settings = frappe.get_single("RASO Sync Settings")
+	if settings.parent_item_group:
+		where_conditions = [
+			"(parent.name = %(parent_group)s OR parent.parent_item_group = %(parent_group)s OR grandparent.name = %(parent_group)s)"
+		]
+		params = {"parent_group": settings.parent_item_group}
 
-	# item_groups = frappe.get_all(
-	#     "Item Group",
-	#     filters=filters,
-	#     fields=["name", "item_group_name", "is_visible_in_catalog", "modified"]
-	# )
+	if full_sync == 0 and date_from:
+		where_conditions.append("ig.modified >= %(modified)s")
+		params["modified"] = datetime.fromisoformat(date_from)
+
+	where_clause = " AND ".join(where_conditions)
 
 	item_groups = frappe.db.sql(
-		"""
-        SELECT CRC32(ig.name) AS id, ig.name, ig.item_group_name, ig.is_visible_in_catalog, ig.modified
+		f"""
+        SELECT ig.raso_id AS id, ig.name, ig.item_group_name, ig.is_visible_in_catalog, ig.modified
         FROM `tabItem Group` ig
         LEFT JOIN `tabItem Group` parent ON ig.parent_item_group = parent.name
-        WHERE (parent.name = 'Prekės' OR parent.parent_item_group = 'Prekės')
-        AND ig.is_visible_in_catalog = 0
-        {filters_clause}
-    """.format(
-			filters_clause="AND ig.modified > '{modified}'".format(
-				modified=filters["modified"][1].strftime("%Y-%m-%d %H:%M:%S")
-			)
-			if "modified" in filters
-			else ""
-		),
-		filters,
+        LEFT JOIN `tabItem Group` grandparent ON parent.parent_item_group = grandparent.name
+        {f"WHERE {where_clause}" if where_clause else ""}
+    """,
+		params,
 		as_dict=1,
 	)
 
@@ -48,10 +43,13 @@ def good_groups_internal(full_sync=1, date_from=None):
 	root.set("FullSync", str(full_sync))
 
 	for item_group in item_groups:
+		if not item_group.get("id"):
+			continue
+
 		group_elem = SubElement(root, "GoodsGroups")
 
 		code_elem = SubElement(group_elem, "Code")
-		code_elem.text = item_group.get("id", "")  # TODO: not ideal, check if hash can be used
+		code_elem.text = item_group.get("id", "")
 
 		name_elem = SubElement(group_elem, "Name")
 		name_elem.text = item_group.get("item_group_name", "")

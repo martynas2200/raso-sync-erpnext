@@ -38,9 +38,7 @@ def test_connection():
 			}
 
 	except Exception as e:
-		frappe.log_error(
-			"RASO Sync Connection Test", f"Connection test failed: {str(e) if str(e) else 'Unknown error'}"
-		)
+		frappe.log_error("RASO Sync Connection Test", f"Connection test failed: {e!s}")
 		return {"success": False, "error": str(e) if str(e) else "Unknown error"}
 
 

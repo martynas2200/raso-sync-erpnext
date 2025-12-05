@@ -15,8 +15,14 @@
     "default_item",
     "default_naming_series",
     "column_break_5",
-    "deposit_package_item",
     "use_shop_no_and_pos_no",
+    "item_section",
+    "parent_item_group",
+    "item_tax_template_mappings",
+    "item_prefix",
+    "column_break_10",
+    "deposit_package_item",
+    "price_list",
     "sync_status_section",
     "last_sale_import",
     "column_break_6",
@@ -106,18 +112,47 @@
       "fieldtype": "Column Break"
     },
     {
-      "fieldname": "deposit_package_item",
-      "fieldtype": "Link",
-      "label": "Package Deposit Item",
-      "options": "Item",
-      "description": "Item used to account for package deposits in RASO. When deposit_package_count is greater than zero, this item will be used."
-    },
-    {
       "fieldname": "use_shop_no_and_pos_no",
       "fieldtype": "Check",
       "label": "Use ShopNo and PosNo",
       "default": 0,
       "description": "If checked, receipt_no field will contain ShopNo and PosNo, used in preventing duplicate receipts."
+    },
+    {
+      "fieldname": "item_section",
+      "fieldtype": "Section Break",
+      "label": "Item Sync Settings"
+    },
+    {
+      "fieldname": "item_tax_template_mappings",
+      "fieldtype": "Table",
+      "label": "Item Tax Template to Fiscal Module Mapping",
+      "options": "RASO Item Tax Mapping"
+    },
+    {
+      "fieldname": "parent_item_group",
+      "fieldtype": "Link",
+      "label": "Parent Item Group",
+      "options": "Item Group",
+      "description": "Select the parent item group for sellable items. Only item groups under this parent will be synced to RASO."
+    },
+    {
+      "fieldname": "column_break_10",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "price_list",
+      "fieldtype": "Link",
+      "label": "Price List",
+      "options": "Price List",
+      "description": "Select the price list to use for syncing item prices to RASO. Only prices from this list will be exported."
+    },
+    {
+      "fieldname": "deposit_package_item",
+      "fieldtype": "Link",
+      "label": "Package Deposit Item",
+      "options": "Item",
+      "description": "Item used to account for package deposits in RASO. When deposit_package_count is greater than zero, this item will be used."
     },
     {
       "fieldname": "sync_status_section",

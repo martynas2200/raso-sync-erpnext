@@ -6,13 +6,11 @@ import frappe
 
 def partners_internal(full_sync, date_from):
 	"""
-	Partners (Clients) sync endpoint - DataType 1
+	Returns XML document of Partners (Clients) - DataType 1
 
 	Parameters:
 	- FullSync: 1 for full sync, 0 for incremental
 	- date_from: Required when FullSync=0, ISO datetime string
-
-	Returns XML document directly
 	"""
 	filters = {"disabled": 0}  # Only enabled customers
 
@@ -21,29 +19,34 @@ def partners_internal(full_sync, date_from):
 		filters["modified"] = (">", modified_date)
 
 	# Fetch customers
-	customers = frappe.get_all(
-		"Customer",
-		filters=filters,
-		fields=[
-			"business_code",
-			"customer_name",
-			"tax_id",
-			"customer_primary_address",
-			"disabled",
-			"modified",
-		],
-	)
+	try:
+		customers = frappe.get_all(
+			"Customer",
+			filters=filters,
+			fields=[
+				"business_code",
+				"customer_name",
+				"tax_id",
+				"customer_primary_address",
+				"disabled",
+				"modified",
+			],
+		)
+	except Exception:
+		customers = []
+
 	root = Element("PartnersSync")
 	root.set("FullSync", str(full_sync))
 
 	for customer in customers:
+		# Code here is used as unique identifier, skip if missing
 		if not customer.get("customer_name") or customer.get("business_code") is None:
-			continue  # Code here is used as unique identifier, skip if missing
+			continue
 
 		partner_elem = SubElement(root, "Partners")
 
 		code_elem = SubElement(partner_elem, "Code")
-		code_elem.text = customer.get("business_code", "")  # Using custom field 'business_code' as Code
+		code_elem.text = customer.get("business_code", "")
 
 		name_elem = SubElement(partner_elem, "Name")
 		name_elem.text = customer.get("customer_name", "")

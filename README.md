@@ -1,6 +1,5 @@
 
 A custom Frappe app that enables ERPNext integration with the RASO RETAIL POS system.
-It also provides XML API endpoints to use a custom client to sync data from RASO POS system.
 
 ## Features
 
@@ -13,19 +12,25 @@ It also provides XML API endpoints to use a custom client to sync data from RASO
 
 ## Installation
 
-1. Make sure the environment has pymssql installed, if it is production environment, it is highly recommended to use custom docker image. More information can be found at [Frappe Docker documentation](https://github.com/frappe/frappe_docker/blob/main/docs/container-setup/02-build-setup.md).
-2. Scheduler must be enabled in Frappe/ERPNext to run background jobs.
+- Make sure the environment has pymssql installed, if it is production environment, it is highly recommended to use custom docker image. More information can be found at [Frappe Docker documentation](https://github.com/frappe/frappe_docker/blob/main/docs/container-setup/02-build-setup.md).
+- Scheduler must be enabled in Frappe setup to run background jobs.
 
 ### Bench Commands for local development
-<!-- TODO: Make sure that setup.py is configured correctly -->
-1. Install the app `bench get-app <repository-url>`
+1. Get the app `bench get-app <repository-url>`
 2. Enable scheduler: `bench config set-common-config --key enable_scheduler --value true`
+3. Install the app on your site: `bench --site <site-name> install-app raso_sync`
 
 ## Pages
 
 - `/app/raso-sync` - RASO Sync Home (workspace, only shortcuts)
 - `/app/raso-sync-overview` - RASO Sync Dashboard
 - `/app/raso-sync-settings` - RASO Sync Settings document
+
+## Constrains
+
+- Items are not send to RASO if they do not have barcode
+- Items names are cut off if it exceeds 80 characters (so we fit in two lines of text fit on the receipt)
+- When picking the price, if multiple valid prices exist for the same item and price list, the one with the most recent `valid_from` date is selected; if there are ties, the most recently modified price is used (ordered by `ip.valid_from DESC, ip.modified DESC`).
 
 ## Background Jobs & Task Logs
 
@@ -42,7 +47,8 @@ It also provides XML API endpoints to use a custom client to sync data from RASO
   - for each mark older than `sending_delay_minutes`, enqueue `raso_sync.tasks.send.execute_send_task` task to send relevant documents to RASO
 - Enqueue Full Sync Task (`raso_sync.tasks.full_sync.execute_full_sync_task`) once daily at configured time (`full_sync_time` setting)
 
-## API Endpoints (optional unless using custom database client)
+## API Endpoints (optional unless using a custom database client)
+The app also provides XML API endpoints for syncing data from the RASO POS system using a custom client.
 
 ### Main Endpoint
 **URL**: `/api/method/raso_sync.api.exporter.export`
@@ -70,19 +76,19 @@ It also provides XML API endpoints to use a custom client to sync data from RASO
 **Response**: JSON Object
 ```json
 {
-  "status": "success" | "error",
+  "status": "success|error",
   "message": "...",
   "results": [
     {
       "receipt_no": "12345",
-      "status": "success" | "accepted" | "skipped" | "error",
+      "status": "success|accepted|skipped|error",
       "message": "..."
     }
   ]
 }
 ```
-<!-- TODO: needs more clarity on what constitutes status error -->
-- Items are matched by VCODE if it starts with 'P' or 'I', otherwise by barcode (CODE xml field)
+<!-- TODO: needs more clarity on what constitutes a status error -->
+<!-- - Items are matched by VCODE if it starts with 'P' or 'I', otherwise by barcode (CODE xml field) -->
 - Import status is tracked in a custom field on the Sales Invoice
 - Errors are added as comments to the Sales Invoice as well.
 

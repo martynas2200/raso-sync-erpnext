@@ -11,7 +11,6 @@ Background Tasks
    - Exports data from ERPNext
    - Sends to RASO
    - ONE-WAY: ERPNext → RASO
-
 """
 
 import logging
@@ -25,7 +24,7 @@ class MsgprintHandler(logging.Handler):
 	def emit(self, record):
 		try:
 			msg = self.format(record)
-			frappe.publish_realtime(event="msgprint", message=msg)
+			frappe.msgprint(message=msg, alert=True, realtime=True)
 		except Exception:
 			self.handleError(record)
 

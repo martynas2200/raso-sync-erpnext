@@ -7,10 +7,11 @@ app_color = "grey"
 app_email = "raso@ekranas.info"
 app_license = "MIT"
 
-# After app install/update, create custom fields
-# If we define it in the fixtures, they will be deleted on uninstall
+# Not using fixtures, since we want to prefill some fields (like raso_id) automatically
 after_install = "raso_sync.custom_fields.create_custom_fields"
 after_migrate = "raso_sync.custom_fields.create_custom_fields"
+before_uninstall = "raso_sync.custom_fields.remove_custom_fields"
+
 # Apps
 # ------------------
 
@@ -151,6 +152,7 @@ doc_events = {
 		"after_delete": "raso_sync.tasks.send.mark_doctype_needs_attention",
 	},
 	"Item Group": {
+		"before_save": "raso_sync.item_group_hook.ensure_raso_id",
 		"after_insert": "raso_sync.tasks.send.mark_doctype_needs_attention",
 		"after_update": "raso_sync.tasks.send.mark_doctype_needs_attention",
 		"after_delete": "raso_sync.tasks.send.mark_doctype_needs_attention",
