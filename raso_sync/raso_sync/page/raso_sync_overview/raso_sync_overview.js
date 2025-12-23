@@ -6,7 +6,7 @@
 frappe.pages["raso-sync-overview"].on_page_load = function (wrapper) {
     var page = frappe.ui.make_app_page({
         parent: wrapper,
-        title: "RASO Sync Overview",
+        title: __("RASO Sync Overview"),
         single_column: true,
     });
 
@@ -20,7 +20,7 @@ frappe.pages["raso-sync-overview"].on_page_load = function (wrapper) {
         });
     }
 
-    page.set_primary_action("Open Settings", () => {
+    page.set_primary_action(__("Open Settings"), () => {
         frappe.set_route("Form", "RASO Sync Settings");
     });
 };
@@ -196,7 +196,7 @@ frappe.raso_sync_overview = {
         const upload_mode = $("input[name='upload-mode']:checked").val();
 
         frappe.confirm(
-            `Are you sure you want to upload ${upload_type} using ${upload_mode} mode?`,
+            __("Are you sure you want to upload {0} using {1} mode?", [upload_type, upload_mode]),
             () => {
                 frappe.show_alert(
                     {
@@ -242,7 +242,7 @@ frappe.raso_sync_overview = {
     execute_fetch: function () {
         const fetch_type = $("#fetch-type").val();
 
-        frappe.confirm(`Are you sure you want to fetch ${fetch_type} from RASO?`, () => {
+        frappe.confirm(__("Are you sure you want to fetch {0} from RASO?", [fetch_type]), () => {
             frappe.show_alert(
                 {
                     message: __("Starting fetch..."),
