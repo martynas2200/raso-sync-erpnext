@@ -20,7 +20,6 @@ def goods_internal(full_sync, date_from):
 	if full_sync == 0 and date_from:
 		modified_date = datetime.fromisoformat(date_from)
 		date_filter = f"AND `tabItem`.`modified` > '{modified_date.strftime('%Y-%m-%d %H:%M:%S')}'"
-	# INNER JOIN `tabItem Price` -> ensures that only items with a selling price are included in the results.
 	# GROUP_CONCAT to get all tax templates assigned to the item in case of multiple assignments.
 	sql = f"""
         SELECT
@@ -39,8 +38,6 @@ def goods_internal(full_sync, date_from):
             GROUP_CONCAT(DISTINCT `tabItem Tax`.`item_tax_template`) as item_tax_templates
         FROM `tabItem`
         INNER JOIN `tabItem Barcode` ON `tabItem`.`name` = `tabItem Barcode`.`parent`
-        INNER JOIN `tabItem Price` ON `tabItem`.`item_code` = `tabItem Price`.`item_code`
-            AND `tabItem Price`.`selling` = 1
         LEFT JOIN `tabItem Group` ON `tabItem`.`item_group` = `tabItem Group`.`name`
         LEFT JOIN `tabItem Tax` ON `tabItem`.`name` = `tabItem Tax`.`parent`
         WHERE `tabItem`.`docstatus` != 2
