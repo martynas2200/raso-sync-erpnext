@@ -1,9 +1,9 @@
-"""
-Database procedure executor for running stored procedures with arguments.
+"""Database procedure executor for running stored procedures with arguments.
 Provides type-safe execution and result mapping.
 """
 
 from typing import Any
+from xml.etree import ElementTree as ET
 
 import frappe
 import pymssql
@@ -261,6 +261,9 @@ class ProcedureBuilder:
 
 		if parameters:
 			for name, value in parameters.items():
+				# Convert XML elements to string payloads for pymssql
+				if isinstance(value, ET.Element):
+					value = ET.tostring(value, encoding="unicode")
 				executor.add_parameter(name, value)
 
 		return executor.execute()

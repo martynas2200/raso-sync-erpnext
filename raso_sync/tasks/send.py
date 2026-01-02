@@ -13,7 +13,7 @@ from . import MsgprintHandler
 logger = frappe.logger("raso_sync_send")
 logger.setLevel("DEBUG")
 
-from raso_sync.api.exporter import export_for_raso
+from raso_sync.api.exporter import export_for_raso, format_xml_response
 from raso_sync.raso_sync.doctype.raso_sync_settings.raso_sync_settings import RASOSyncSettings
 from raso_sync.utils.working_hours import is_within_working_hours
 
@@ -277,7 +277,7 @@ def execute_send_task_worker(
 				results["total_exported"] += type_result.get("count", 0)
 				results["successful"] += 1
 				frappe.msgprint(
-					message=frappe._("Sent Task: Exported {0} records of {1}").format(
+					frappe._("Sent Task: Exported {0} records of {1}").format(
 						type_result.get("count", 0),
 						frappe._(CODE_TO_DOCTYPE.get(_export_type_to_code(exp_type), exp_type)),
 					),
@@ -366,13 +366,16 @@ def export_and_send_type(export_type, date_from=None):
 	record_count = len(export_data)
 	logger.debug(f"Exported {record_count} {export_type} records from ERPNext")
 
+	# Convert XML Element to string payload expected by MSSQL
+	xml_payload = format_xml_response(export_data)
+
 	# Get RASO settings
 	# settings = get_raso_settings()
 	# data_provider = settings.get('data_provider', 'FRAPPE')
 	# NOTE: can be implemented later, just not really using different types, need to have documentation for it
 
 	# Send to RASO database using ie.usp_SyncDataImport_i
-	sync_import_id = insert_to_raso(data_type=export_type, sync_data=export_data)
+	sync_import_id = insert_to_raso(data_type=export_type, sync_data=xml_payload)
 	logger.info(f"Sent {export_type} to RASO (SyncDataImportId: {sync_import_id})")
 
 	return {"count": record_count, "sync_import_id": sync_import_id}

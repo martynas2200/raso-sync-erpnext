@@ -25,10 +25,16 @@ def test_connection():
 			connection = MSSQLConnectionManager.get_connection()
 
 			with connection.cursor() as cursor:
-				cursor.execute("SELECT 1")
-				cursor.fetchone()
+				cursor.execute("SELECT GETDATE() AS test_time;")
+				row = cursor.fetchone()
+				db_time = row["test_time"] if row else None
+			connection.close()
 
-			return {"success": True, "message": _("Connection successful")}
+			message = _("Connection successful, db_time not retrieved....?")
+			if db_time is not None:
+				message = _("Connection successful. Database time: {0}").format(db_time)
+
+			return {"success": True, "message": message}
 		except Exception as e:
 			return {
 				"success": False,

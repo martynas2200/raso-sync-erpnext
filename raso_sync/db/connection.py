@@ -1,3 +1,4 @@
+import logging
 from contextlib import contextmanager
 from typing import Any, ClassVar
 
@@ -5,6 +6,7 @@ import frappe
 import pymssql
 
 logger = frappe.logger("raso_sync.db")
+logger.setLevel(logging.INFO)
 
 
 class MSSQLConnection:
@@ -21,6 +23,7 @@ class MSSQLConnection:
 		database: str,
 		port: int = 1433,
 		encryption: str = "request",
+		login_timeout: int = 60,
 	):
 		"""
 		Initialize connection configuration.
@@ -31,6 +34,7 @@ class MSSQLConnection:
 		self.database = database
 		self.port = port
 		self.encryption = encryption
+		self.login_timeout = login_timeout
 		self._connection: pymssql.Connection | None = None
 		self._is_connected = False
 
@@ -45,6 +49,10 @@ class MSSQLConnection:
 		    frappe.ValidationError: If connection fails
 		"""
 		try:
+			logger.info(
+				f"Opening MSSQL connection to host={self.host}, port={self.port}, "
+				f"database={self.database}, user={self.user}, encryption={self.encryption}"
+			)
 			conn = pymssql.connect(
 				server=self.host,
 				user=self.user,
@@ -54,16 +62,17 @@ class MSSQLConnection:
 				encryption=self.encryption,
 				as_dict=True,  # Return results as dictionaries
 				autocommit=True,
-				timeout=30,
+				login_timeout=self.login_timeout,
 			)
 			self._is_connected = True
 
-			# Update synchronization status
 			self._update_sync_status(is_running=True)
 
 			logger.info(f"Connected to MSSQL database at {self.host}:{self.port}/{self.database}")
 			return conn
 		except pymssql.Error as e:
+			self._is_connected = False
+			self._update_sync_status(is_running=False)
 			frappe.log_error("RASO DB Connection", f"MSSQL Connection Error: {e!s}")
 			raise frappe.ValidationError(f"Database connection failed: {e!s}")
 
@@ -139,6 +148,12 @@ class MSSQLConnection:
 			raise
 		finally:
 			cursor.close()
+			# Ensure running flag is reset when cursor usage is finished
+			try:
+				self.close()
+			except Exception:
+				# close() already logs/handles its own errors
+				pass
 
 	def __del__(self):
 		"""Cleanup connection on garbage collection."""
@@ -195,6 +210,7 @@ class MSSQLConnectionManager:
 			database=config["database"],
 			port=config.get("port", 1433),
 			encryption=config.get("encryption", "request"),
+			login_timeout=config.get("login_timeout", 60),
 		)
 
 		MSSQLConnectionManager._connections[site_key] = connection
@@ -238,13 +254,20 @@ class MSSQLConnectionManager:
 				f"Missing required MSSQL configuration fields: {', '.join(missing_fields)}"
 			)
 
+		# Optional login timeout (in seconds) for slow SQL servers
+		try:
+			login_timeout = int(getattr(settings_doc, "login_timeout", 60) or 60)
+		except Exception:
+			login_timeout = 60
+
 		config = {
 			"host": settings_doc.ip,
 			"user": settings_doc.database_username,
-			"password": settings_doc.database_password,
+			"password": settings_doc.get_password("database_password"),
 			"database": settings_doc.database_name,
 			"port": settings_doc.port or 1433,
 			"encryption": settings_doc.encryption or "request",
+			"login_timeout": login_timeout,
 		}
 
 		return config
