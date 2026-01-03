@@ -1,6 +1,7 @@
 """Fetch Task (RASO -> ERPNext)"""
 
 import logging
+import traceback
 
 import frappe
 from frappe.utils.background_jobs import is_job_enqueued
@@ -82,22 +83,20 @@ def execute_fetch_task_worker(type=None, inform_user=False):
 					results["successful"] += 1
 				except Exception as e:
 					results["failed"] += 1
-					results["errors"].append(
-						{"sync_id": export_record.get("SyncDataExportId"), "error": str(e)}
-					)
-					logger.error(
-						f"Fetch Task: Error processing export {export_record.get('SyncDataExportId')}: {e!s}"
-					)
-					if export_record.get("SyncData"):
-						logger.debug(export_record.get("SyncData"))
+					logger.error(f"Fetch Task: Error processing export {export_record}: {e!s}")
+					if export_record.get("SyncData", 0):
+						logger.error(export_record.get("SyncData", ""))
 					ui_error_msg = f"Error processing export: {e!s}"
 					frappe.msgprint(ui_error_msg)
-					document = frappe.log_error("execute_fetch_task", ui_error_msg)
-					# NOTE: Not yet sure about best channel to inform user about errors.
+					# Log full exception with traceback
+					error_details = f"Export Record: {export_record}\n\nException:\n{traceback.format_exc()}"
+					document = frappe.log_error("execute_fetch_task", error_details)
+					error_name = document.name if document else "Unknown"
+
 					update_export_status(
 						export_record.get("SyncDataExportId"),
 						status=3,  # Error
-						message="See error log: " + document.name + " for details in ERPNext logs.",
+						message="See error log " + error_name + " for details in ERPNext logs.",
 					)
 			logger.info(f"Fetch Task Completed. Successful: {results['successful']}")
 			if results["failed"] > 0:
@@ -140,6 +139,9 @@ def get_new_exports(data_type=None, data_provider=None):
 		# Use reporting procedure for querying (read-only, efficient)
 		result = ProcedureBuilder.execute_procedure("ie.usp_SyncDataExport_rp", params)
 
+		# Extract result_set from the procedure execution result
+		if isinstance(result, dict) and "result_set" in result:
+			return result["result_set"] if result["result_set"] else []
 		return result if result else []
 
 	except Exception as e:
@@ -178,6 +180,13 @@ def process_export_record(export_record):
 		full_sync_data = ProcedureBuilder.execute_procedure(
 			"ie.usp_SyncDataExport_v", {"SyncDataExportId": sync_id}
 		)
+		# Extract result_set from procedure result
+		if isinstance(full_sync_data, dict) and "result_set" in full_sync_data:
+			full_sync_data = full_sync_data["result_set"]
+
+		if not full_sync_data or len(full_sync_data) == 0:
+			raise Exception(f"No data retrieved for export {sync_id}")
+
 		sync_data_str = full_sync_data[0].get("SyncData")
 
 	if not sync_data_str:
@@ -189,7 +198,7 @@ def process_export_record(export_record):
 	# Update status to success
 	update_export_status(
 		sync_id,
-		status=1 if import_result.status == "success" else 3,
+		status=1 if import_result.get("status") == "success" else 3,
 		message=import_result.get("message", "No message returned"),
 	)
 

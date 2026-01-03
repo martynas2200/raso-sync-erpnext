@@ -171,7 +171,7 @@ def validate_sales_payments(root):
 		total_sum = total_payments.get(code, 0)
 		difference = abs(sales_sum - total_sum)
 
-		if difference > 0:
+		if difference > 0.005:
 			has_errors = True
 			comparison.append(
 				f"Payment Code {code}: Individual sales sum={sales_sum:.2f}, Expected total={total_sum:.2f}, Difference={difference:.2f}"
@@ -241,6 +241,7 @@ def process_sales(sales_node):
 		invoice.is_pos = 1
 		invoice.update_stock = 1
 		invoice.raso_receipt_no = receipt
+		invoice.title = _("POS Receipt") + f" {receipt}"
 		invoice.naming_series = settings.default_naming_series
 		invoice.raso_import_status = "Processing"
 
@@ -455,6 +456,11 @@ def add_payment_to_invoice(settings, invoice, payment_node):
 	amount = flt(payment_node.find("AMOUNT").text)
 	# paymethod = payment_node.find("PAYMETHOD").text
 
+	# Check rounding codes first before looking up payment method
+	if code in settings.rounding_codes.split(","):
+		invoice.rounding_adjustment = amount
+		return amount
+
 	payment_method = RASOSyncSettings.get_payment_method_mapping(code)
 
 	if not payment_method:
@@ -463,10 +469,6 @@ def add_payment_to_invoice(settings, invoice, payment_node):
 			f"No payment method mapping found for RASO payment code {code}. Skipping payment addition.",
 		)
 		return 0
-
-	if code in settings.rounding_codes.split(","):
-		invoice.rounding_adjustment = amount
-		return amount
 
 	# Adding a second check in case of mixed payment (card + cash), so we keep it enabled
 	if payment_method.disable_rounding and invoice.rounding_adjustment == 0:

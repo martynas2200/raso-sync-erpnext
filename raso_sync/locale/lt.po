@@ -485,3 +485,6 @@ msgstr "Ar tikrai norite gauti {0} iš RASO?"
 
 msgid "Are you sure you want to upload {0} using {1} mode?"
 msgstr "Ar tikrai norite įkelti {0} naudojant {1} režimą?"
+
+msgid "POS Receipt"
+msgstr "POS kvitas"
