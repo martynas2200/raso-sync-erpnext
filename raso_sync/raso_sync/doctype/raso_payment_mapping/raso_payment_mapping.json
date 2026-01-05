@@ -7,7 +7,6 @@
  "engine": "InnoDB",
  "field_order": [
   "raso_payment_code",
-  "disable_rounding",
   "frappe_payment_method"
  ],
  "fields": [
@@ -17,13 +16,6 @@
    "in_list_view": 1,
    "label": "RASO Payment Code",
    "reqd": 1
-  },
-  {
-   "fieldname": "disable_rounding",
-   "fieldtype": "Check",
-   "in_list_view": 1,
-   "default": "0",
-   "label": "Disable Rounding"
   },
   {
    "fieldname": "frappe_payment_method",

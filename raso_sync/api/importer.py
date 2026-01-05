@@ -244,6 +244,7 @@ def process_sales(sales_node):
 		invoice.title = _("POS Receipt") + f" {receipt}"
 		invoice.naming_series = settings.default_naming_series
 		invoice.raso_import_status = "Processing"
+		invoice.disable_rounded_total = 1
 
 		if settings.vat_account:
 			vat = 0.00
@@ -271,9 +272,12 @@ def process_sales(sales_node):
 		for sale in sales_node.findall("Sale"):
 			add_item_to_invoice(invoice, sale)
 
-		if settings.add_payments_to_invoices:
-			for payment in sales_node.findall("Payment"):
-				payment_amount = add_payment_to_invoice(settings, invoice, payment)
+		for payment in sales_node.findall("Payment"):
+			# Check for rounding codes
+			if payment.find("CODE").text in settings.rounding_codes.split(","):
+				invoice.disable_rounded_total = 0
+			elif settings.add_payments_to_invoices:
+				add_payment_to_invoice(settings, invoice, payment)
 
 		invoice.save()
 
@@ -454,12 +458,6 @@ def add_payment_to_invoice(settings, invoice, payment_node):
 	"""
 	code = payment_node.find("CODE").text
 	amount = flt(payment_node.find("AMOUNT").text)
-	# paymethod = payment_node.find("PAYMETHOD").text
-
-	# Check rounding codes first before looking up payment method
-	if code in settings.rounding_codes.split(","):
-		invoice.rounding_adjustment = amount
-		return amount
 
 	payment_method = RASOSyncSettings.get_payment_method_mapping(code)
 
@@ -469,12 +467,6 @@ def add_payment_to_invoice(settings, invoice, payment_node):
 			f"No payment method mapping found for RASO payment code {code}. Skipping payment addition.",
 		)
 		return 0
-
-	# Adding a second check in case of mixed payment (card + cash), so we keep it enabled
-	if payment_method.disable_rounding and invoice.rounding_adjustment == 0:
-		invoice.disable_rounded_total = 1
-	else:
-		invoice.disable_rounded_total = 0
 
 	invoice.append("payments", {"mode_of_payment": payment_method.frappe_payment_method, "amount": amount})
 
