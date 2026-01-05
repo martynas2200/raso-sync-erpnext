@@ -67,7 +67,6 @@ def goods_internal(full_sync, date_from):
 			continue
 
 		goods_elem = SubElement(root, "Goods")
-		goods_elem.set("taxType", row.get("item_tax_template") or "")
 
 		code_elem = SubElement(goods_elem, "Code")
 		code_elem.text = row.get("barcode")

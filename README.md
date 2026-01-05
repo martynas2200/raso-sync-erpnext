@@ -14,6 +14,7 @@ A custom Frappe app that enables ERPNext integration with the RASO RETAIL POS sy
 
 - Make sure the environment has pymssql installed, if it is production environment, it is highly recommended to use custom docker image. More information can be found at [Frappe Docker documentation](https://github.com/frappe/frappe_docker/blob/main/docs/container-setup/02-build-setup.md).
 - Scheduler must be enabled in Frappe setup to run background jobs.
+- Precision of Field `Rate` in `Sales Invoice Item` doctype must be increased to at least 3 decimal places to avoid rounding issues.
 
 ### Bench Commands for local development
 1. Get the app `bench get-app <repository-url>`

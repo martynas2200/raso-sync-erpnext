@@ -360,7 +360,6 @@ def add_item_to_invoice(invoice, sale_node):
 		name_element = sale_node.find("n")
 	item_name = name_element.text if name_element is not None else "Unknown Item"
 
-	# Determine which quantity and amount to use
 	qty = flt(sale_node.find("QTY").text) if sale_node.find("QTY") is not None else 0
 	amount = flt(sale_node.find("AMOUNT").text) if sale_node.find("AMOUNT") is not None else 0
 
@@ -429,21 +428,25 @@ def add_item_to_invoice(invoice, sale_node):
 		enhanced_description = ""
 
 	# Not wrapping this in a try-except block; we either import the whole receipt or none of it
-	invoice.append(
-		"items",
-		{
-			"item_code": item_code,
-			"qty": final_qty,
-			"stock_uom": stock_uom,
-			"uom": stock_uom,
-			"rate": rate,
-			"amount": final_amount,
-			"discount_amount": discount,
-			"description": enhanced_description,
-			"barcode": code,
-			"has_item_scanned": 1,
-		},
-	)
+	item_dict = {
+		"item_code": item_code,
+		"qty": final_qty,
+		"stock_uom": stock_uom,
+		"uom": stock_uom,
+		"rate": rate,
+		"amount": final_amount,
+		"description": enhanced_description,
+		"barcode": code,
+		"has_item_scanned": 1,
+	}
+
+	if rate <= 0:
+		item_dict["is_free_item"] = 1
+		item_dict["discount_percentage"] = 100
+	else:
+		item_dict["discount_amount"] = discount
+
+	invoice.append("items", item_dict)
 
 	# Forward the comment
 	if "settings" in locals() and settings.default_item and item_code == settings.default_item:

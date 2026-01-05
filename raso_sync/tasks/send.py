@@ -15,7 +15,6 @@ logger.setLevel("DEBUG")
 
 from raso_sync.api.exporter import export_for_raso, format_xml_response
 from raso_sync.raso_sync.doctype.raso_sync_settings.raso_sync_settings import RASOSyncSettings
-from raso_sync.utils.working_hours import is_within_working_hours
 
 from ..db.executor import ProcedureBuilder
 
@@ -299,6 +298,10 @@ def execute_send_task_worker(
 				results["failed"],
 			)
 		)
+		if results["total_exported"] > 0:
+			# Update the last export timestamp in settings
+			RASOSyncSettings.update_last_export_timestamp()
+
 		# Clean debounce marks only for successfully processed doctypes that are past delay
 		if delay_minutes > 0:
 			try:
