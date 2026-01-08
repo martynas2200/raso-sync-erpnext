@@ -62,7 +62,7 @@ def execute_full_sync_task_worker():
 	time.sleep(10)
 	execute_send_task_worker("goods")
 	time.sleep(10)
-	execute_send_task_worker("goods_prices", date_from="2000-01-01")
+	execute_send_task_worker("good_prices", date_from="2000-01-01")
 
 	logger.info("Full Sync Task Completed.")
 	return {"status": "completed"}

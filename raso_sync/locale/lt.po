@@ -31,7 +31,7 @@ msgid "Is Visible in Catalog"
 msgstr "Matoma kataloge"
 
 msgid "Indicates if items in this group are visible in the POS catalog"
-msgstr "Nurodo, ar šios grupės prekės matomos POS kataloge
+msgstr "Nurodo, ar šios grupės prekės matomos POS kataloge"
 
 msgid "RASO ID"
 msgstr "RASO ID"
@@ -229,9 +229,6 @@ msgstr "Suapvalinimo kodai"
 msgid "Comma-separated list of RASO payment codes that are used to indicate rounding."
 msgstr "Kableliais atskirtas RASO mokėjimo kodų sąrašas, kuris naudojamas suapvalinimui nurodyti."
 
-msgid "Disable Rounding"
-msgstr "Išjungti suapvalinimą"
-
 msgid "Employee to Sales Person Mapping"
 msgstr "Darbuotojų ir pardavėjų siejimas"
 
@@ -246,13 +243,13 @@ msgid "Open Settings"
 msgstr "Atidaryti nustatymus"
 
 msgid "Synchronization is idle"
-msgstr "Sinchronizacija neaktyvi"
+msgstr "Sinchronizacija šiuo metu nevyksta"
 
 msgid "Synchronization is currently running"
 msgstr "Sinchronizacija šiuo metu vykdoma"
 
-msgid "System Actions"
-msgstr "Sistemos veiksmai"
+msgid "Manual Sync and other actions"
+msgstr "Rankinis sinchronizavimas ir kiti veiksmai"
 
 msgid "Refresh Status"
 msgstr "Atnaujinti būseną"
@@ -314,9 +311,6 @@ msgstr "Pardavimų sąskaitos"
 msgid "Execute Fetch"
 msgstr "Vykdyti gavimą"
 
-msgid "Are you sure you want to upload {0} using {1} mode?"
-msgstr "Ar tikrai norite įkelti {0} naudojant {1} režimą?"
-
 msgid "Starting upload..."
 msgstr "Pradedamas įkėlimas..."
 
@@ -328,9 +322,6 @@ msgstr "Įkėlimas nepavyko: {0}"
 
 msgid "Unknown error"
 msgstr "Nežinoma klaida"
-
-msgid "Are you sure you want to fetch {0} from RASO?"
-msgstr "Ar tikrai norite gauti {0} iš RASO?"
 
 msgid "Starting fetch..."
 msgstr "Pradedamas gavimas..."

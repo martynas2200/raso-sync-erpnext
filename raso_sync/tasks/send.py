@@ -111,6 +111,7 @@ def mark_doctype_needs_attention(doc, method):
 	key = _needs_attention_key(doc.doctype)
 	value = {
 		"doctype": doc.doctype,
+		"name": doc.name,  # TODO: make into an array and get rid of 15-min window? -> this for now to add UI element later to inform the user which records caused the send
 		"last_event": method,
 		"marked_at": _now_str(),
 	}
@@ -132,22 +133,8 @@ def process_cache_marks():
 	  otherwise we use the 15-minute window.
 	- Clears processed cache marks after enqueuing.
 	"""
-	settings = () or {}
+	settings = RASOSyncSettings.get_settings()
 	delay_minutes = settings.get("sending_delay_minutes") or 0
-	try:
-		delay_minutes = int(delay_minutes)
-	except Exception:
-		delay_minutes = 0
-
-	# NECESSARY CHECK
-	# send_check_interval_minutes > 0
-	if (
-		settings.get("send_check_interval_minutes") is None
-		or int(settings.get("send_check_interval_minutes")) <= 0
-	):
-		logger.debug("RASO Sync: Sending disabled, skipping debounced send processing")
-		return {"status": "disabled"}
-
 	now = datetime.now()
 
 	# Collect marks
@@ -299,10 +286,18 @@ def execute_send_task_worker(
 			)
 		)
 		if results["total_exported"] > 0:
-			# Update the last export timestamp in settings
-			RASOSyncSettings.update_last_export_timestamp()
+			RASOSyncSettings.update_last_data_export()
+		if results["failed"] > 0:
+			frappe.msgprint(
+				frappe._("Sent Task: Completed with errors. Failed types: {0}").format(
+					", ".join([err["type"] for err in results["errors"]])
+				)
+			)
+			frappe.log_error(
+				"RASO Sync: Send task completed with errors",
+				f"Failed types: {', '.join([err['type'] for err in results['errors']])}",
+			)
 
-		# Clean debounce marks only for successfully processed doctypes that are past delay
 		if delay_minutes > 0:
 			try:
 				for key in map(
@@ -362,24 +357,19 @@ def export_and_send_type(export_type, date_from=None):
 	if export_type is None:
 		raise ValueError("Invalid export type. Must be one of the defined keys or numbers in RASO_TYPES.")
 
-	logger.debug(f"Exporting {export_type}...")
+	logger.debug(f"Exporting type {export_type}...")
 
 	export_data = export_for_raso(data_type=export_type, full_sync=0 if date_from else 1, date_from=date_from)
 
 	record_count = len(export_data)
-	logger.debug(f"Exported {record_count} {export_type} records from ERPNext")
+	logger.debug(f"Exported {record_count} records of type {export_type} from ERPNext")
 
 	# Convert XML Element to string payload expected by MSSQL
 	xml_payload = format_xml_response(export_data)
 
-	# Get RASO settings
-	# settings = get_raso_settings()
-	# data_provider = settings.get('data_provider', 'FRAPPE')
-	# NOTE: can be implemented later, just not really using different types, need to have documentation for it
-
 	# Send to RASO database using ie.usp_SyncDataImport_i
 	sync_import_id = insert_to_raso(data_type=export_type, sync_data=xml_payload)
-	logger.info(f"Sent {export_type} to RASO (SyncDataImportId: {sync_import_id})")
+	logger.debug(f"Sent type {export_type} to RASO (SyncDataImportId: {sync_import_id})")
 
 	return {"count": record_count, "sync_import_id": sync_import_id}
 
@@ -405,8 +395,7 @@ def insert_to_raso(data_type, sync_data, data_provider=None):
 	try:
 		params = {
 			"DataType": data_type,
-			"DataProvider": "KVITAS",  # For now harcoding like this since RASO somewhat expects it
-			#    data_provider or settings.get('data_provider', 'FRAPPE'),
+			"DataProvider": "KVITAS",
 			"SyncData": sync_data,
 		}
 
@@ -415,14 +404,18 @@ def insert_to_raso(data_type, sync_data, data_provider=None):
 		result = ProcedureBuilder.execute_procedure("ie.usp_SyncDataImport_i", params)
 
 		# Extract the ID from result
-		if isinstance(result, list) and len(result) > 0:
-			sync_import_id = result[0].get("SyncDataImportId")
+		if isinstance(result, dict) and result.get("result_set") and len(result["result_set"]) > 0:
+			sync_import_id = result["result_set"][0].get("SyncDataImportId")
 		else:
 			sync_import_id = result.get("SyncDataImportId") if result else None
 
 		if not sync_import_id:
-			logger.error("No SyncDataImportId returned from procedure")
-			raise Exception("No SyncDataImportId returned from procedure")
+			logger.error(f"No SyncDataImportId returned from procedure. Full result: {result}")
+			frappe.log_error(
+				"No SyncDataImportId in RASO send task",
+				f"RASO Sync: insert_to_raso failed, data_type={data_type}, data_provider={data_provider}, the full result: {result}",
+			)
+			raise Exception("No SyncDataImportId returned from RASO database.")
 
 		logger.debug(f"Created import record {sync_import_id} in RASO")
 		return sync_import_id
@@ -432,7 +425,7 @@ def insert_to_raso(data_type, sync_data, data_provider=None):
 		raise
 
 
-def store_export_to_disk(export_type, data, export_data):
+def store_export_to_disk(export_type, data):
 	"""
 	Store exported data to disk for audit/debugging purposes.
 	"""

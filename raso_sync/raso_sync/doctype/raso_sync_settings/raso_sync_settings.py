@@ -81,7 +81,7 @@ class RASOSyncSettings(Document):
 
 		frappe.log_error("Missing payment mapping", f"RASO payment code: {payment_code}")
 
-		# Get default mapping or try to fallback
+		# ---- try to fallback ----------------------------------------
 		default_mappings = {
 			"0": "Cash",
 			"2": "Credit Card",

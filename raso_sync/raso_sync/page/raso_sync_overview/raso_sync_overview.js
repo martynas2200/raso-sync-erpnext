@@ -87,11 +87,13 @@ frappe.raso_sync_overview = {
 
         // Upload Actions
         $("#upload-btn").on("click", function () {
+            $("#sync-buttons").hide();
             $("#upload-options").toggleClass("show");
             $("#fetch-options").removeClass("show");
         });
 
         $("#cancel-upload-btn").on("click", function () {
+            $("#sync-buttons").show();
             $("#upload-options").removeClass("show");
         });
 
@@ -99,11 +101,13 @@ frappe.raso_sync_overview = {
 
         // Fetch Actions
         $("#fetch-btn").on("click", function () {
+            $("#sync-buttons").hide();
             $("#fetch-options").toggleClass("show");
             $("#upload-options").removeClass("show");
         });
 
         $("#cancel-fetch-btn").on("click", function () {
+            $("#sync-buttons").show();
             $("#fetch-options").removeClass("show");
         });
 
@@ -126,19 +130,13 @@ frappe.raso_sync_overview = {
             $status_text.text(__("Synchronization is idle"));
         }
 
-        // Format date
-        const format_date = (date_str) => {
-            if (!date_str) return __("Never");
-            return (
-                frappe.datetime.global_date_format(date_str) +
-                " " +
-                frappe.datetime.str_to_user(date_str).split(" ")[1]
-            );
-        };
-
         // Update status cards
-        $("#last-sale-import").text(format_date(this.settings.last_sale_import));
-        $("#last-data-export").text(format_date(this.settings.last_data_export));
+        $("#last-sale-import").text(this.format_date(this.settings.last_sale_import));
+        $("#last-data-export").text(this.format_date(this.settings.last_data_export));
+    },
+    format_date: (date_str) => {
+        if (!date_str) return __("Never");
+        return frappe.datetime.str_to_user(date_str);
     },
 
     test_connection: function () {
@@ -195,90 +193,75 @@ frappe.raso_sync_overview = {
         const upload_type = $("#upload-type").val();
         const upload_mode = $("input[name='upload-mode']:checked").val();
 
-        frappe.confirm(
-            __("Are you sure you want to upload {0} using {1} mode?", [upload_type, upload_mode]),
-            () => {
-                frappe.show_alert(
-                    {
-                        message: __("Starting upload..."),
-                        indicator: "blue",
-                    },
-                    3
-                );
-
-                frappe.call({
-                    method: "raso_sync.api.manual.manual_upload",
-                    args: {
-                        data_type: upload_type,
-                        mode: upload_mode,
-                    },
-                    callback: function (r) {
-                        if (r.message && r.message.success) {
-                            frappe.show_alert(
-                                {
-                                    message: r.message.message || __("Upload queued successfully"),
-                                    indicator: "green",
-                                },
-                                5
-                            );
-                            $("#upload-options").removeClass("show");
-                        } else {
-                            frappe.show_alert(
-                                {
-                                    message:
-                                        __("Upload queued failed: ") +
-                                        (r.message?.error || "Unknown error"),
-                                    indicator: "red",
-                                },
-                                5
-                            );
-                        }
-                    },
-                });
-            }
+        frappe.show_alert(
+            {
+                message: __("Starting upload..."),
+                indicator: "blue",
+            },
+            3
         );
+
+        frappe.call({
+            method: "raso_sync.api.manual.manual_upload",
+            args: {
+                data_type: upload_type,
+                mode: upload_mode,
+            },
+            callback: function (r) {
+                if (r.message && r.message.success) {
+                    frappe.show_alert(
+                        {
+                            message: r.message.message || __("Upload queued successfully"),
+                            indicator: "green",
+                        },
+                        5
+                    );
+                    $("#upload-options").removeClass("show");
+                    $("#sync-buttons").show();
+                } else {
+                    frappe.show_alert(
+                        {
+                            message:
+                                __("Upload queued failed: ") +
+                                (r.message?.error || "Unknown error"),
+                            indicator: "red",
+                        },
+                        5
+                    );
+                }
+            },
+        });
     },
 
     execute_fetch: function () {
         const fetch_type = $("#fetch-type").val();
-
-        frappe.confirm(__("Are you sure you want to fetch {0} from RASO?", [fetch_type]), () => {
-            frappe.show_alert(
-                {
-                    message: __("Starting fetch..."),
-                    indicator: "blue",
-                },
-                3
-            );
-
-            frappe.call({
-                method: "raso_sync.api.manual.manual_fetch",
-                args: {
-                    data_type: fetch_type,
-                },
-                callback: function (r) {
-                    if (r.message && r.message.success) {
-                        frappe.show_alert(
-                            {
-                                message: r.message.message || __("Fetch queued successfully"),
-                                indicator: "green",
-                            },
-                            5
-                        );
-                        $("#fetch-options").removeClass("show");
-                    } else {
-                        frappe.show_alert(
-                            {
-                                message:
-                                    __("Fetch queued failed: ") +
-                                    (r.message?.error || "Unknown error"),
-                                indicator: "red",
-                            },
-                            5
-                        );
-                    }
-                },
-            });
+        frappe.call({
+            method: "raso_sync.api.manual.manual_fetch",
+            args: {
+                data_type: fetch_type,
+            },
+            callback: function (r) {
+                if (r.message && r.message.success) {
+                    frappe.show_alert(
+                        {
+                            message: r.message.message || __("Fetch queued successfully"),
+                            indicator: "green",
+                        },
+                        5
+                    );
+                    $("#fetch-options").removeClass("show");
+                } else {
+                    frappe.show_alert(
+                        {
+                            message:
+                                __("Fetch queued failed: ") +
+                                (r.message?.error || "Unknown error"),
+                            indicator: "red",
+                        },
+                        5
+                    );
+                }
+            },
         });
     },
 };

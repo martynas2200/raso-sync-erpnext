@@ -1,4 +1,3 @@
-
 A custom Frappe app that enables ERPNext integration with the RASO RETAIL POS system.
 
 ## Features
