@@ -9,6 +9,15 @@ A custom Frappe app that enables ERPNext integration with the RASO RETAIL POS sy
 - Payment method mapping
 - Default item handling for unmatched items
 
+
+## Types of Data Synced
+- One-way sync from ERPNext to RASO:
+  - Customer
+  - Item Group
+  - Item
+  - Item Price
+- Import of Sales and Returns from RASO to ERPNext, creates Sales Invoices with relevant items and payments
+
 ## Installation
 
 - Make sure the environment has pymssql installed, if it is production environment, it is highly recommended to use custom docker image. More information can be found at [Frappe Docker documentation](https://github.com/frappe/frappe_docker/blob/main/docs/container-setup/02-build-setup.md).
@@ -47,8 +56,12 @@ A custom Frappe app that enables ERPNext integration with the RASO RETAIL POS sy
   - for each mark older than `sending_delay_minutes`, enqueue `raso_sync.tasks.send.execute_send_task` task to send relevant documents to RASO
 - Enqueue Full Sync Task (`raso_sync.tasks.full_sync.execute_full_sync_task`) once daily at configured time (`full_sync_time` setting)
 
-## API Endpoints (optional unless using a custom database client)
-The app also provides XML API endpoints for syncing data from the RASO POS system using a custom client.
+---
+
+## OPTIONAL API Endpoints (unless using a custom database client)
+Syncing is using done via direct database access to RASO's SQL Server database using stored procedures in background worker task.
+However, for advanced setups, the app provides XML API endpoints.
+In that case, a custom client must be implemented.
 
 ### Main Endpoint
 **URL**: `/api/method/raso_sync.api.exporter.export`
@@ -72,6 +85,9 @@ The app also provides XML API endpoints for syncing data from the RASO POS syste
 **Method**: POST
 **Content-Type**: application/xml
 **Request Body**: XML data in SalesSync format
+**Supported Types**:
+- Type 0: Sales
+- Type 3: Returns (detected automatically if items have negative quantities)
 **Validation**: the sum of all individual `<Payment>` entries under each `<Sales>` node must match the corresponding `<Payments>` totals under `<SalesSync>`.
 **Response**: JSON Object
 ```json

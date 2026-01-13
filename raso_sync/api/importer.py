@@ -1,3 +1,4 @@
+import traceback
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from datetime import datetime
@@ -69,14 +70,26 @@ def import_data_internal(type=None, xml_data=None):
 		root = ET.fromstring(xml_data)
 		root_tag = root.tag.strip()
 		if root_tag == "SalesSync":
-			type = 0  # Sales
+			# Detect if this is a return by checking for negative quantities
+			has_negative_qty = False
+			for sales in root.findall("Sales"):
+				for sale in sales.findall("Sale"):
+					qty_element = sale.find("QTY")
+					if qty_element is not None:
+						qty = flt(qty_element.text)
+						if qty < 0:
+							has_negative_qty = True
+							break
+				if has_negative_qty:
+					break
+			type = 3 if has_negative_qty else 0  # 3 = Returns, 0 = Sales
 		else:
 			return {
 				"status": "error",
 				"message": _("DataType not specified and could not be inferred from XML."),
 			}
 
-	if type != 0:
+	if type not in [0, 3]:
 		frappe.log_error(
 			"RASO Import - Unsupported DataType",
 			_("Received unsupported DataType. XML Data:") + f"\n{xml_data}",
@@ -112,7 +125,7 @@ def import_data_internal(type=None, xml_data=None):
 		response = {"status": "success", "message": "", "results": []}
 
 		for sales in root.findall("Sales"):
-			result = process_sales(sales)
+			result = process_sales(sales, type=type)
 			response["results"].append(result)
 
 		error_count = sum(1 for r in response["results"] if r["status"] == "error")
@@ -127,7 +140,7 @@ def import_data_internal(type=None, xml_data=None):
 		return response
 
 	except Exception as e:
-		frappe.log_error("RASO Import Error", str(e))
+		frappe.log_error("RASO Import Error", traceback.format_exc())
 		return {"status": "error", "message": str(e)[:50] if str(e) else "An unknown error occurred."}
 
 
@@ -196,9 +209,13 @@ def add_comment(subject, content, reference_doctype=None, reference_name=None):
 		frappe.log_error("Error adding comment", str(e) if str(e) else "Unknown error")
 
 
-def process_sales(sales_node):
+def process_sales(sales_node, type=0):
 	"""
-	Process a single sales receipt
+	Process a single sales receipt or return
+
+	Args:
+	    sales_node: ElementTree node for Sales element
+	    type (int): DataType - 0 for Sales, 3 for Returns
 	"""
 	try:
 		receipt_no = sales_node.get("ReceiptNo")
@@ -229,7 +246,6 @@ def process_sales(sales_node):
 				"status": "skipped",
 				"message": f"Invoice {receipt} already exists",
 			}
-
 		# Prepare Sales Invoice document
 		invoice = frappe.new_doc("Sales Invoice")
 		invoice.posting_date = posting_date
@@ -243,8 +259,8 @@ def process_sales(sales_node):
 		invoice.raso_receipt_no = receipt
 		invoice.title = _("POS Receipt") + f" {receipt}"
 		invoice.naming_series = settings.default_naming_series
-		invoice.raso_import_status = "Processing"
 		invoice.disable_rounded_total = 1
+		invoice.is_return = 1 if type == 3 else 0
 
 		if settings.vat_account:
 			vat = 0.00
@@ -263,7 +279,6 @@ def process_sales(sales_node):
 					"tax_amount": vat,
 				},
 			)
-
 		if user_id and settings.employee_mappings:
 			sales_person = RASOSyncSettings.get_sales_person_from_employee(user_id)
 			if sales_person:
@@ -274,9 +289,13 @@ def process_sales(sales_node):
 
 		for payment in sales_node.findall("Payment"):
 			# Check for rounding codes
-			if payment.find("CODE").text in settings.rounding_codes.split(","):
+			if (
+				settings.rounding_codes
+				and payment.find("CODE") is not None
+				and payment.find("CODE").text in settings.rounding_codes.split(",")
+			):
 				invoice.disable_rounded_total = 0
-			elif settings.add_payments_to_invoices:
+			elif settings.add_payments_to_invoices and type == 0:
 				add_payment_to_invoice(settings, invoice, payment)
 
 		invoice.save()
@@ -299,9 +318,6 @@ def process_sales(sales_node):
 				error_list += _("Insufficient stock for item") + f"- {item.item_code}"
 
 		if can_submit is False:
-			invoice.raso_import_status = "Missing Stock or Information"
-			invoice.save()
-
 			add_comment(_("Invoice Creation Failed"), error_list, "Sales Invoice", invoice.name)
 
 			return {
@@ -310,8 +326,6 @@ def process_sales(sales_node):
 				"message": _("Invoice created but not submitted"),
 			}
 		elif not settings.submit_sales_documents:
-			invoice.raso_import_status = "Success"
-			invoice.save()
 			return {
 				"receipt_no": receipt_no,
 				"status": "success",
@@ -319,8 +333,6 @@ def process_sales(sales_node):
 			}
 		else:
 			try:
-				invoice.raso_import_status = "Success"
-				invoice.save()
 				invoice.submit()
 				return {
 					"receipt_no": receipt_no,
@@ -329,8 +341,6 @@ def process_sales(sales_node):
 				}
 			except Exception as e:
 				error_msg = str(e)
-				invoice.raso_import_status = "Failed"
-				invoice.save()
 
 				add_comment("Invoice Submission Failed", str(e), "Sales Invoice", invoice.name)
 
@@ -340,7 +350,7 @@ def process_sales(sales_node):
 					"message": _("Invoice created but submission failed"),
 				}
 	except Exception as e:
-		frappe.log_error(f"RASO Sales {receipt_no} processing Error:", str(e))
+		frappe.log_error(f"RASO Sales {receipt_no} processing Error:", traceback.format_exc())
 		return {
 			"receipt_no": receipt_no if "receipt_no" in locals() else "Unknown",
 			"status": "error",
@@ -374,10 +384,10 @@ def add_item_to_invoice(invoice, sale_node):
 	final_qty = qty + qty_manual
 	final_amount = amount + amount_manual
 
-	if final_qty <= 0:
+	if final_qty == 0:
 		return
 
-	rate = (final_amount - vat) / final_qty if final_qty > 0 else 0
+	rate = abs((final_amount - vat) / final_qty) if final_qty != 0 else 0
 
 	# Determine item
 	item_code = None
@@ -427,6 +437,14 @@ def add_item_to_invoice(invoice, sale_node):
 	else:
 		enhanced_description = ""
 
+	# Add comment if it exists (used for returns)
+	comment_element = sale_node.find("COMMENT")
+	if comment_element is not None and comment_element.text:
+		if enhanced_description:
+			enhanced_description += f" | {comment_element.text}"
+		else:
+			enhanced_description = comment_element.text
+
 	# Not wrapping this in a try-except block; we either import the whole receipt or none of it
 	item_dict = {
 		"item_code": item_code,
@@ -434,16 +452,16 @@ def add_item_to_invoice(invoice, sale_node):
 		"stock_uom": stock_uom,
 		"uom": stock_uom,
 		"rate": rate,
-		"amount": final_amount,
+		"amount": abs(final_amount),
 		"description": enhanced_description,
 		"barcode": code,
 		"has_item_scanned": 1,
 	}
 
-	if rate <= 0:
+	if rate <= 0.004:
 		item_dict["is_free_item"] = 1
 		item_dict["discount_percentage"] = 100
-	else:
+	elif discount > 0:
 		item_dict["discount_amount"] = discount
 
 	invoice.append("items", item_dict)

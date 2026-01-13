@@ -18,15 +18,7 @@ definitions = {
 			"insert_after": "paid_amount",
 			"read_only": 1,
 			"translatable": 0,
-		},
-		{
-			"fieldname": "raso_import_status",
-			"label": "RASO Import Status",
-			"fieldtype": "Data",
-			"insert_after": "raso_receipt_no",
-			"read_only": 1,
-			"translatable": 1,
-		},
+		}
 	],
 	"Item": [
 		{
