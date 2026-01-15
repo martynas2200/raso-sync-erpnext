@@ -30,9 +30,10 @@ def test_connection():
 				db_time = row["test_time"] if row else None
 			connection.close()
 
-			message = _("Connection successful, db_time not retrieved....?")
 			if db_time is not None:
 				message = _("Connection successful. Database time: {0}").format(db_time)
+			else:
+				message = _("Connection successful, db_time not retrieved....?")
 
 			return {"success": True, "message": message}
 		except Exception as e:

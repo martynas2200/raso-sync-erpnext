@@ -36,30 +36,30 @@ def good_prices_internal(full_sync, date_from):
 	# NOTE: Subquery is needed in case of multiple valid prices per item/barcode to get the latest one
 	item_prices = frappe.db.sql(
 		f"""
-        SELECT
-            price_list_rate,
-            item_code,
-            packing_unit,
-            modified,
-            valid_from,
-            valid_upto,
-            barcode
-        FROM (
-            SELECT
-                ip.price_list_rate,
-                ip.item_code,
-                ip.packing_unit,
-                ip.modified,
-                ip.valid_from,
-                ip.valid_upto,
-                ib.barcode,
-                ROW_NUMBER() OVER (PARTITION BY ib.barcode ORDER BY ip.valid_from DESC, ip.modified DESC) as rn
-            FROM `tabItem Price` ip
-            INNER JOIN `tabItem Barcode` ib ON ip.item_code = ib.parent
-            WHERE {where_clause}
-        ) ranked
-        WHERE rn = 1
-    """,
+		SELECT
+			price_list_rate,
+			item_code,
+			packing_unit,
+			modified,
+			valid_from,
+			valid_upto,
+			barcode
+		FROM (
+			SELECT
+				ip.price_list_rate,
+				ip.item_code,
+				ip.packing_unit,
+				ip.modified,
+				ip.valid_from,
+				ip.valid_upto,
+			    ib.barcode,
+				ROW_NUMBER() OVER (PARTITION BY ib.barcode ORDER BY ip.valid_from DESC, ip.modified DESC) as rn
+			FROM `tabItem Price` ip
+			INNER JOIN `tabItem Barcode` ib ON ip.item_code = ib.parent AND ip.uom = ib.uom
+			WHERE {where_clause} AND ib.barcode IS NOT NULL
+		) ranked
+		WHERE rn = 1
+	""",
 		params,
 		as_dict=True,
 	)

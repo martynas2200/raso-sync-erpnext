@@ -123,7 +123,6 @@ msgstr "Naudoti Parduotuvės numerį ir POS numerį"
 msgid "If checked, receipt_no field will contain ShopNo and PosNo, used in preventing duplicate receipts."
 msgstr "Jei pažymėta, receipt_no laukas turės Parduotuvės numerį ir POS numerį, naudojamus siekiant išvengti pasikartojančių kvitų."
 
-
 msgid "Sync Status"
 msgstr "Sinchronizacijos būsena"
 
@@ -311,9 +310,6 @@ msgstr "Pardavimų sąskaitos"
 msgid "Execute Fetch"
 msgstr "Vykdyti gavimą"
 
-msgid "Starting upload..."
-msgstr "Pradedamas įkėlimas..."
-
 msgid "Upload completed successfully"
 msgstr "Įkėlimas sėkmingai baigtas"
 
@@ -322,9 +318,6 @@ msgstr "Įkėlimas nepavyko: {0}"
 
 msgid "Unknown error"
 msgstr "Nežinoma klaida"
-
-msgid "Starting fetch..."
-msgstr "Pradedamas gavimas..."
 
 msgid "Fetch completed successfully"
 msgstr "Gavimas sėkmingai baigtas"
@@ -479,3 +472,21 @@ msgstr "Ar tikrai norite įkelti {0} naudojant {1} režimą?"
 
 msgid "POS Receipt"
 msgstr "POS kvitas"
+
+msgid "{0} records of {1} were sent to RASO"
+msgstr "Į RASO išsiųsti {0} {1} įrašai"
+
+msgid "Connection successful, db_time not retrieved....?"
+msgstr "Prisijungimas sėkmingas, db_time negautas....?"
+
+msgid "Connection successful. Database time: {0}"
+msgstr "Prisijungimas sėkmingas. Duomenų bazės laikas: {0}"
+
+msgid "Fiscal Module VAT Code"
+msgstr "Fiskalinio modulio PVM kodas"
+
+msgid "Send Task: Completed with errors. Failed types: {0}"
+msgstr "Siuntimo užduotis: baigta su klaidomis. Nepavykę tipai: {0}"
+
+msgid "Unsupported DataType"
+msgstr "Nepalaikomas DataType"

@@ -74,9 +74,6 @@ frappe.raso_sync_overview = {
         var me = this;
 
         // System Actions
-        $("#refresh-btn").on("click", () => {
-            me.load_settings();
-        });
         $("#test-connection-btn").on("click", () => me.test_connection());
         $("#check-logs-btn").on("click", () => me.check_logs());
         $("#open-scheduled-jobs-btn").on("click", function () {
@@ -154,7 +151,7 @@ frappe.raso_sync_overview = {
                 if (r.message && r.message.success) {
                     frappe.show_alert(
                         {
-                            message: __("Connection test successful"),
+                            message: r.message.message || __("Connection test successful"),
                             indicator: "green",
                         },
                         5
@@ -192,14 +189,6 @@ frappe.raso_sync_overview = {
     execute_upload: function () {
         const upload_type = $("#upload-type").val();
         const upload_mode = $("input[name='upload-mode']:checked").val();
-
-        frappe.show_alert(
-            {
-                message: __("Starting upload..."),
-                indicator: "blue",
-            },
-            3
-        );
 
         frappe.call({
             method: "raso_sync.api.manual.manual_upload",

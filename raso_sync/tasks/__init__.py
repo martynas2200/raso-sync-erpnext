@@ -24,7 +24,7 @@ class MsgprintHandler(logging.Handler):
 	def emit(self, record):
 		try:
 			msg = self.format(record)
-			frappe.msgprint(msg, alert=True)
+			frappe.msgprint(msg, realtime=True, alert=True)
 		except Exception:
 			self.handleError(record)
 

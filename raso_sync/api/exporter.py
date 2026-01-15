@@ -19,7 +19,7 @@ def format_xml_response(root):
 	return '<?xml version="1.0" encoding="UTF-8"?>' + tostring(root, encoding="unicode")
 
 
-@frappe.whitelist(allow_guest=True, methods=["GET", "POST"])
+@frappe.whitelist(allow_guest=False, methods=["GET", "POST"])
 def get():
 	"""
 	Main API endpoint for RASO sync data - Returns XML directly

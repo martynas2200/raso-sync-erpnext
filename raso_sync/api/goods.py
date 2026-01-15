@@ -32,6 +32,7 @@ def goods_internal(full_sync, date_from):
             `tabItem`.`modified`,
             `tabItem`.`deposit_package_count`,
             `tabItem Barcode`.`barcode`,
+            `tabItem Barcode`.`uom`,
             `tabItem Group`.`pos_department_no`,
             `tabItem Group`.`is_refundable`,
             `tabItem Group`.`raso_id`,
@@ -93,8 +94,7 @@ def goods_internal(full_sync, date_from):
 		vat_code_elem.text = vat_code
 
 		unit_elem = SubElement(goods_elem, "Unit")
-		unit_elem.text = row.get("stock_uom", "")
-		# TODO: check barcode uom first
+		unit_elem.text = row.get("uom") or row.get("stock_uom", "")
 
 		extra_info_elem = SubElement(goods_elem, "ExtraInfo")
 		refundable_elem = SubElement(goods_elem, "Refundable")

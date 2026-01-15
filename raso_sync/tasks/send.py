@@ -1,4 +1,4 @@
-"""Sent Task (ERPNext -> RASO)"""
+"""Send Task (ERPNext -> RASO)"""
 
 import logging
 from datetime import datetime, timedelta
@@ -263,7 +263,7 @@ def execute_send_task_worker(
 				results["total_exported"] += type_result.get("count", 0)
 				results["successful"] += 1
 				frappe.msgprint(
-					frappe._("Sent Task: Exported {0} records of {1}").format(
+					frappe._("{0} records of {1} were sent to RASO").format(
 						type_result.get("count", 0),
 						frappe._(CODE_TO_DOCTYPE.get(_export_type_to_code(exp_type), exp_type)),
 					),
@@ -275,10 +275,10 @@ def execute_send_task_worker(
 				results["failed"] += 1
 				error_msg = str(e)
 				results["errors"].append({"type": exp_type, "error": error_msg})
-				logger.error(f"Sent Task: Error exporting {exp_type}: {error_msg}")
+				logger.error(f"Send Task: Error exporting {exp_type}: {error_msg}")
 
 		logger.info(
-			"Sent Task: Completed. Exported: %s, Successful: %s, Failed: %s"
+			"Send Task is completed. Exported: %s, Successful: %s, Failed: %s"
 			% (
 				results["total_exported"],
 				results["successful"],
@@ -289,7 +289,7 @@ def execute_send_task_worker(
 			RASOSyncSettings.update_last_data_export()
 		if results["failed"] > 0:
 			frappe.msgprint(
-				frappe._("Sent Task: Completed with errors. Failed types: {0}").format(
+				frappe._("Send Task: Completed with errors. Failed types: {0}").format(
 					", ".join([err["type"] for err in results["errors"]])
 				)
 			)
@@ -317,11 +317,11 @@ def execute_send_task_worker(
 					if marked_at and (now - marked_at) >= timedelta(minutes=delay_minutes):
 						frappe.cache().delete_value(key)
 			except Exception as e:
-				logger.error(f"Sent Task: Error cleaning cache for {key}: {e!s}")
+				logger.error(f"Send Task: Error cleaning cache for {key}: {e!s}")
 				pass
 
 	except Exception as e:
-		logger.error(f"Sent Task: Fatal error - {e!s}")
+		logger.error(f"Send Task: Fatal error - {e!s}")
 		raise
 	finally:
 		# Remove msgprint handler after task completion
@@ -369,7 +369,7 @@ def export_and_send_type(export_type, date_from=None):
 
 	# Send to RASO database using ie.usp_SyncDataImport_i
 	sync_import_id = insert_to_raso(data_type=export_type, sync_data=xml_payload)
-	logger.debug(f"Sent type {export_type} to RASO (SyncDataImportId: {sync_import_id})")
+	logger.debug(f"Send type {export_type} to RASO (SyncDataImportId: {sync_import_id})")
 
 	return {"count": record_count, "sync_import_id": sync_import_id}
 

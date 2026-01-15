@@ -23,6 +23,8 @@ A custom Frappe app that enables ERPNext integration with the RASO RETAIL POS sy
 - Make sure the environment has pymssql installed, if it is production environment, it is highly recommended to use custom docker image. More information can be found at [Frappe Docker documentation](https://github.com/frappe/frappe_docker/blob/main/docs/container-setup/02-build-setup.md).
 - Scheduler must be enabled in Frappe setup to run background jobs.
 - Precision of Field `Rate` in `Sales Invoice Item` doctype must be increased to at least 3 decimal places to avoid rounding issues.
+- Consider enabling `Allow Negative Stock` if auto submit of Sales Invoices is desired.
+- Consider making `uom` field in `Item Barcode` doctype mandatory, otherwise item prices might not be sent.
 
 ### Bench Commands for local development
 1. Get the app `bench get-app <repository-url>`
@@ -35,9 +37,9 @@ A custom Frappe app that enables ERPNext integration with the RASO RETAIL POS sy
 - `/app/raso-sync-overview` - RASO Sync Dashboard
 - `/app/raso-sync-settings` - RASO Sync Settings document
 
-## Constrains
+## Constraints
 
-- Items are not send to RASO if they do not have barcode
+- Items are not send to RASO if they do not have barcode and uom of a particular barcode set.
 - Items names are cut off if it exceeds 80 characters (so we fit in two lines of text fit on the receipt)
 - When picking the price, if multiple valid prices exist for the same item and price list, the one with the most recent `valid_from` date is selected; if there are ties, the most recently modified price is used (ordered by `ip.valid_from DESC, ip.modified DESC`).
 
