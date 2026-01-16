@@ -1,0 +1,41 @@
+{
+ "app": "raso_sync",
+ "creation": "2026-01-16 13:05:18.211665",
+ "docstatus": 0,
+ "doctype": "Workspace Sidebar",
+ "header_icon": "branch",
+ "idx": 0,
+ "items": [
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "info",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "RASO sinchronizacijos ap\u017evalga",
+   "link_to": "raso-sync-overview",
+   "link_type": "Page",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "setting",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "RASO sinchronizacijos nustatymai",
+   "link_to": "RASO Sync Settings",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-01-16 13:15:18.211665",
+ "modified_by": "Administrator",
+ "module": "Raso Sync",
+ "name": "RASO Sync",
+ "owner": "Administrator",
+ "standard": 1,
+ "title": "RASO Sync"
+}

@@ -262,13 +262,16 @@ def execute_send_task_worker(
 				results["types_processed"].append(exp_type)
 				results["total_exported"] += type_result.get("count", 0)
 				results["successful"] += 1
-				frappe.msgprint(
-					frappe._("{0} records of {1} were sent to RASO").format(
-						type_result.get("count", 0),
-						frappe._(CODE_TO_DOCTYPE.get(_export_type_to_code(exp_type), exp_type)),
-					),
-					alert=True,
-					realtime=True,
+				frappe.publish_realtime(
+					event="msgprint",
+					message={
+						"message": frappe._("{0} records of {1} were sent to RASO").format(
+							type_result.get("count", 0),
+							frappe._(CODE_TO_DOCTYPE.get(_export_type_to_code(exp_type), exp_type)),
+						),
+						"alert": 1,
+					},
+					room="all",
 				)
 
 			except Exception as e:
