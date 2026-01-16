@@ -9,7 +9,7 @@ app_license = "MIT"
 
 # Not using fixtures, since we want to prefill some fields (like raso_id) automatically
 after_install = "raso_sync.custom_fields.create_custom_fields"
-after_migrate = "raso_sync.custom_fields.create_custom_fields"
+after_migrate = "raso_sync.migrations.run_migrations"
 before_uninstall = "raso_sync.custom_fields.remove_custom_fields"
 
 # Apps
