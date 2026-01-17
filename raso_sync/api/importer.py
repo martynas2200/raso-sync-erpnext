@@ -251,7 +251,11 @@ def process_sales(sales_node, type=0):
 		invoice.posting_date = posting_date
 		invoice.posting_time = posting_time
 		invoice.set_posting_time = 1
-		invoice.debit_to = settings.debit_to_account
+		invoice.debit_to = (
+			settings.debit_to_account_returns
+			if (type == 3 and settings.debit_to_account_returns)
+			else settings.debit_to_account
+		)
 		invoice.customer = settings.default_customer
 		invoice.ignore_pricing_rule = 1
 		invoice.is_pos = 1
@@ -333,6 +337,10 @@ def process_sales(sales_node, type=0):
 			}
 		else:
 			try:
+				invoice.save()
+				# NOTE: ^ saving again here looks redundant, we had this before 9f289684ca08ef78ac536631bcbc8aecca2f363b
+				# After deployment, there were missing gl entries for ADDED payment entries, when an invoice status is PAID, so might be related...
+				# TODO: verify the cause, account was added when invoice.append("payments", ... ), so might be related to that
 				invoice.submit()
 				return {
 					"receipt_no": receipt_no,
@@ -342,7 +350,7 @@ def process_sales(sales_node, type=0):
 			except Exception as e:
 				error_msg = str(e)
 
-				add_comment("Invoice Submission Failed", str(e), "Sales Invoice", invoice.name)
+				add_comment("Invoice Submission Failed", error_msg, "Sales Invoice", invoice.name)
 
 				return {
 					"receipt_no": receipt_no,
@@ -473,6 +481,26 @@ def add_item_to_invoice(invoice, sale_node):
 		invoice._item_lookup_errors.append(f"Item not found with a barcode {code}, kodu {vcode}")
 
 
+def get_payment_account(payment_method_name, company):
+	"""
+	Get the account for a payment method from Mode of Payment doctype
+	"""
+	try:
+		mode_of_payment_doc = frappe.get_doc("Mode of Payment", payment_method_name)
+
+		if mode_of_payment_doc and hasattr(mode_of_payment_doc, "accounts"):
+			for acc_row in mode_of_payment_doc.accounts:
+				if acc_row.company == company:
+					return acc_row.default_account
+	except Exception as e:
+		frappe.log_error(
+			"Error fetching payment account",
+			f"Payment method: {payment_method_name}, Company: {company}, Error: {e!s}",
+		)
+
+	return None
+
+
 def add_payment_to_invoice(settings, invoice, payment_node):
 	"""
 	Add payment information to the sales invoice
@@ -489,6 +517,19 @@ def add_payment_to_invoice(settings, invoice, payment_node):
 		)
 		return 0
 
-	invoice.append("payments", {"mode_of_payment": payment_method.frappe_payment_method, "amount": amount})
+	# Get the account for this payment method
+	account = get_payment_account(payment_method.frappe_payment_method, invoice.company)
+
+	if not account:
+		frappe.log_error(
+			"RASO Payment Account Missing",
+			f"No account found for payment method {payment_method.frappe_payment_method} in company {invoice.company}. Skipping payment addition.",
+		)
+		return 0
+
+	invoice.append(
+		"payments",
+		{"mode_of_payment": payment_method.frappe_payment_method, "amount": amount, "account": account},
+	)
 
 	return amount

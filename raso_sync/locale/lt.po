@@ -490,3 +490,9 @@ msgstr "Siuntimo užduotis: baigta su klaidomis. Nepavykę tipai: {0}"
 
 msgid "Unsupported DataType"
 msgstr "Nepalaikomas DataType"
+
+msgid "Debit To Account (Returns)"
+msgstr "Debeto kor. sąskaita (grąžinimams)"
+
+msgid "Account to use for return transactions. If not set, the default debit account will be used."
+msgstr "Sąskaita, kurią naudoti grąžinimo operacijoms. Jei nenurodyta, bus naudojama numatytoji debeto sąskaita
