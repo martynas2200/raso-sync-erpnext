@@ -506,3 +506,270 @@ msgstr "Prekių skaičius užstato pakuotėje, pvz., 6 buteliai pakuotėje"
 msgid "Debit To Account (Returns)"
 msgstr "Debeto kor. sąskaita (grąžinimams)"
 
+
+msgid "Additional Counter 1"
+msgstr "Papildomas skaitiklis 1"
+
+msgid "Additional Counter 10"
+msgstr "Papildomas skaitiklis 10"
+
+msgid "Additional Counter 11"
+msgstr "Papildomas skaitiklis 11"
+
+msgid "Additional Counter 12"
+msgstr "Papildomas skaitiklis 12"
+
+msgid "Additional Counter 13"
+msgstr "Papildomas skaitiklis 13"
+
+msgid "Additional Counter 14"
+msgstr "Papildomas skaitiklis 14"
+
+msgid "Additional Counter 15"
+msgstr "Papildomas skaitiklis 15"
+
+msgid "Additional Counter 16"
+msgstr "Papildomas skaitiklis 16"
+
+msgid "Additional Counter 17"
+msgstr "Papildomas skaitiklis 17"
+
+msgid "Additional Counter 18"
+msgstr "Papildomas skaitiklis 18"
+
+msgid "Additional Counter 19"
+msgstr "Papildomas skaitiklis 19"
+
+msgid "Additional Counter 2"
+msgstr "Papildomas skaitiklis 2"
+
+msgid "Additional Counter 20"
+msgstr "Papildomas skaitiklis 20"
+
+msgid "Additional Counter 21"
+msgstr "Papildomas skaitiklis 21"
+
+msgid "Additional Counter 22"
+msgstr "Papildomas skaitiklis 22"
+
+msgid "Additional Counter 3"
+msgstr "Papildomas skaitiklis 3"
+
+msgid "Additional Counter 4"
+msgstr "Papildomas skaitiklis 4"
+
+msgid "Additional Counter 5"
+msgstr "Papildomas skaitiklis 5"
+
+msgid "Additional Counter 6"
+msgstr "Papildomas skaitiklis 6"
+
+msgid "Additional Counter 7"
+msgstr "Papildomas skaitiklis 7"
+
+msgid "Additional Counter 8"
+msgstr "Papildomas skaitiklis 8"
+
+msgid "Additional Counter 9"
+msgstr "Papildomas skaitiklis 9"
+
+msgid "Additional Counters"
+msgstr "Papildomi skaitikliai"
+
+msgid "Amount Without VAT 1"
+msgstr "Suma be PVM 1"
+
+msgid "Amount Without VAT 2"
+msgstr "Suma be PVM 2"
+
+msgid "Amount Without VAT 3"
+msgstr "Suma be PVM 3"
+
+msgid "Amount Without VAT 4"
+msgstr "Suma be PVM 4"
+
+msgid "Amount Without VAT 5"
+msgstr "Suma be PVM 5"
+
+msgid "Cash Deposited 1"
+msgstr "Įdėta grynaisiais 1"
+
+msgid "Cash Deposited 2"
+msgstr "Įdėta grynaisiais 2"
+
+msgid "Cash Deposited Times 1"
+msgstr "Įdėta grynaisiais kartų 1"
+
+msgid "Cash Deposited Times 2"
+msgstr "Įdėta grynaisiais kartų 2"
+
+msgid "Cash Withdrawn 1"
+msgstr "Išimta grynaisiais 1"
+
+msgid "Cash Withdrawn 2"
+msgstr "Išimta grynaisiais 2"
+
+msgid "Cash Withdrawn Times 1"
+msgstr "Išimta grynaisiais kartų 1"
+
+msgid "Cash in Register"
+msgstr "Grynieji kasoje"
+
+msgid "Daily Turnover"
+msgstr "Dienos apyvarta"
+
+msgid "Daily Turnover Cash"
+msgstr "Dienos apyvarta grynaisiais"
+
+msgid "Daily Turnover Credit 1"
+msgstr "Dienos apyvarta kreditais 1"
+
+msgid "Daily Turnover Credit 2"
+msgstr "Dienos apyvarta kreditais 2"
+
+msgid "Daily Turnover Credit 3"
+msgstr "Dienos apyvarta kreditais 3"
+
+msgid "Daily Turnover Credit 4"
+msgstr "Dienos apyvarta kreditais 4"
+
+msgid "Daily Turnover Credit 5"
+msgstr "Dienos apyvarta kreditais 5"
+
+msgid "Discount Amount on Items"
+msgstr "Nuolaidų suma prekėms"
+
+msgid "Discount Amount on Receipt"
+msgstr "Nuolaidų suma kvitui"
+
+msgid "Discounts & Errors"
+msgstr "Nuolaidos ir klaidos"
+
+msgid "Drawer Opening Times"
+msgstr "Stalčiaus atidarymo kartai"
+
+msgid "Error Amount"
+msgstr "Klaidų suma"
+
+msgid "Error Count"
+msgstr "Klaidų skaičius"
+
+msgid "Fiscal No"
+msgstr "Fiskalinis Nr."
+
+msgid "Fiscal Receipts Count"
+msgstr "Fiskalinių kvitų skaičius"
+
+msgid "Markup Amount on Items"
+msgstr "Antkainio suma prekėms"
+
+msgid "Markup Amount on Receipt"
+msgstr "Antkainio suma kvitui"
+
+msgid "Non-Fiscal Receipts Count"
+msgstr "Nefiskalinių kvitų skaičius"
+
+msgid "POS No"
+msgstr "POS Nr."
+
+msgid "RASO Sales {} Invoice Submission Failed"
+msgstr "RASO pardavimų {} sąskaitos pateikimas nepavyko"
+
+msgid "Receipt Cancellation Amount"
+msgstr "Kvitų atšaukimo suma"
+
+msgid "Receipt Cancellation Count"
+msgstr "Kvitų atšaukimo skaičius"
+
+msgid "Receipt No"
+msgstr "Kvito Nr."
+
+msgid "Return Amount"
+msgstr "Grąžinimo suma"
+
+msgid "Return Amount Without VAT 1"
+msgstr "Grąžinimo suma be PVM 1"
+
+msgid "Return Amount Without VAT 2"
+msgstr "Grąžinimo suma be PVM 2"
+
+msgid "Return Amount Without VAT 3"
+msgstr "Grąžinimo suma be PVM 3"
+
+msgid "Return Amount Without VAT 4"
+msgstr "Grąžinimo suma be PVM 4"
+
+msgid "Return Amount Without VAT 5"
+msgstr "Grąžinimo suma be PVM 5"
+
+msgid "Return Count"
+msgstr "Grąžinimų skaičius"
+
+msgid "Return VAT"
+msgstr "Grąžinimo PVM"
+
+msgid "Return VAT Amount 1"
+msgstr "Grąžinimo PVM suma 1"
+
+msgid "Return VAT Amount 2"
+msgstr "Grąžinimo PVM suma 2"
+
+msgid "Return VAT Amount 3"
+msgstr "Grąžinimo PVM suma 3"
+
+msgid "Return VAT Amount 4"
+msgstr "Grąžinimo PVM suma 4"
+
+msgid "Return VAT Amount 5"
+msgstr "Grąžinimo PVM suma 5"
+
+msgid "Returns & Cancellations"
+msgstr "Grąžinimai ir atšaukimai"
+
+msgid "Shop No"
+msgstr "Parduotuvės Nr."
+
+msgid "Tare Amount"
+msgstr "Taros suma"
+
+msgid "Tare Quantity"
+msgstr "Taros kiekis"
+
+msgid "Unique identifier for the Z Report"
+msgstr "Unikalus Z ataskaitos identifikatorius ERPNext sistemoje"
+
+msgid "User Code"
+msgstr "Naudotojo kodas"
+
+msgid "VAT"
+msgstr "PVM"
+
+msgid "VAT Amount 1"
+msgstr "PVM suma 1"
+
+msgid "VAT Amount 2"
+msgstr "PVM suma 2"
+
+msgid "VAT Amount 3"
+msgstr "PVM suma 3"
+
+msgid "VAT Amount 4"
+msgstr "PVM suma 4"
+
+msgid "VAT Amount 5"
+msgstr "PVM suma 5"
+
+msgid "Z No"
+msgstr "Z Nr."
+
+msgid "Z Report Date"
+msgstr "Z ataskaitos data"
+
+msgid "Z Report"
+msgstr "Z ataskaita"
+
+msgid "Depending on the configuration, might be used for rounding"
+msgstr "Priklausomai nuo konfigūracijos, gali būti naudojamas suapvalinimui"
+
+msgid "Based on User Code field"
+msgstr "Remiantis naudotojo kodo lauku"

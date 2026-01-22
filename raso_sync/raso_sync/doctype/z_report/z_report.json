@@ -1,0 +1,670 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "field:id",
+ "creation": "2025-01-21 12:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "id",
+  "date",
+  "shop_no",
+  "pos_no",
+  "receipt_no",
+  "column_break_1",
+  "z_no",
+  "fiscal_no",
+  "user_code",
+  "sales_person",
+  "column_break_2",
+  "fiscal_receipts_count",
+  "non_fiscal_receipts_count",
+  "daily_turnover",
+  "gt",
+  "vat_section",
+  "vat_amount_1",
+  "vat_amount_2",
+  "vat_amount_3",
+  "vat_amount_4",
+  "vat_amount_5",
+  "column_break_3",
+  "amount_without_vat_1",
+  "amount_without_vat_2",
+  "amount_without_vat_3",
+  "amount_without_vat_4",
+  "amount_without_vat_5",
+  "payment_section",
+  "daily_turnover_cash",
+  "daily_turnover_credit_1",
+  "daily_turnover_credit_2",
+  "daily_turnover_credit_3",
+  "daily_turnover_credit_4",
+  "daily_turnover_credit_5",
+  "drawer_opening_times",
+  "column_break_4",
+  "cash_deposited_1",
+  "cash_deposited_times_1",
+  "cash_deposited_2",
+  "cash_withdrawn_1",
+  "cash_withdrawn_times_1",
+  "cash_withdrawn_2",
+  "cash_in_register",
+  "discounts_section",
+  "discount_amount_receipt",
+  "discount_amount_items",
+  "column_break_5",
+  "markup_amount_receipt",
+  "markup_amount_items",
+  "column_break_10",
+  "error_amount",
+  "error_count",
+  "returns_section",
+  "return_amount",
+  "return_count",
+  "column_break_6",
+  "tare_amount",
+  "tare_quantity",
+  "column_break_7",
+  "receipt_cancellation_amount",
+  "receipt_cancellation_count",
+  "return_vat_section",
+  "return_vat_amount_1",
+  "return_vat_amount_2",
+  "return_vat_amount_3",
+  "return_vat_amount_4",
+  "return_vat_amount_5",
+  "column_break_8",
+  "return_amount_without_vat_1",
+  "return_amount_without_vat_2",
+  "return_amount_without_vat_3",
+  "return_amount_without_vat_4",
+  "return_amount_without_vat_5",
+  "additional_counters_section",
+  "additional_counter_1",
+  "additional_counter_2",
+  "additional_counter_3",
+  "additional_counter_4",
+  "additional_counter_5",
+  "additional_counter_6",
+  "additional_counter_7",
+  "additional_counter_8",
+  "additional_counter_9",
+  "additional_counter_10",
+  "additional_counter_11",
+  "column_break_9",
+  "additional_counter_12",
+  "additional_counter_13",
+  "additional_counter_14",
+  "additional_counter_15",
+  "additional_counter_16",
+  "additional_counter_17",
+  "additional_counter_18",
+  "additional_counter_19",
+  "additional_counter_20",
+  "additional_counter_21",
+  "additional_counter_22"
+ ],
+ "fields": [
+  {
+   "fieldname": "id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "ID",
+   "reqd": 1,
+   "unique": 1,
+   "description": "Unique identifier for the Z Report"
+  },
+  {
+   "fieldname": "shop_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Shop No"
+  },
+  {
+   "fieldname": "pos_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "POS No"
+  },
+  {
+   "fieldname": "receipt_no",
+   "fieldtype": "Data",
+   "label": "Receipt No"
+  },
+  {
+   "fieldname": "user_code",
+   "fieldtype": "Data",
+   "label": "User Code"
+  },
+  {
+   "fieldname": "sales_person",
+   "fieldtype": "Link",
+   "options": "Sales Person",
+   "in_list_view": 1,
+   "label": "Sales Person",
+   "description": "Based on User Code field"
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Z Report Date"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "z_no",
+   "fieldtype": "Data",
+   "label": "Z No"
+  },
+  {
+   "fieldname": "fiscal_no",
+   "fieldtype": "Data",
+   "label": "Fiscal No"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "fiscal_receipts_count",
+   "fieldtype": "Int",
+   "label": "Fiscal Receipts Count"
+  },
+  {
+   "fieldname": "non_fiscal_receipts_count",
+   "fieldtype": "Int",
+   "label": "Non-Fiscal Receipts Count"
+  },
+  {
+   "fieldname": "daily_turnover",
+   "in_list_view": 1,
+   "fieldtype": "Currency",
+   "label": "Daily Turnover"
+  },
+  {
+   "fieldname": "gt",
+   "fieldtype": "Currency",
+   "label": "GT"
+  },
+  {
+   "fieldname": "vat_section",
+   "fieldtype": "Section Break",
+   "collapsible": 1,
+   "label": "VAT"
+  },
+  {
+   "fieldname": "vat_amount_1",
+   "fieldtype": "Currency",
+   "label": "VAT Amount 1"
+  },
+  {
+   "fieldname": "vat_amount_2",
+   "fieldtype": "Currency",
+   "label": "VAT Amount 2"
+  },
+  {
+   "fieldname": "vat_amount_3",
+   "fieldtype": "Currency",
+   "label": "VAT Amount 3"
+  },
+  {
+   "fieldname": "vat_amount_4",
+   "fieldtype": "Currency",
+   "label": "VAT Amount 4"
+  },
+  {
+   "fieldname": "vat_amount_5",
+   "fieldtype": "Currency",
+   "label": "VAT Amount 5"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "amount_without_vat_1",
+   "fieldtype": "Currency",
+   "label": "Amount Without VAT 1"
+  },
+  {
+   "fieldname": "amount_without_vat_2",
+   "fieldtype": "Currency",
+   "label": "Amount Without VAT 2"
+  },
+  {
+   "fieldname": "amount_without_vat_3",
+   "fieldtype": "Currency",
+   "label": "Amount Without VAT 3"
+  },
+  {
+   "fieldname": "amount_without_vat_4",
+   "fieldtype": "Currency",
+   "label": "Amount Without VAT 4"
+  },
+  {
+   "fieldname": "amount_without_vat_5",
+   "fieldtype": "Currency",
+   "label": "Amount Without VAT 5"
+  },
+  {
+   "fieldname": "payment_section",
+   "fieldtype": "Section Break",
+   "label": "Payments"
+  },
+  {
+   "fieldname": "daily_turnover_cash",
+   "fieldtype": "Currency",
+   "label": "Daily Turnover Cash"
+  },
+  {
+   "fieldname": "daily_turnover_credit_1",
+   "fieldtype": "Currency",
+   "label": "Daily Turnover Credit 1"
+  },
+  {
+   "fieldname": "daily_turnover_credit_2",
+   "fieldtype": "Currency",
+   "label": "Daily Turnover Credit 2"
+  },
+  {
+   "fieldname": "daily_turnover_credit_3",
+   "fieldtype": "Currency",
+   "label": "Daily Turnover Credit 3"
+  },
+  {
+   "fieldname": "daily_turnover_credit_4",
+   "fieldtype": "Currency",
+   "label": "Daily Turnover Credit 4"
+  },
+  {
+   "fieldname": "daily_turnover_credit_5",
+   "fieldtype": "Currency",
+   "label": "Daily Turnover Credit 5"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cash_deposited_1",
+   "fieldtype": "Currency",
+   "label": "Cash Deposited 1"
+  },
+  {
+   "fieldname": "cash_deposited_times_1",
+   "fieldtype": "Int",
+   "depends_on": "eval:doc.cash_deposited_1 > 0",
+   "label": "Cash Deposited Times 1"
+  },
+  {
+   "fieldname": "cash_deposited_2",
+   "fieldtype": "Currency",
+   "depends_on": "eval:doc.cash_deposited_2 > 0",
+   "label": "Cash Deposited 2"
+  },
+  {
+   "fieldname": "cash_withdrawn_1",
+   "fieldtype": "Currency",
+   "depends_on": "eval:doc.cash_withdrawn_1 > 0",
+   "label": "Cash Withdrawn 1"
+  },
+  {
+   "fieldname": "cash_withdrawn_times_1",
+   "fieldtype": "Int",
+   "depends_on": "eval:doc.cash_withdrawn_1 > 0",
+   "label": "Cash Withdrawn Times 1"
+  },
+  {
+   "fieldname": "cash_withdrawn_2",
+   "fieldtype": "Currency",
+    "depends_on": "eval:doc.cash_withdrawn_2 > 0",
+   "label": "Cash Withdrawn 2"
+  },
+  {
+   "fieldname": "cash_in_register",
+   "fieldtype": "Currency",
+   "label": "Cash in Register"
+  },
+  {
+   "fieldname": "discounts_section",
+   "fieldtype": "Section Break",
+   "label": "Discounts & Errors"
+  },
+  {
+   "fieldname": "discount_amount_receipt",
+   "fieldtype": "Currency",
+   "label": "Discount Amount on Receipt"
+  },
+  {
+   "fieldname": "discount_amount_items",
+   "fieldtype": "Currency",
+   "label": "Discount Amount on Items"
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "markup_amount_receipt",
+   "fieldtype": "Currency",
+   "label": "Markup Amount on Receipt"
+  },
+  {
+   "fieldname": "markup_amount_items",
+   "fieldtype": "Currency",
+   "label": "Markup Amount on Items"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "error_amount",
+   "fieldtype": "Currency",
+   "label": "Error Amount"
+  },
+  {
+   "fieldname": "error_count",
+   "fieldtype": "Int",
+   "label": "Error Count"
+  },
+  {
+   "fieldname": "drawer_opening_times",
+   "fieldtype": "Int",
+   "label": "Drawer Opening Times"
+  },
+  {
+   "fieldname": "returns_section",
+   "fieldtype": "Section Break",
+   "label": "Returns & Cancellations"
+  },
+  {
+   "fieldname": "return_amount",
+   "fieldtype": "Currency",
+   "label": "Return Amount"
+  },
+  {
+   "fieldname": "return_count",
+   "fieldtype": "Int",
+   "label": "Return Count"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tare_amount",
+   "fieldtype": "Currency",
+   "label": "Tare Amount"
+  },
+  {
+   "fieldname": "tare_quantity",
+   "fieldtype": "Int",
+   "label": "Tare Quantity"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "receipt_cancellation_amount",
+   "fieldtype": "Currency",
+   "label": "Receipt Cancellation Amount"
+  },
+  {
+   "fieldname": "receipt_cancellation_count",
+   "fieldtype": "Int",
+   "label": "Receipt Cancellation Count"
+  },
+  {
+   "fieldname": "return_vat_section",
+   "fieldtype": "Section Break",
+   "collapsible": 1,
+   "label": "Return VAT"
+  },
+  {
+   "fieldname": "return_vat_amount_1",
+   "fieldtype": "Currency",
+   "label": "Return VAT Amount 1"
+  },
+  {
+   "fieldname": "return_vat_amount_2",
+   "fieldtype": "Currency",
+   "label": "Return VAT Amount 2"
+  },
+  {
+   "fieldname": "return_vat_amount_3",
+   "fieldtype": "Currency",
+   "label": "Return VAT Amount 3"
+  },
+  {
+   "fieldname": "return_vat_amount_4",
+   "fieldtype": "Currency",
+   "label": "Return VAT Amount 4"
+  },
+  {
+   "fieldname": "return_vat_amount_5",
+   "fieldtype": "Currency",
+   "label": "Return VAT Amount 5"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "return_amount_without_vat_1",
+   "fieldtype": "Currency",
+   "label": "Return Amount Without VAT 1"
+  },
+  {
+   "fieldname": "return_amount_without_vat_2",
+   "fieldtype": "Currency",
+   "label": "Return Amount Without VAT 2"
+  },
+  {
+   "fieldname": "return_amount_without_vat_3",
+   "fieldtype": "Currency",
+   "label": "Return Amount Without VAT 3"
+  },
+  {
+   "fieldname": "return_amount_without_vat_4",
+   "fieldtype": "Currency",
+   "label": "Return Amount Without VAT 4"
+  },
+  {
+   "fieldname": "return_amount_without_vat_5",
+   "fieldtype": "Currency",
+   "label": "Return Amount Without VAT 5"
+  },
+  {
+   "fieldname": "additional_counters_section",
+   "fieldtype": "Section Break",
+   "collapsible": 1,
+   "label": "Additional Counters"
+  },
+  {
+   "fieldname": "additional_counter_1",
+   "depends_on": "eval:doc.additional_counter_1 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 1"
+  },
+  {
+   "fieldname": "additional_counter_2",
+   "depends_on": "eval:doc.additional_counter_2 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 2"
+  },
+  {
+   "fieldname": "additional_counter_3",
+   "depends_on": "eval:doc.additional_counter_3 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 3"
+  },
+  {
+   "fieldname": "additional_counter_4",
+   "depends_on": "eval:doc.additional_counter_4> 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 4"
+  },
+  {
+   "fieldname": "additional_counter_5",
+   "depends_on": "eval:doc.additional_counter_5 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 5"
+  },
+  {
+   "fieldname": "additional_counter_6",
+   "depends_on": "eval:doc.additional_counter_6 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 6"
+  },
+  {
+   "fieldname": "additional_counter_7",
+   "depends_on": "eval:doc.additional_counter_7 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 7"
+  },
+  {
+   "fieldname": "additional_counter_8",
+   "depends_on": "eval:doc.additional_counter_8 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 8"
+  },
+  {
+   "fieldname": "additional_counter_9",
+   "depends_on": "eval:doc.additional_counter_9> 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 9"
+  },
+  {
+   "fieldname": "additional_counter_10",
+   "depends_on": "eval:doc.additional_counter_10 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 10"
+  },
+  {
+   "fieldname": "additional_counter_11",
+   "depends_on": "eval:doc.additional_counter_11 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 11"
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "additional_counter_12",
+   "depends_on": "eval:doc.additional_counter_12 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 12"
+  },
+  {
+   "fieldname": "additional_counter_13",
+   "depends_on": "eval:doc.additional_counter_13 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 13"
+  },
+  {
+   "fieldname": "additional_counter_14",
+   "depends_on": "eval:doc.additional_counter_14 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 14"
+  },
+  {
+   "fieldname": "additional_counter_15",
+   "depends_on": "eval:doc.additional_counter_15 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 15"
+  },
+  {
+   "fieldname": "additional_counter_16",
+   "depends_on": "eval:doc.additional_counter_16 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 16"
+  },
+  {
+   "fieldname": "additional_counter_17",
+   "depends_on": "eval:doc.additional_counter_17 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 17"
+  },
+  {
+   "fieldname": "additional_counter_18",
+   "depends_on": "eval:doc.additional_counter_18 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 18"
+  },
+  {
+   "fieldname": "additional_counter_19",
+   "depends_on": "eval:doc.additional_counter_19 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 19"
+  },
+  {
+   "fieldname": "additional_counter_20",
+   "depends_on": "eval:doc.additional_counter_20 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 20"
+  },
+  {
+   "fieldname": "additional_counter_21",
+   "depends_on": "eval:doc.additional_counter_21 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 21",
+   "description": "Depending on the configuration, might be used for rounding"
+  },
+  {
+   "fieldname": "additional_counter_22",
+   "depends_on": "eval:doc.additional_counter_22 > 0",
+   "fieldtype": "Currency",
+   "label": "Additional Counter 22",
+    "description": "Depending on the configuration, might be used for rounding"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-01-21 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "RASO Sync",
+ "name": "Z Report",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 0
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "RASO Sync User",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Account Manager",
+   "share": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0
+}

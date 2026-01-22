@@ -167,7 +167,7 @@ doc_events = {
 # Scheduled Tasks
 # ---------------
 
-scheduler_events = {"hourly_maintenance": ["raso_sync.tasks.maintenance.execute_maintenance_task"]}
+scheduler_events = {"daily_maintenance": ["raso_sync.tasks.maintenance.execute_maintenance_task"]}
 
 # Testing
 # -------
