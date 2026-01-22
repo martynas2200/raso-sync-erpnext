@@ -21,8 +21,8 @@ def execute_fetch_task(type=None):
 	"""
 	Enqueue the fetch task to import data from RASO.
 	Returns:
-	    status: str: 'queued' if enqueued, 'skipped' if already running
-	    job_id: str: ID of the enqueued job
+		status: str: 'queued' if enqueued, 'skipped' if already running
+		job_id: str: ID of the enqueued job
 	"""
 	job_id = "raso_sync_fetch_task_worker"
 
@@ -47,8 +47,8 @@ def execute_fetch_task_worker(type=None, inform_user=False):
 	Worker function that performs the actual fetching and importing.
 
 	Args:
-	    type: Optional filter for data type
-	    inform_user: If True, sends log messages to users via frappe.msgprint
+		type: Optional filter for data type
+		inform_user: If True, sends log messages to users via frappe.msgprint
 	"""
 	# Add msgprint handler to send log messages to user interface
 	msgprint_handler = None
@@ -67,7 +67,7 @@ def execute_fetch_task_worker(type=None, inform_user=False):
 
 		try:
 			# Retrieve all new data exports (Status = 0)
-			new_exports = get_new_exports()
+			new_exports = get_exports()
 			results["total_processed"] = len(new_exports)
 
 			if not new_exports:
@@ -111,7 +111,7 @@ def execute_fetch_task_worker(type=None, inform_user=False):
 			logger.removeHandler(msgprint_handler)
 
 
-def get_new_exports(data_type=None, data_provider=None):
+def get_exports(status=0, data_type=None, data_provider=None):
 	"""
 	Retrieve new data exports from RASO database.
 
@@ -119,19 +119,19 @@ def get_new_exports(data_type=None, data_provider=None):
 	Filters for Status = 0 ("New Data").
 
 	Args:
-	    data_type (int, optional): Filter by specific data type
-	    data_provider (str, optional): Filter by data provider
+		data_type (int, optional): Filter by specific data type
+		data_provider (str, optional): Filter by data provider
 
 	Returns:
-	    list: List of export records with new data
+		list: List of export records with new data
 	"""
 	try:
 		params = {
-			"Status": 0,  # New Data
+			"Status": status,
 		}
 
 		if data_type is not None:
-			params["DataType"] = data_type or 1
+			params["DataType"] = data_type
 
 		if data_provider is not None:
 			params["DataProvider"] = data_provider
@@ -158,15 +158,15 @@ def process_export_record(export_record):
 	3. Update status to 1 (success)
 
 	Args:
-	    export_record (dict): Export record from database with keys:
-	        - SyncDataExportId
-	        - DataType
-	        - DataProvider
-	        - SyncData (JSON string)
-	        - ShopNo
+		export_record (dict): Export record from database with keys:
+			- SyncDataExportId
+			- DataType
+			- DataProvider
+			- SyncData (JSON string)
+			- ShopNo
 
 	Raises:
-	    Exception: If processing fails
+		Exception: If processing fails
 	"""
 	sync_id = export_record.get("SyncDataExportId")
 	data_type = export_record.get("DataType")
@@ -198,7 +198,9 @@ def process_export_record(export_record):
 	# Update status to success
 	update_export_status(
 		sync_id,
-		status=1 if import_result.get("status") == "success" else 3,
+		status=1
+		if import_result.get("status") == "success"
+		else (4 if import_result.get("status") == "partial_success" else 3),
 		message=import_result.get("message", "No message returned"),
 	)
 
@@ -210,12 +212,12 @@ def update_export_status(sync_id, status, message=None):
 	Uses ie.usp_SyncDataExport_u stored procedure.
 
 	Args:
-	    sync_id (int): SyncDataExportId
-	    status (int): New status code (1=success, 3=error)
-	    message (str, optional): Status message (max 1024 chars)
+		sync_id (int): SyncDataExportId
+		status (int): New status code (1=success, 3=error, 4=partial success)
+		message (str, optional): Status message (max 1024 chars)
 
 	Raises:
-	    Exception: If database update fails
+		Exception: If database update fails
 	"""
 
 	try:

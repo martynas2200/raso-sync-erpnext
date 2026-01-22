@@ -167,31 +167,7 @@ doc_events = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"raso_sync.tasks.all"
-# 	],
-# 	"daily": [
-# 		"raso_sync.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"raso_sync.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"raso_sync.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"raso_sync.tasks.monthly"
-#   ],
-#   "cron": {
-#       "*/10 * * * *": [
-#           "raso_sync.tasks.fetch.execute_fetch_task"
-#       ],
-#       "0 6 * * *": [
-#           "raso_sync.tasks.send.execute_sent_task"
-#       ],
-#   },
-# }
+scheduler_events = {"hourly_maintenance": ["raso_sync.tasks.maintenance.execute_maintenance_task"]}
 
 # Testing
 # -------

@@ -60,17 +60,8 @@ def create_or_update_scheduled_job(method, interval=0, enabled=True, cron_format
 		else:
 			cron_format = cron_format_every_n_minutes(interval_int)
 
-		# Check if job exists
 		job = _get_scheduled_job_by_method(method)
-		if job:
-			# Update existing job
-			job.cron_format = cron_format
-			job.stopped = 0 if enabled else 1
-			job.save(ignore_permissions=True)
-
-			return {"status": "updated", "enabled": enabled, "cron_format": cron_format}
-		else:
-			# Create new Scheduled Job Type
+		if not job:
 			job = frappe.new_doc("Scheduled Job Type")
 			job.update(
 				{
@@ -84,8 +75,19 @@ def create_or_update_scheduled_job(method, interval=0, enabled=True, cron_format
 
 			return {"status": "created", "enabled": enabled, "cron_format": cron_format}
 
+		stopped_value = 0 if enabled else 1
+		has_changes = job.cron_format != cron_format or job.stopped != stopped_value
+
+		if has_changes:
+			job.cron_format = cron_format
+			job.stopped = stopped_value
+			job.save(ignore_permissions=True)
+			return {"status": "updated", "enabled": enabled, "cron_format": cron_format}
+		else:
+			return {"status": "unchanged", "enabled": enabled, "cron_format": cron_format}
+
 	except Exception as e:
-		frappe.log_error(f"Error creating/updating scheduled job: {e}", "Scheduler Manager")
+		frappe.log_error("RASO: Scheduler Manager", f"Error creating/updating scheduled job {method}: {e}")
 		raise
 
 

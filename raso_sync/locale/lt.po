@@ -495,4 +495,14 @@ msgid "Debit To Account (Returns)"
 msgstr "Debeto kor. sąskaita (grąžinimams)"
 
 msgid "Account to use for return transactions. If not set, the default debit account will be used."
-msgstr "Sąskaita, kurią naudoti grąžinimo operacijoms. Jei nenurodyta, bus naudojama numatytoji debeto sąskaita
+msgstr "Sąskaita, kurią naudoti grąžinimo operacijoms. Jei nenurodyta, bus naudojama numatytoji debeto sąskaita"
+
+msgid "Deposit Package Count"
+msgstr "Užstato pakuotės kiekis"
+
+msgid "Number of items in a deposit package, e.g., 6 bottles in a pack"
+msgstr "Prekių skaičius užstato pakuotėje, pvz., 6 buteliai pakuotėje"
+
+msgid "Debit To Account (Returns)"
+msgstr "Debeto kor. sąskaita (grąžinimams)"
+

@@ -74,14 +74,16 @@
       "fieldtype": "Link",
       "label": "Default Debit To Account",
       "options": "Account",
-      "reqd": 1
+      "reqd": 1,
+      "link_filters": "[[\"Account\", \"account_type\", \"=\", \"Receivable\"]]"
     },
     {
       "fieldname": "debit_to_account_returns",
       "fieldtype": "Link",
       "label": "Debit To Account (Returns)",
       "options": "Account",
-      "description": "Account to use for return transactions. If not set, the default debit account will be used."
+      "description": "Account to use for return transactions. If not set, the default debit account will be used.",
+      "link_filters": "[[\"Account\", \"account_type\", \"=\", \"Receivable\"]]"
     },
     {
       "fieldname": "vat_account",

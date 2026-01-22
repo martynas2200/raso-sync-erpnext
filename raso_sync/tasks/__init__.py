@@ -31,7 +31,7 @@ class MsgprintHandler(logging.Handler):
 
 from .fetch import (
 	execute_fetch_task,
-	get_new_exports,
+	get_exports,
 	process_export_record,
 	update_export_status,
 )
@@ -50,7 +50,7 @@ __all__ = [
 	"execute_fetch_task",
 	"execute_send_task",
 	"export_and_send_type",
-	"get_new_exports",
+	"get_exports",
 	"get_raso_settings",
 	"insert_to_raso",
 	"process_export_record",

@@ -54,18 +54,24 @@ class RASOSyncSettings(Document):
 		"""
 		Update the last sale import timestamp
 		"""
-		settings = RASOSyncSettings.get_settings()
-		settings.last_sale_import = frappe.utils.now_datetime()
-		settings.save(ignore_permissions=True)
+		frappe.db.set_value(
+			"RASO Sync Settings",
+			"RASO Sync Settings",
+			"last_sale_import",
+			frappe.utils.now(),
+		)
 
 	@staticmethod
 	def update_last_data_export():
 		"""
 		Update the last data export timestamp
 		"""
-		settings = RASOSyncSettings.get_settings()
-		settings.last_data_export = frappe.utils.now_datetime()
-		settings.save(ignore_permissions=True)
+		frappe.db.set_value(
+			"RASO Sync Settings",
+			"RASO Sync Settings",
+			"last_data_export",
+			frappe.utils.now(),
+		)
 
 	@staticmethod
 	def get_payment_method_mapping(payment_code: str):

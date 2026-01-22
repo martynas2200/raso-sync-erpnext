@@ -5,7 +5,7 @@ from datetime import datetime
 
 import frappe
 from frappe import _
-from frappe.utils import cint, flt, now_datetime
+from frappe.utils import flt
 
 from raso_sync.raso_sync.doctype.raso_sync_settings.raso_sync_settings import RASOSyncSettings
 
@@ -18,11 +18,11 @@ def import_data():
 	- Delegates processing to the internal function `import_data_internal`.
 
 	Args:
-	    type (int): DataType sent by RASO (only 0 = Sales supported)
-	    xml_data (str|None): Optional XML payload; if missing, taken from request body
+		type (int): DataType sent by RASO (only 0 = Sales supported)
+		xml_data (str|None): Optional XML payload; if missing, taken from request body
 
 	Returns:
-	    dict: Response with status and message
+		dict: Response with status and message
 	"""
 	# Normalize incoming payload here (change/shape the request)
 	# check content-type and return an error if not xml
@@ -50,11 +50,11 @@ def import_data_internal(type=None, xml_data=None):
 	Internal implementation of RASO sales import logic. Not whitelisted.
 
 	Args:
-	    type (int): DataType sent by RASO (only 0 = Sales supported)
-	    xml_data (str|None): XML payload (if None, will attempt to read from request body)
+		type (int): DataType sent by RASO (only 0 = Sales supported)
+		xml_data (str|None): XML payload (if None, will attempt to read from request body)
 
 	Returns:
-	    dict: Response with status and message
+		dict: Response with status and message
 	"""
 
 	try:
@@ -131,10 +131,13 @@ def import_data_internal(type=None, xml_data=None):
 		error_count = sum(1 for r in response["results"] if r["status"] == "error")
 		if not error_count:
 			response["message"] = f"{len(response['results'])} sales receipts imported successfully."
+		elif error_count == len(response["results"]):
+			response["status"] = "error"
+			response["message"] = "Nothing was imported due to errors."
 		else:
+			response["status"] = "partial_success"
 			response["message"] = f"Completed with {error_count} errors."
 
-		# Update the last import timestamp
 		RASOSyncSettings.update_last_sale_import()
 
 		return response
@@ -150,10 +153,10 @@ def validate_sales_payments(root):
 	the totals in Payments nodes under SalesSync
 
 	Args:
-	    root: ElementTree root node of SalesSync XML
+		root: ElementTree root node of SalesSync XML
 
 	Returns:
-	    dict: Result with 'valid' (bool) and 'error' (str) keys
+		dict: Result with 'valid' (bool) and 'error' (str) keys
 	"""
 	# Sum up all payments from individual Sales nodes
 	sales_payments = defaultdict(float)
@@ -198,15 +201,11 @@ def validate_sales_payments(root):
 	}
 
 
-def add_comment(subject, content, reference_doctype=None, reference_name=None):
-	try:
-		if reference_doctype and reference_name:
-			doc = frappe.get_doc(reference_doctype, reference_name)
-			doc.add_comment("Comment", f"{subject}: {content}")
-		else:
-			frappe.log_error("Failed to add a comment", f"{subject}: {content}")
-	except Exception as e:
-		frappe.log_error("Error adding comment", str(e) if str(e) else "Unknown error")
+def add_comment(doc, subject, content):
+	if doc:
+		doc.add_comment("Comment", f"{subject}: {content}")
+	else:
+		frappe.log_error("RASO: Failed to add a comment", f"{subject}: {content}")
 
 
 def process_sales(sales_node, type=0):
@@ -214,8 +213,8 @@ def process_sales(sales_node, type=0):
 	Process a single sales receipt or return
 
 	Args:
-	    sales_node: ElementTree node for Sales element
-	    type (int): DataType - 0 for Sales, 3 for Returns
+		sales_node: ElementTree node for Sales element
+		type (int): DataType - 0 for Sales, 3 for Returns
 	"""
 	try:
 		receipt_no = sales_node.get("ReceiptNo")
@@ -305,12 +304,12 @@ def process_sales(sales_node, type=0):
 		invoice.save()
 
 		# Checks before submission
-		can_submit = True
+		# - Verify stock levels if negative stock not allowed
+		# - Verify if all items were found
 		error_list = ""
 
 		if hasattr(invoice, "_item_lookup_errors") and invoice._item_lookup_errors:
 			error_list = "<br>".join(invoice._item_lookup_errors)
-			can_submit = False
 
 		for item in invoice.items:
 			if (
@@ -318,11 +317,10 @@ def process_sales(sales_node, type=0):
 				and flt(item.actual_qty) < flt(item.qty)
 				and item.maintain_stock
 			):
-				can_submit = False
 				error_list += _("Insufficient stock for item") + f"- {item.item_code}"
 
-		if can_submit is False:
-			add_comment(_("Invoice Creation Failed"), error_list, "Sales Invoice", invoice.name)
+		if error_list:
+			add_comment(invoice, _("Invoice Creation Failed") + f" {receipt_no}", error_list)
 
 			return {
 				"receipt_no": receipt_no,
@@ -335,28 +333,27 @@ def process_sales(sales_node, type=0):
 				"status": "success",
 				"message": _("Invoice created (not submitted as per settings)"),
 			}
-		else:
-			try:
-				invoice.save()
-				# NOTE: ^ saving again here looks redundant, we had this before 9f289684ca08ef78ac536631bcbc8aecca2f363b
-				# After deployment, there were missing gl entries for ADDED payment entries, when an invoice status is PAID, so might be related...
-				# TODO: verify the cause, account was added when invoice.append("payments", ... ), so might be related to that
-				invoice.submit()
-				return {
-					"receipt_no": receipt_no,
-					"status": "success",
-					"message": _("Invoice created and submitted"),
-				}
-			except Exception as e:
-				error_msg = str(e)
+		try:
+			invoice.save()
+			# NOTE: ^ saving again here looks redundant, we had this before 9f289684ca08ef78ac536631bcbc8aecca2f363b
+			# After deployment, there were missing gl entries for ADDED payment entries, when an invoice status is PAID, so might be related...
+			# TODO: verify the cause, account was added when invoice.append("payments", ... ), so might be related to that
+			invoice.submit()
+			return {
+				"receipt_no": receipt_no,
+				"status": "success",
+				"message": _("Invoice created and submitted"),
+			}
+		except Exception as e:
+			error_msg = str(e)
 
-				add_comment("Invoice Submission Failed", error_msg, "Sales Invoice", invoice.name)
+			add_comment(invoice, _("RASO Sales {} Invoice Submission Failed").format(receipt_no), error_msg)
 
-				return {
-					"receipt_no": receipt_no,
-					"status": "accepted",
-					"message": _("Invoice created but submission failed"),
-				}
+			return {
+				"receipt_no": receipt_no,
+				"status": "accepted",
+				"message": _("Invoice created but submission failed"),
+			}
 	except Exception as e:
 		frappe.log_error(f"RASO Sales {receipt_no} processing Error:", traceback.format_exc())
 		return {
@@ -494,7 +491,7 @@ def get_payment_account(payment_method_name, company):
 					return acc_row.default_account
 	except Exception as e:
 		frappe.log_error(
-			"Error fetching payment account",
+			"RASO: Error fetching payment account",
 			f"Payment method: {payment_method_name}, Company: {company}, Error: {e!s}",
 		)
 
