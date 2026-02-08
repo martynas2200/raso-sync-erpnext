@@ -60,6 +60,7 @@ class RASOSyncSettings(Document):
 			"last_sale_import",
 			frappe.utils.now(),
 		)
+		frappe.publish_realtime("raso_sync_status_update", {"last_sale_import": frappe.utils.now()})
 
 	@staticmethod
 	def update_last_data_export():
@@ -72,6 +73,7 @@ class RASOSyncSettings(Document):
 			"last_data_export",
 			frappe.utils.now(),
 		)
+		frappe.publish_realtime("raso_sync_status_update", {"last_data_export": frappe.utils.now()})
 
 	@staticmethod
 	def get_payment_method_mapping(payment_code: str):

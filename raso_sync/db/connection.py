@@ -1,5 +1,7 @@
 import logging
 from contextlib import contextmanager
+
+# TODO: import threading
 from typing import Any, ClassVar
 
 import frappe
@@ -11,7 +13,7 @@ logger.setLevel(logging.INFO)
 
 class MSSQLConnection:
 	"""
-	Manages a single MSSQL connection with automatic cleanup.
+	Manages a single MSSQL connection.
 	Uses context managers for safe cursor operations.
 	"""
 
@@ -120,6 +122,7 @@ class MSSQLConnection:
 				settings.save(ignore_permissions=True)
 				frappe.db.commit()
 				logger.info(f"Synchronization status set to: {is_running}")
+				frappe.publish_realtime("raso_sync_status_update", {"is_running": is_running})
 		except Exception as e:
 			logger.warning(f"Could not update synchronization status: {e!s}")
 

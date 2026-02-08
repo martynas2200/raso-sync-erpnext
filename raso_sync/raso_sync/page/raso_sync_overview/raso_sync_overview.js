@@ -1,7 +1,4 @@
 // Page API documentation: https://frappeframework.com/docs/user/en/api/page
-// https://github.com/frappe/erpnext/blob/version-15/erpnext/stock/page/warehouse_capacity_summary/warehouse_capacity_summary.js
-
-// Also consider using frappe.cache to report on the last sync times without querying the database
 
 frappe.pages["raso-sync-overview"].on_page_load = function (wrapper) {
     var page = frappe.ui.make_app_page({
@@ -14,10 +11,6 @@ frappe.pages["raso-sync-overview"].on_page_load = function (wrapper) {
 
     if (frappe.raso_sync_overview) {
         frappe.raso_sync_overview.setup(page);
-        // Ensure interval cleanup when page is unloaded (navigated away)
-        $(wrapper).on("remove", function () {
-            frappe.raso_sync_overview.cleanup && frappe.raso_sync_overview.cleanup();
-        });
     }
 
     page.set_primary_action(__("Open Settings"), () => {
@@ -25,28 +18,26 @@ frappe.pages["raso-sync-overview"].on_page_load = function (wrapper) {
     });
 };
 
+frappe.pages["raso-sync-overview"].refresh = function (wrapper) {
+    if (frappe.raso_sync_overview) {
+        frappe.raso_sync_overview.load_settings();
+    }
+};
+
 frappe.raso_sync_overview = {
+    realtime_callback: null,
+
     setup: function (page) {
         this.page = page;
         this.load_settings();
         this.attach_event_handlers();
-        // Clear existing interval if setup re-runs for any reason
-        if (this.refresh_interval) {
-            clearInterval(this.refresh_interval);
-        }
-        this.refresh_interval = setInterval(() => {
-            this.load_settings(false);
-        }, 10000);
+        this.setup_realtime_updates();
     },
 
-    cleanup: function () {
-        if (this.refresh_interval) {
-            clearInterval(this.refresh_interval);
-            this.refresh_interval = null;
+    load_settings: function () {
+        if (!$(this.page.wrapper).is(":visible")) {
+            return;
         }
-    },
-
-    load_settings: function (notification = true) {
         var me = this;
         frappe.call({
             method: "frappe.client.get",
@@ -57,14 +48,6 @@ frappe.raso_sync_overview = {
                 if (response.message) {
                     me.settings = response.message;
                     me.update_ui();
-                    if (notification)
-                        frappe.show_alert(
-                            {
-                                message: __("Settings loaded successfully"),
-                                indicator: "green",
-                            },
-                            3
-                        );
                 }
             },
         });
@@ -111,10 +94,33 @@ frappe.raso_sync_overview = {
         $("#execute-fetch-btn").on("click", () => me.execute_fetch());
     },
 
+    setup_realtime_updates: function () {
+        var me = this;
+        // Unsubscribe previous callback if exists
+        if (this.realtime_callback) {
+            frappe.realtime.off("raso_sync_status_update", this.realtime_callback);
+        }
+        this.realtime_callback = function (data) {
+            if (!me.settings || !data) {
+                return;
+            }
+
+            // Might be good idea to use Object.Assign here
+            if (typeof data.is_running === "boolean") {
+                me.settings.synchronization_is_running = data.is_running;
+            } else if (data.last_data_export) {
+                me.settings.last_data_export = data.last_data_export;
+            } else if (data.last_sale_import) {
+                me.settings.last_sale_import = data.last_sale_import;
+            }
+            me.update_ui();
+        };
+        frappe.realtime.on("raso_sync_status_update", this.realtime_callback);
+    },
+
     update_ui: function () {
         if (!this.settings) return;
 
-        // Update sync status banner
         const is_running = this.settings.synchronization_is_running;
         const $banner = $("#sync-status-banner");
         const $status_text = $("#sync-status-text");
@@ -127,7 +133,6 @@ frappe.raso_sync_overview = {
             $status_text.text(__("Synchronization is idle"));
         }
 
-        // Update status cards
         $("#last-sale-import").text(this.format_date(this.settings.last_sale_import));
         $("#last-data-export").text(this.format_date(this.settings.last_data_export));
     },
@@ -239,6 +244,7 @@ frappe.raso_sync_overview = {
                         5
                     );
                     $("#fetch-options").removeClass("show");
+                    $("#sync-buttons").show();
                 } else {
                     frappe.show_alert(
                         {

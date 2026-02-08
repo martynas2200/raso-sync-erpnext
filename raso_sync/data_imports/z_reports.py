@@ -108,7 +108,6 @@ def process_z_report(z_report_node):
 
 		# Financial data
 		doc.daily_turnover = flt(_get_text(z_report_node, "DienosApyvarta"))
-		doc.gt = flt(_get_text(z_report_node, "GT"))
 
 		# VAT amounts
 		for i in range(1, 6):

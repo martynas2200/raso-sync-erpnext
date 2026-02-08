@@ -21,7 +21,6 @@
   "fiscal_receipts_count",
   "non_fiscal_receipts_count",
   "daily_turnover",
-  "gt",
   "vat_section",
   "vat_amount_1",
   "vat_amount_2",
@@ -109,7 +108,6 @@
   {
    "fieldname": "id",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "ID",
    "reqd": 1,
    "unique": 1,
@@ -184,11 +182,6 @@
    "in_list_view": 1,
    "fieldtype": "Currency",
    "label": "Daily Turnover"
-  },
-  {
-   "fieldname": "gt",
-   "fieldtype": "Currency",
-   "label": "GT"
   },
   {
    "fieldname": "vat_section",
