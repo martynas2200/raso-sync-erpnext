@@ -143,23 +143,23 @@ before_uninstall = "raso_sync.custom_fields.remove_custom_fields"
 doc_events = {
 	"Item": {
 		"after_insert": "raso_sync.tasks.send.mark_doctype_needs_attention",
-		"after_update": "raso_sync.tasks.send.mark_doctype_needs_attention",
+		"on_update": "raso_sync.tasks.send.mark_doctype_needs_attention",
 		"after_delete": "raso_sync.tasks.send.mark_doctype_needs_attention",
 	},
 	"Item Price": {
 		"after_insert": "raso_sync.tasks.send.mark_doctype_needs_attention",
-		"after_update": "raso_sync.tasks.send.mark_doctype_needs_attention",
+		"on_update": "raso_sync.tasks.send.mark_doctype_needs_attention",
 		"after_delete": "raso_sync.tasks.send.mark_doctype_needs_attention",
 	},
 	"Item Group": {
 		"before_save": "raso_sync.item_group_hook.ensure_raso_id",
 		"after_insert": "raso_sync.tasks.send.mark_doctype_needs_attention",
-		"after_update": "raso_sync.tasks.send.mark_doctype_needs_attention",
+		"on_update": "raso_sync.tasks.send.mark_doctype_needs_attention",
 		"after_delete": "raso_sync.tasks.send.mark_doctype_needs_attention",
 	},
 	"Customer": {
 		"after_insert": "raso_sync.tasks.send.mark_doctype_needs_attention",
-		"after_update": "raso_sync.tasks.send.mark_doctype_needs_attention",
+		"on_update": "raso_sync.tasks.send.mark_doctype_needs_attention",
 		"after_delete": "raso_sync.tasks.send.mark_doctype_needs_attention",
 	},
 }
