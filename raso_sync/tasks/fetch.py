@@ -194,6 +194,7 @@ def process_export_record(export_record):
 
 	# Import data to ERPNext
 	import_result = import_data_internal(type=data_type, xml_data=sync_data_str)
+	frappe.db.commit()
 
 	# Update status to success
 	update_export_status(

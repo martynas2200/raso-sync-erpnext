@@ -53,23 +53,60 @@ def sales_internal(xml_data=None):
 				),
 			}
 
-		# Process each receipt
+		# Process each receipt with per-record isolation.
 		response = {"status": "success", "message": "", "results": []}
 
-		for sale in root.findall("Sales"):
-			type = get_sales_type(sale)
-			result = process_sales(sale, type)
-			response["results"].append(result)
+		for i, sale in enumerate(root.findall("Sales")):
+			savepoint_name = f"sales_import_{i}"
+			try:
+				frappe.db.savepoint(savepoint_name)
+				type = get_sales_type(sale)
+				result = process_sales(sale, type)
+				response["results"].append(result)
 
+				if result["status"] == "error":
+					frappe.db.rollback(save_point=savepoint_name)
+				else:
+					frappe.db.commit()
+			except Exception as e:
+				frappe.db.rollback(save_point=savepoint_name)
+				frappe.log_error(
+					"RASO Import Record Error",
+					f"Record {i}: {traceback.format_exc()}",
+				)
+				response["results"].append(
+					{
+						"receipt_no": sale.get("ReceiptNo", "Unknown"),
+						"status": "error",
+						"message": str(e),
+					}
+				)
+
+		# Build accurate status message
+		success_count = sum(1 for r in response["results"] if r["status"] == "success")
+		accepted_count = sum(1 for r in response["results"] if r["status"] == "accepted")
+		skipped_count = sum(1 for r in response["results"] if r["status"] == "skipped")
 		error_count = sum(1 for r in response["results"] if r["status"] == "error")
-		if not error_count:
-			response["message"] = f"{len(response['results'])} sales receipts imported successfully."
-		elif error_count == len(response["results"]):
+		total = len(response["results"])
+
+		parts = []
+		if success_count:
+			parts.append(f"{success_count} imported successfully")
+		if accepted_count:
+			parts.append(f"{accepted_count} created but not submitted")
+		if skipped_count:
+			parts.append(f"{skipped_count} skipped")
+		if error_count:
+			parts.append(f"{error_count} failed")
+
+		response["message"] = ". ".join(parts) + "." if parts else "No records to process."
+
+		if error_count == 0:
+			response["status"] = "success"
+		elif error_count == total:
 			response["status"] = "error"
-			response["message"] = "Nothing was imported due to errors."
 		else:
 			response["status"] = "partial_success"
-			response["message"] = f"Completed with {error_count} errors."
 
 		RASOSyncSettings.update_last_sale_import()
 
