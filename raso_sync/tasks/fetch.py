@@ -175,6 +175,8 @@ def process_export_record(export_record):
 
 	logger.info(f"Processing export {sync_id} (Type: {data_type}, Shop: {shop_no})")
 
+	update_export_status(sync_id, status=2)
+
 	# Get full SyncData from the database record
 	if sync_data_str.endswith("..."):
 		full_sync_data = ProcedureBuilder.execute_procedure(

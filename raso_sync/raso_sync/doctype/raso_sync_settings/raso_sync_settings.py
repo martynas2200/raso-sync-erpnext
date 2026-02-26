@@ -98,7 +98,7 @@ class RASOSyncSettings(Document):
 		default_payment_method = default_mappings.get(payment_code, "Other")
 
 		# Check if the default mapping even exists in Frappe DB
-		frappe_payment_methods = [pm.name for pm in frappe.get_all("Payment Method")]
+		frappe_payment_methods = [pm.name for pm in frappe.get_all("Mode of Payment")]
 		if frappe_payment_methods:
 			if default_payment_method in frappe_payment_methods:
 				return {"frappe_payment_method": default_payment_method}

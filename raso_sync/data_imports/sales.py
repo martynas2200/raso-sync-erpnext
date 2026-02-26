@@ -133,7 +133,11 @@ def validate_sales_payments(root):
 
 	for sales in root.findall("Sales"):
 		for payment in sales.findall("Payment"):
-			code = payment.find("CODE").text
+			code = (
+				payment.find("CODE").text
+				if payment.find("CODE") is not None and payment.find("CODE").text
+				else ""
+			)
 			amount = flt(payment.find("AMOUNT").text)
 			sales_payments[code] += amount
 
@@ -141,7 +145,11 @@ def validate_sales_payments(root):
 	total_payments = defaultdict(float)
 
 	for payment in root.findall("Payments"):
-		code = payment.find("CODE").text
+		code = (
+			payment.find("CODE").text
+			if payment.find("CODE") is not None and payment.find("CODE").text
+			else ""
+		)
 		amount = flt(payment.find("AMOUNT").text)
 		total_payments[code] = amount
 
@@ -178,6 +186,26 @@ def add_comment(doc, subject, content):
 		frappe.log_error("RASO: Failed to add a comment", f"{subject}: {content}")
 
 
+def get_receipt_number(receipt_no, shop_no, pos_no, settings=None):
+	"""
+	Generate the receipt number based on settings.
+	"""
+	if not settings:
+		settings = RASOSyncSettings.get_settings()
+
+	if settings.use_shop_no_and_pos_no:
+		return f"{shop_no}-{pos_no}-{receipt_no}"
+	return f"{receipt_no}"
+
+
+def check_existing_invoice(receipt):
+	"""
+	Check if a Sales Invoice with the given receipt number already exists.
+	Returns the name of the invoice if it exists, otherwise None.
+	"""
+	return frappe.db.get_value("Sales Invoice", {"raso_receipt_no": receipt}, "name")
+
+
 def process_sales(sales_node, type=0):
 	"""
 	Process a single sales receipt or return
@@ -202,13 +230,11 @@ def process_sales(sales_node, type=0):
 				"status": "error",
 				"message": "Missing data",
 			}
-		if settings.use_shop_no_and_pos_no:
-			receipt = f"{shop_no}-{pos_no}-{receipt_no}"
-		else:
-			receipt = f"{receipt_no}"
+
+		receipt = get_receipt_number(receipt_no, shop_no, pos_no, settings)
 
 		# Check for existing invoice with the same raso_receipt_no
-		existing_invoice = frappe.db.get_value("Sales Invoice", {"raso_receipt_no": receipt}, "name")
+		existing_invoice = check_existing_invoice(receipt)
 		if existing_invoice:
 			return {
 				"receipt_no": receipt_no,
@@ -272,6 +298,7 @@ def process_sales(sales_node, type=0):
 				add_payment_to_invoice(settings, invoice, payment)
 
 		invoice.save()
+		frappe.db.commit()
 
 		# Checks before submission
 		# - Verify stock levels if negative stock not allowed
@@ -305,10 +332,8 @@ def process_sales(sales_node, type=0):
 			}
 		try:
 			invoice.save()
-			# NOTE: ^ saving again here looks redundant, we had this before 9f289684ca08ef78ac536631bcbc8aecca2f363b
-			# After deployment, there were missing gl entries for ADDED payment entries, when an invoice status is PAID, so might be related...
-			# TODO: verify the cause, account was added when invoice.append("payments", ... ), so might be related to that
 			invoice.submit()
+			frappe.db.commit()
 			return {
 				"receipt_no": receipt_no,
 				"status": "success",
@@ -472,7 +497,11 @@ def add_payment_to_invoice(settings, invoice, payment_node):
 	"""
 	Add payment information to the sales invoice
 	"""
-	code = payment_node.find("CODE").text
+	code = (
+		payment_node.find("CODE").text
+		if payment_node.find("CODE") is not None and payment_node.find("CODE").text
+		else ""
+	)
 	amount = flt(payment_node.find("AMOUNT").text)
 
 	payment_method = RASOSyncSettings.get_payment_method_mapping(code)
