@@ -1,10 +1,11 @@
 import logging
 import traceback
+from collections import Counter
 
 import frappe
 from frappe.utils.background_jobs import is_job_enqueued
 
-from . import MsgprintHandler, get_exports, process_export_record, update_export_status
+from . import MsgprintHandler, get_exports, process_export_record
 
 logger = frappe.logger("raso_sync_maintenance")
 logger.setLevel("DEBUG")
@@ -91,7 +92,7 @@ def check_for_errors_in_previous_imports():
 			return []
 
 		logger.warning(f"Found {len(error_exports)} previous import errors to retry")
-		results = {"total_processed": len(error_exports), "successful": 0, "failed": 0}
+		results = Counter()
 
 		# Retry processing each error export
 		for export_record in error_exports:
@@ -102,14 +103,8 @@ def check_for_errors_in_previous_imports():
 			logger.info(f"Retrying Export ID: {sync_id}, DataType: {data_type}, ShopNo: {shop_no}")
 
 			try:
-				# Retry processing the export record
-				process_export_record(export_record)
-				results["successful"] += 1
-				logger.info(f"Successfully reprocessed export {sync_id}!")
-				update_export_status(
-					sync_id, status=1, message="Successfully reprocessed during maintenance task."
-				)
-
+				status = process_export_record(export_record)
+				results[status] += 1
 			except Exception as e:
 				results["failed"] += 1
 				logger.error(f"Error retrying export {sync_id}: {e!s}")
@@ -117,7 +112,11 @@ def check_for_errors_in_previous_imports():
 				frappe.log_error("RASO: maintenance_retry_failed", error_details)
 
 		logger.info(
-			f"Maintenance completed. Successful: {results['successful']}, Failed: {results['failed']}"
+			"Maintenance completed. Processed: %s, Success: %s, Partial: %s, Failed: %s",
+			len(error_exports),
+			results.get("success", 0),
+			results.get("partial_success", 0),
+			results.get("failed", 0),
 		)
 
 		return error_exports

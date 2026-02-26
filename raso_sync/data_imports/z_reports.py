@@ -6,6 +6,8 @@ from frappe.utils import cint, flt
 
 from raso_sync.raso_sync.doctype.raso_sync_settings.raso_sync_settings import RASOSyncSettings
 
+from .utils import summarize_import_results
+
 
 # NOTE: helper function for cases like: if IdetaGrynuju2 = 0, then there is no exported IdetaGrynujuKartai2 for some reason
 def _get_text(node, tag_name):
@@ -44,15 +46,9 @@ def z_report_internal(xml_data=None):
 			result = process_z_report(z_report_node)
 			response["results"].append(result)
 
-		# Summary
-		error_count = sum(1 for r in response["results"] if r["status"] == "error")
-		success_count = sum(1 for r in response["results"] if r["status"] == "success")
-
-		if not error_count:
-			response["message"] = f"{success_count} Z Report(s) imported successfully."
-		else:
-			response["status"] = "partial_success" if success_count > 0 else "error"
-			response["message"] = f"{success_count} succeeded, {error_count} failed."
+		summary_status, summary_message = summarize_import_results(response["results"])
+		response["status"] = summary_status
+		response["message"] = summary_message
 
 		return response
 

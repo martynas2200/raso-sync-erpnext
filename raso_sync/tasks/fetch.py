@@ -2,6 +2,7 @@
 
 import logging
 import traceback
+from collections import Counter
 
 import frappe
 from frappe.utils.background_jobs import is_job_enqueued
@@ -14,7 +15,14 @@ from . import MsgprintHandler
 
 logger = frappe.logger("raso_sync_fetch")
 logger.setLevel("DEBUG")
-# https://docs.frappe.io/framework/user/en/api/logging
+
+STATUS_CODE_MAP = {
+	"new": 0,
+	"success": 1,
+	"processing": 2,
+	"error": 3,
+	"partial_success": 4,
+}
 
 
 def execute_fetch_task(type=None):
@@ -61,14 +69,11 @@ def execute_fetch_task_worker(type=None, inform_user=False):
 			logger.info("Fetch Task: Skipped due to outside of working hours.")
 			return
 
-		# POSSIBLE TODO: Argument check --- not needed, we only support a single type
-
-		results = {"total_processed": 0, "successful": 0, "failed": 0, "errors": []}
+		results_counter = Counter()
 
 		try:
-			# Retrieve all new data exports (Status = 0)
 			new_exports = get_exports()
-			results["total_processed"] = len(new_exports)
+			total_processed = len(new_exports)
 
 			if not new_exports:
 				logger.info("Fetch Task: No new data exports to process")
@@ -79,10 +84,10 @@ def execute_fetch_task_worker(type=None, inform_user=False):
 			# Process each export record
 			for export_record in new_exports:
 				try:
-					process_export_record(export_record)
-					results["successful"] += 1
+					status = process_export_record(export_record)
+					results_counter[status] += 1
 				except Exception as e:
-					results["failed"] += 1
+					results_counter["failed"] += 1
 					logger.error(f"Fetch Task: Error processing export {export_record}: {e!s}")
 					if export_record.get("SyncData", 0):
 						logger.error(export_record.get("SyncData", ""))
@@ -91,16 +96,20 @@ def execute_fetch_task_worker(type=None, inform_user=False):
 					# Log full exception with traceback
 					error_details = f"Export Record: {export_record}\n\nException:\n{traceback.format_exc()}"
 					document = frappe.log_error("execute_fetch_task", error_details)
-					error_name = document.name if document else "Unknown"
+					error_name = document.name if document else ""
 
 					update_export_status(
 						export_record.get("SyncDataExportId"),
-						status=3,  # Error
+						status=STATUS_CODE_MAP["error"],
 						message="See error log " + error_name + " for details in ERPNext logs.",
 					)
-			logger.info(f"Fetch Task Completed. Successful: {results['successful']}")
-			if results["failed"] > 0:
-				logger.info(f"Fetch Task Completed. Failed: {results['failed']}")
+			logger.info(
+				"Fetch Task Completed. Processed: %s, Success: %s, Partial: %s, Failed: %s",
+				total_processed,
+				results_counter.get("success", 0),
+				results_counter.get("partial_success", 0),
+				results_counter.get("failed", 0),
+			)
 
 		except Exception as e:
 			logger.error(f"Fetch Task: Fatal error - {e!s}")
@@ -175,10 +184,10 @@ def process_export_record(export_record):
 
 	logger.info(f"Processing export {sync_id} (Type: {data_type}, Shop: {shop_no})")
 
-	update_export_status(sync_id, status=2)
+	update_export_status(sync_id, status=STATUS_CODE_MAP["processing"])
 
 	# Get full SyncData from the database record
-	if sync_data_str.endswith("..."):
+	if sync_data_str and sync_data_str.endswith("..."):
 		full_sync_data = ProcedureBuilder.execute_procedure(
 			"ie.usp_SyncDataExport_v", {"SyncDataExportId": sync_id}
 		)
@@ -198,14 +207,17 @@ def process_export_record(export_record):
 	import_result = import_data_internal(type=data_type, xml_data=sync_data_str)
 	frappe.db.commit()
 
-	# Update status to success
+	status = import_result.get("status", "error")
+
 	update_export_status(
 		sync_id,
-		status=1
-		if import_result.get("status") == "success"
-		else (4 if import_result.get("status") == "partial_success" else 3),
-		message=import_result.get("message", "No message returned"),
+		status=STATUS_CODE_MAP.get(status, 3),  # Default to error if unknown status
+		message=import_result.get("message", "Unknown error"),
 	)
+
+	logger.info("Export %s completed with status %s", sync_id, status)
+
+	return status
 
 
 def update_export_status(sync_id, status, message=None):
@@ -222,6 +234,8 @@ def update_export_status(sync_id, status, message=None):
 	Raises:
 		Exception: If database update fails
 	"""
+	if status < 0 or status > 4:
+		raise ValueError(f"Invalid status code: {status}. Must be between 0 and 4.")
 
 	try:
 		params = {

@@ -11,6 +11,8 @@ from frappe.utils import flt
 
 from raso_sync.raso_sync.doctype.raso_sync_settings.raso_sync_settings import RASOSyncSettings
 
+from .utils import summarize_import_results
+
 
 def sales_internal(xml_data=None):
 	"""
@@ -82,33 +84,11 @@ def sales_internal(xml_data=None):
 					}
 				)
 
-		# Build accurate status message
-		success_count = sum(1 for r in response["results"] if r["status"] == "success")
-		accepted_count = sum(1 for r in response["results"] if r["status"] == "accepted")
-		skipped_count = sum(1 for r in response["results"] if r["status"] == "skipped")
-		error_count = sum(1 for r in response["results"] if r["status"] == "error")
-		total = len(response["results"])
-
-		parts = []
-		if success_count:
-			parts.append(f"{success_count} imported successfully")
-		if accepted_count:
-			parts.append(f"{accepted_count} created but not submitted")
-		if skipped_count:
-			parts.append(f"{skipped_count} skipped")
-		if error_count:
-			parts.append(f"{error_count} failed")
-
-		response["message"] = ". ".join(parts) + "." if parts else "No records to process."
-
-		if error_count == 0:
-			response["status"] = "success"
-		elif error_count == total:
-			response["status"] = "error"
-		else:
-			response["status"] = "partial_success"
-
 		RASOSyncSettings.update_last_sale_import()
+
+		response_status, response_message = summarize_import_results(response["results"])
+		response["status"] = response_status
+		response["message"] = response_message
 
 		return response
 
