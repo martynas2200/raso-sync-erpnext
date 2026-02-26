@@ -85,7 +85,7 @@ class RASOSyncSettings(Document):
 		# Check if there's a custom mapping
 		for mapping in settings.payment_mappings:
 			if mapping.raso_payment_code == payment_code:
-				return mapping
+				return mapping.frappe_payment_method
 
 		frappe.log_error("Missing payment mapping", f"RASO payment code: {payment_code}")
 
@@ -101,13 +101,13 @@ class RASOSyncSettings(Document):
 		frappe_payment_methods = [pm.name for pm in frappe.get_all("Mode of Payment")]
 		if frappe_payment_methods:
 			if default_payment_method in frappe_payment_methods:
-				return {"frappe_payment_method": default_payment_method}
+				return default_payment_method
 			else:
 				frappe.log_error(
 					"Fallback failed - missing Payment Method",
-					f"Payment Method '{default_payment_method}' for RASO code '{payment_code}' is missing. Using first available payment method.",
+					f"Payment Method '{default_payment_method}' for RASO code '{payment_code}' is missing.",
 				)
-				return {"frappe_payment_method": frappe_payment_methods[0]}
+				return None
 		return None
 
 	@staticmethod

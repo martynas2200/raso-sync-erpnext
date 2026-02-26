@@ -117,6 +117,22 @@ def sales_internal(xml_data=None):
 		return {"status": "error", "message": str(e)[:50] if str(e) else "An unknown error occurred."}
 
 
+def get_payment_code(payment_node):
+	"""
+	Extract payment code from Payment node.
+	Tries 'CODE' first, then 'PAYMETHOD'.
+	Raises ValueError if both are missing or empty.
+	"""
+	code = payment_node.find("CODE").text if payment_node.find("CODE") is not None else None
+	if not code:
+		code = payment_node.find("PAYMETHOD").text if payment_node.find("PAYMETHOD") is not None else None
+
+	if not code:
+		raise ValueError("Missing or empty CODE and PAYMETHOD in Payment node.")
+
+	return code
+
+
 def validate_sales_payments(root):
 	"""
 	Validate that the sum of all payments in Sales nodes matches
@@ -133,11 +149,13 @@ def validate_sales_payments(root):
 
 	for sales in root.findall("Sales"):
 		for payment in sales.findall("Payment"):
-			code = (
-				payment.find("CODE").text
-				if payment.find("CODE") is not None and payment.find("CODE").text
-				else ""
-			)
+			try:
+				code = get_payment_code(payment)
+			except ValueError as e:
+				return {
+					"valid": False,
+					"error": _("Payment validation failed: ") + str(e),
+				}
 			amount = flt(payment.find("AMOUNT").text)
 			sales_payments[code] += amount
 
@@ -145,11 +163,13 @@ def validate_sales_payments(root):
 	total_payments = defaultdict(float)
 
 	for payment in root.findall("Payments"):
-		code = (
-			payment.find("CODE").text
-			if payment.find("CODE") is not None and payment.find("CODE").text
-			else ""
-		)
+		try:
+			code = get_payment_code(payment)
+		except ValueError as e:
+			return {
+				"valid": False,
+				"error": _("Payment validation failed: ") + str(e),
+			}
 		amount = flt(payment.find("AMOUNT").text)
 		total_payments[code] = amount
 
@@ -287,15 +307,12 @@ def process_sales(sales_node, type=0):
 			add_item_to_invoice(invoice, sale)
 
 		for payment in sales_node.findall("Payment"):
+			code = get_payment_code(payment)
 			# Check for rounding codes
-			if (
-				settings.rounding_codes
-				and payment.find("CODE") is not None
-				and payment.find("CODE").text in settings.rounding_codes.split(",")
-			):
+			if settings.rounding_codes and code in settings.rounding_codes.split(","):
 				invoice.disable_rounded_total = 0
 			elif settings.add_payments_to_invoices and type == 0:
-				add_payment_to_invoice(settings, invoice, payment)
+				add_payment_to_invoice(settings, invoice, payment, code)
 
 		invoice.save()
 		frappe.db.commit()
@@ -493,15 +510,13 @@ def get_payment_account(payment_method_name, company):
 	return None
 
 
-def add_payment_to_invoice(settings, invoice, payment_node):
+def add_payment_to_invoice(settings, invoice, payment_node, code=None):
 	"""
 	Add payment information to the sales invoice
 	"""
-	code = (
-		payment_node.find("CODE").text
-		if payment_node.find("CODE") is not None and payment_node.find("CODE").text
-		else ""
-	)
+	if not code:
+		code = get_payment_code(payment_node)
+
 	amount = flt(payment_node.find("AMOUNT").text)
 
 	payment_method = RASOSyncSettings.get_payment_method_mapping(code)
@@ -509,23 +524,23 @@ def add_payment_to_invoice(settings, invoice, payment_node):
 	if not payment_method:
 		frappe.log_error(
 			"RASO Payment Method Mapping Missing",
-			f"No payment method mapping found for RASO payment code {code}. Skipping payment addition.",
+			f"No payment method mapping found for RASO payment code '{code}'. Skipping payment addition.",
 		)
 		return 0
 
 	# Get the account for this payment method
-	account = get_payment_account(payment_method.frappe_payment_method, invoice.company)
+	account = get_payment_account(payment_method, invoice.company)
 
 	if not account:
 		frappe.log_error(
 			"RASO Payment Account Missing",
-			f"No account found for payment method {payment_method.frappe_payment_method} in company {invoice.company}. Skipping payment addition.",
+			f"No account found for payment method {payment_method} in company {invoice.company}. Skipping payment addition.",
 		)
 		return 0
 
 	invoice.append(
 		"payments",
-		{"mode_of_payment": payment_method.frappe_payment_method, "amount": amount, "account": account},
+		{"mode_of_payment": payment_method, "amount": amount, "account": account},
 	)
 
 	return amount

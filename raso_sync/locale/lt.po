@@ -773,3 +773,6 @@ msgstr "Priklausomai nuo konfigūracijos, gali būti naudojamas suapvalinimui"
 
 msgid "Based on User Code field"
 msgstr "Remiantis naudotojo kodo lauku"
+
+msgid "RASO Sync"
+msgstr "RASO sinchronizacija"
