@@ -96,7 +96,7 @@ def manual_upload(data_type, mode):
 
 
 @frappe.whitelist()
-def manual_fetch(data_type):
+def manual_fetch():
 	"""
 	Manually trigger fetch of data from RASO
 	"""

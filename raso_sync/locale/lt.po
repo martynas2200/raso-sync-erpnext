@@ -304,11 +304,8 @@ msgstr "Rankinis sinchronizavimas"
 msgid "Get Data"
 msgstr "Gauti duomenis"
 
-msgid "Sale Invoices"
-msgstr "Pardavimų sąskaitos"
-
-msgid "Execute Fetch"
-msgstr "Vykdyti gavimą"
+msgid "Are you sure you want to fetch data from RASO POS server?<br>Supported data types: Sales, Returns, Z Reports"
+msgstr "Ar tikrai norite gauti duomenis iš RASO POS serverio?<br>Palaikomi duomenų tipai: pardavimai, grąžinimai, Z ataskaitos"
 
 msgid "Upload completed successfully"
 msgstr "Įkėlimas sėkmingai baigtas"

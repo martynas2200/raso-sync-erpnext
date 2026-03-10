@@ -79,19 +79,8 @@ frappe.raso_sync_overview = {
 
         $("#execute-upload-btn").on("click", () => me.execute_upload());
 
-        // Fetch Actions
-        $("#fetch-btn").on("click", function () {
-            $("#sync-buttons").hide();
-            $("#fetch-options").toggleClass("show");
-            $("#upload-options").removeClass("show");
-        });
-
-        $("#cancel-fetch-btn").on("click", function () {
-            $("#sync-buttons").show();
-            $("#fetch-options").removeClass("show");
-        });
-
-        $("#execute-fetch-btn").on("click", () => me.execute_fetch());
+        // Fetch
+        $("#fetch-btn").on("click", () => me.execute_fetch());
     },
 
     setup_realtime_updates: function () {
@@ -105,14 +94,8 @@ frappe.raso_sync_overview = {
                 return;
             }
 
-            // Might be good idea to use Object.Assign here
-            if (typeof data.is_running === "boolean") {
-                me.settings.synchronization_is_running = data.is_running;
-            } else if (data.last_data_export) {
-                me.settings.last_data_export = data.last_data_export;
-            } else if (data.last_sale_import) {
-                me.settings.last_sale_import = data.last_sale_import;
-            }
+            // Update all provided fields
+            Object.assign(me.settings, data);
             me.update_ui();
         };
         frappe.realtime.on("raso_sync_status_update", this.realtime_callback);
@@ -121,7 +104,7 @@ frappe.raso_sync_overview = {
     update_ui: function () {
         if (!this.settings) return;
 
-        const is_running = this.settings.synchronization_is_running;
+        const is_running = this.settings.is_running;
         const $banner = $("#sync-status-banner");
         const $status_text = $("#sync-status-text");
 
@@ -228,35 +211,36 @@ frappe.raso_sync_overview = {
     },
 
     execute_fetch: function () {
-        const fetch_type = $("#fetch-type").val();
-        frappe.call({
-            method: "raso_sync.api.manual.manual_fetch",
-            args: {
-                data_type: fetch_type,
-            },
-            callback: function (r) {
-                if (r.message && r.message.success) {
-                    frappe.show_alert(
-                        {
-                            message: r.message.message || __("Fetch queued successfully"),
-                            indicator: "green",
-                        },
-                        5
-                    );
-                    $("#fetch-options").removeClass("show");
-                    $("#sync-buttons").show();
-                } else {
-                    frappe.show_alert(
-                        {
-                            message:
-                                __("Fetch queued failed: ") +
-                                (r.message?.error || "Unknown error"),
-                            indicator: "red",
-                        },
-                        5
-                    );
-                }
-            },
-        });
+        frappe.confirm(
+            __(
+                "Are you sure you want to fetch data from RASO POS server?<br>Supported data types: Sales, Returns, Z Reports"
+            ),
+            () => {
+                frappe.call({
+                    method: "raso_sync.api.manual.manual_fetch",
+                    callback: function (r) {
+                        if (r.message && r.message.success) {
+                            frappe.show_alert(
+                                {
+                                    message: r.message.message || __("Fetch queued successfully"),
+                                    indicator: "green",
+                                },
+                                5
+                            );
+                        } else {
+                            frappe.show_alert(
+                                {
+                                    message:
+                                        __("Fetch queued failed: ") +
+                                        (r.message?.error || "Unknown error"),
+                                    indicator: "red",
+                                },
+                                5
+                            );
+                        }
+                    },
+                });
+            }
+        );
     },
 };

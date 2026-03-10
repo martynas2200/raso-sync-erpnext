@@ -69,16 +69,14 @@ def execute_send_task(export_type=None, date_from=None):
 	"""
 	Enqueue the send task to export data to RASO.
 
-	Returns:
-		status: str: 'queued' if enqueued, 'skipped' if already running
-		job_id: str: ID of the enqueued job
+	Returns 'queued' if enqueued, 'skipped' if already running
 
 	"""
 	# Define unique job ID to prevent parallel execution
 	job_id = "raso_sync_send_task_worker"
 
 	if is_job_enqueued(job_id):
-		return {"status": "skipped"}
+		return "skipped"
 
 	frappe.enqueue(
 		"raso_sync.tasks.send.execute_send_task_worker",
@@ -89,7 +87,7 @@ def execute_send_task(export_type=None, date_from=None):
 		date_from=date_from,
 	)
 
-	return {"status": "queued", "job_id": job_id}
+	return "queued"
 
 
 def mark_doctype_needs_attention(doc, method):
@@ -106,12 +104,14 @@ def mark_doctype_needs_attention(doc, method):
 	# Only consider supported doctypes
 	if doc.doctype not in DOCTYPE_TO_RASO_TYPE:
 		logger.debug(f"RASO Sync: Ignoring document event for unsupported doctype: {doc.doctype}")
+		return {"status": "ignored", "doctype": doc.doctype}
 
+		# TODO: make into an array and get rid of 15-min window?
 	# Mark needs-attention entry in cache with last event and timestamp
 	key = _needs_attention_key(doc.doctype)
 	value = {
 		"doctype": doc.doctype,
-		"name": doc.name,  # TODO: make into an array and get rid of 15-min window? -> this for now to add UI element later to inform the user which records caused the send
+		"name": doc.name,
 		"last_event": method,
 		"marked_at": _now_str(),
 	}
@@ -254,19 +254,19 @@ def execute_send_task_worker(
 
 		for exp_type in types_to_export:
 			try:
-				type_result = export_and_send_type(
+				record_count = export_and_send_type(
 					export_type=exp_type,
 					date_from=date_from,
 				)
 
 				results["types_processed"].append(exp_type)
-				results["total_exported"] += type_result.get("count", 0)
+				results["total_exported"] += record_count
 				results["successful"] += 1
 				frappe.publish_realtime(
 					event="msgprint",
 					message={
 						"message": frappe._("{0} records of {1} were sent to RASO").format(
-							type_result.get("count", 0),
+							record_count,
 							frappe._(CODE_TO_DOCTYPE.get(_export_type_to_code(exp_type), exp_type)),
 						),
 						"alert": 1,
@@ -340,10 +340,7 @@ def export_and_send_type(export_type, date_from=None):
 		export_type (str): Type of data to export RASO_TYPE
 		date_from (str, optional): Start date filter
 
-	Returns:
-		dict: Export result with keys:
-			- count: Number of records exported
-			- sync_import_id: ID returned from RASO database
+	Returns the number of records exported
 
 	Raises:
 		Exception: If export or send fails
@@ -367,14 +364,17 @@ def export_and_send_type(export_type, date_from=None):
 	record_count = len(export_data)
 	logger.debug(f"Exported {record_count} records of type {export_type} from ERPNext")
 
+	if record_count == 0:
+		return 0
+
 	# Convert XML Element to string payload expected by MSSQL
 	xml_payload = format_xml_response(export_data)
 
 	# Send to RASO database using ie.usp_SyncDataImport_i
 	sync_import_id = insert_to_raso(data_type=export_type, sync_data=xml_payload)
-	logger.debug(f"Send type {export_type} to RASO (SyncDataImportId: {sync_import_id})")
+	logger.debug(f"Sent type {export_type} to RASO (SyncDataImportId: {sync_import_id})")
 
-	return {"count": record_count, "sync_import_id": sync_import_id}
+	return record_count
 
 
 def insert_to_raso(data_type, sync_data, data_provider=None):
