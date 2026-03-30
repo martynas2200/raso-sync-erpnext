@@ -4,7 +4,7 @@ from xml.etree.ElementTree import Element, SubElement
 import frappe
 
 
-def good_groups_internal(full_sync=1, date_from=None):
+def good_groups_internal(full_sync=1, date_from=None, docnames=None):
 	"""
 	Returns XML document of GoodsGroups - DataType 2 (Item Groups)
 
@@ -24,6 +24,10 @@ def good_groups_internal(full_sync=1, date_from=None):
 	if full_sync == 0 and date_from:
 		where_conditions.append("ig.modified >= %(modified)s")
 		params["modified"] = datetime.fromisoformat(date_from)
+
+	if docnames:
+		where_conditions.append("ig.name IN %(docnames)s")
+		params["docnames"] = tuple(docnames)
 
 	where_clause = " AND ".join(where_conditions)
 

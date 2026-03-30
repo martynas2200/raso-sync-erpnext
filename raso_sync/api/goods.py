@@ -4,7 +4,7 @@ from xml.etree.ElementTree import Element, SubElement
 import frappe
 
 
-def goods_internal(full_sync, date_from):
+def goods_internal(full_sync, date_from, docnames=None):
 	"""
 	Returns XML document of Goods (Items) - DataType 3
 
@@ -16,10 +16,18 @@ def goods_internal(full_sync, date_from):
 	root = Element("GoodsSync")
 	root.set("FullSync", str(full_sync))
 
-	date_filter = ""
+	where_conditions = ["`tabItem`.`docstatus` != 2"]
+	params = {}
 	if full_sync == 0 and date_from:
 		modified_date = datetime.fromisoformat(date_from)
-		date_filter = f"AND `tabItem`.`modified` > '{modified_date.strftime('%Y-%m-%d %H:%M:%S')}'"
+		where_conditions.append("`tabItem`.`modified` > %(modified)s")
+		params["modified"] = modified_date.strftime("%Y-%m-%d %H:%M:%S")
+
+	if docnames:
+		where_conditions.append("`tabItem`.`name` IN %(docnames)s")
+		params["docnames"] = tuple(docnames)
+
+	where_clause = " AND ".join(where_conditions)
 	# GROUP_CONCAT to get all tax templates assigned to the item in case of multiple assignments.
 	sql = f"""
         SELECT
@@ -41,12 +49,11 @@ def goods_internal(full_sync, date_from):
         INNER JOIN `tabItem Barcode` ON `tabItem`.`name` = `tabItem Barcode`.`parent`
         LEFT JOIN `tabItem Group` ON `tabItem`.`item_group` = `tabItem Group`.`name`
         LEFT JOIN `tabItem Tax` ON `tabItem`.`name` = `tabItem Tax`.`parent`
-        WHERE `tabItem`.`docstatus` != 2
-        {date_filter}
+		WHERE {where_clause}
         GROUP BY `tabItem Barcode`.`barcode`
     """
 
-	results = frappe.db.sql(sql, as_dict=True)
+	results = frappe.db.sql(sql, params, as_dict=True)
 
 	settings = frappe.get_single("RASO Sync Settings")
 	deposit_package_item = settings.get("deposit_package_item")

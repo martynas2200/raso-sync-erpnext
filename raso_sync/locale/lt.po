@@ -72,8 +72,8 @@ msgstr "Įkelta {0} naudojant {1} režimą"
 msgid "Fetched {0}"
 msgstr "Gauta {0}"
 
-msgid "Manual upload failed: {0}"
-msgstr "Rankinis įkėlimas nepavyko: {0}"
+msgid "Manual send failed: {0}"
+msgstr "Rankinis siuntimas nepavyko: {0}"
 
 msgid "Manual fetch failed: {0}"
 msgstr "Rankinis gavimas nepavyko: {0}"
@@ -455,8 +455,8 @@ msgstr "Šie nustatymai apibrėžia sinchronizavimo intervalus ir elgseną <b>ti
 msgid "Unsupported DataType. Only DataType 0 (Sales) is supported."
 msgstr "Nepalaikomas DataType. Palaikomas tik DataType 0 (pardavimai)."
 
-msgid "Upload queued failed: "
-msgstr "Įkėlimo užklausa į eilę nepavyko: "
+msgid "Send queued failed: "
+msgstr "Siuntimo užklausa į eilę nepavyko: "
 
 msgid "Upload queued successfully"
 msgstr "Užklausa įkėlimui į eilę sėkminga"

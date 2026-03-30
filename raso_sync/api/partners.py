@@ -4,7 +4,7 @@ from xml.etree.ElementTree import Element, SubElement
 import frappe
 
 
-def partners_internal(full_sync, date_from):
+def partners_internal(full_sync, date_from, docnames=None):
 	"""
 	Returns XML document of Partners (Clients) - DataType 1
 
@@ -17,6 +17,9 @@ def partners_internal(full_sync, date_from):
 	if full_sync == 0 and date_from:
 		modified_date = datetime.fromisoformat(date_from)
 		filters["modified"] = (">", modified_date)
+
+	if docnames:
+		filters["name"] = ("in", docnames)
 
 	# Fetch customers
 	try:

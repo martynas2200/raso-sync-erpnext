@@ -52,9 +52,9 @@ def test_connection():
 @frappe.whitelist()
 def manual_upload(data_type, mode):
 	"""
-	Manually trigger upload of data to RASO
+	Manually trigger send of data to RASO
 	Args:
-	    data_type: Type of data to upload (goods, good_prices, good_groups, partners, all)
+	    data_type: Type of data to send (goods, good_prices, good_groups, partners, all)
 	    mode: Sync mode (fullsync or today)
 	"""
 	time.sleep(0.5)
@@ -87,7 +87,7 @@ def manual_upload(data_type, mode):
 
 	except Exception as e:
 		frappe.log_error(
-			"RASO Sync Manual Upload", f"Manual upload failed: {str(e) if str(e) else 'Unknown error'}"
+			"RASO Sync Manual Send", f"Manual send failed: {str(e) if str(e) else 'Unknown error'}"
 		)
 		return {
 			"success": False,
@@ -114,6 +114,7 @@ def manual_fetch():
 			queue="long",
 			job_id="raso_sync_fetch_task_worker",
 			enqueue_after_commit=True,
+			ignore_workhours=True,
 			at_front=True,
 			inform_user=True,
 		)

@@ -9,8 +9,10 @@ from raso_sync.raso_sync.doctype.raso_sync_settings.raso_sync_settings import RA
 from .utils import summarize_import_results
 
 
-# NOTE: helper function for cases like: if IdetaGrynuju2 = 0, then there is no exported IdetaGrynujuKartai2 for some reason
 def _get_text(node, tag_name):
+	"""
+	Helper function to get text content of a child element by tag name, returns None if not found or empty.
+	"""
 	element = node.find(tag_name)
 	return element.text if element is not None and element.text else None
 
@@ -129,7 +131,7 @@ def process_z_report(z_report_node):
 		doc.cash_withdrawn_times_1 = cint(_get_text(z_report_node, "IsimtaGrynujuKartai1"))
 		doc.cash_withdrawn_2 = flt(_get_text(z_report_node, "IsimtaGrynuju2"))
 		doc.cash_in_register = flt(_get_text(z_report_node, "GrynujuKasoje"))
-		# TODO: check for IsimtaGrynujuKartai2, my export sample does not have it.
+		# Not sure about IsimtaGrynujuKartai2, my export sample does not have it.
 
 		# Discounts and markups
 		doc.discount_amount_receipt = flt(_get_text(z_report_node, "NuolaidosSumaKvitui"))

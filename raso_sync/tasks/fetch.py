@@ -48,7 +48,7 @@ def execute_fetch_task(type=None):
 	return {"status": "queued", "job_id": job_id}
 
 
-def execute_fetch_task_worker(type=None, inform_user=False):
+def execute_fetch_task_worker(type=None, inform_user=False, ignore_workhours=False):
 	"""
 	NEEDS TO BE ENQUEUED WITH JOB-ID: raso_sync_fetch_task_worker
 
@@ -65,7 +65,7 @@ def execute_fetch_task_worker(type=None, inform_user=False):
 		msgprint_handler.setLevel(logging.INFO)
 		logger.addHandler(msgprint_handler)
 	try:
-		if not is_within_working_hours():
+		if not ignore_workhours and not is_within_working_hours():
 			logger.info("Fetch Task: Skipped due to outside of working hours.")
 			return
 

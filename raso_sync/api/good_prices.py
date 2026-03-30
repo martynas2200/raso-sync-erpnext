@@ -4,7 +4,7 @@ from xml.etree.ElementTree import Element, SubElement
 import frappe
 
 
-def good_prices_internal(full_sync, date_from):
+def good_prices_internal(full_sync, date_from, docnames=None):
 	"""
 	Returns XML document directly of GoodsPrices (Item Prices) - DataType 4
 
@@ -26,6 +26,10 @@ def good_prices_internal(full_sync, date_from):
 	if full_sync == 0 and date_from:
 		where_conditions.append("ip.modified >= %(modified)s")
 		params["modified"] = datetime.fromisoformat(date_from)
+
+	if docnames:
+		where_conditions.append("ip.name IN %(docnames)s")
+		params["docnames"] = tuple(docnames)
 
 	if settings.price_list:
 		where_conditions.append("ip.price_list = %(price_list)s")
