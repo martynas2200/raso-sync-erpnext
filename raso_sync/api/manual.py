@@ -50,7 +50,7 @@ def test_connection():
 
 
 @frappe.whitelist()
-def manual_upload(data_type, mode):
+def manual_send(data_type, mode):
 	"""
 	Manually trigger send of data to RASO
 	Args:

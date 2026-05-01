@@ -22,12 +22,13 @@
         <div class="action-section">
             <h4>{{__("Manual Sync and other actions")}}</h4>
             <div class="action-buttons" id="sync-buttons">
-                <button class="btn btn-sm btn-success" id="upload-btn">
-                    <i class="fa fa-upload"></i> {{__("Upload Data")}}
+                <button class="btn btn-sm btn-success" id="send-btn">
+                    <i class="fa fa-send"></i> {{__("Send Data")}}
                 </button>
                 <button class="btn btn-sm btn-info" id="fetch-btn">
                     <i class="fa fa-download"></i> {{__("Get Data")}}
                 </button>
+                <div class="divider"></div>
                 <button class="btn btn-sm btn-default" id="test-connection-btn">
                     <i class="fa fa-plug"></i> {{__("Test Connection")}}
                 </button>
@@ -39,9 +40,9 @@
                 </button>
             </div>
             <div class="action-group">
-                <div id="upload-options" class="sync-options">
+                <div id="send-options" class="sync-options">
                     <label>{{__("Data Type:")}}</label>
-                    <select class="form-control form-control-sm" id="upload-type">
+                    <select class="form-control form-control-sm" id="send-type">
                         <option value="all">{{__("All Data Types")}}</option>
                         <option value="good_prices">{{__("Good Prices")}}</option>
                         <option value="goods">{{__("Goods (Items)")}}</option>
@@ -52,23 +53,23 @@
                     <div class="checkbox-group">
                         <div class="checkbox">
                             <label>
-                                <input type="radio" name="upload-mode" value="full" id="fullsync-radio">
+                                <input type="radio" name="send-mode" value="full" id="fullsync-radio">
                                 {{__("Full Sync (takes a long time - sends all data)")}}
                             </label>
                         </div>
                         <div class="checkbox">
                             <label>
-                                <input type="radio" name="upload-mode" value="today" id="today-radio" checked>
+                                <input type="radio" name="send-mode" value="today" id="today-radio" checked>
                                 {{__("Send all changes of today")}}
                             </label>
                         </div>
                     </div>
 
-                    <button class="btn btn-sm btn-primary" id="execute-upload-btn">
-                        <i class="fa fa-check"></i> {{__("Execute Upload")}}
+                    <button class="btn btn-sm btn-primary" id="execute-send-btn">
+                        <i class="fa fa-check"></i> {{__("Execute Send")}}
                     </button>
-                    <button class="btn btn-sm btn-default" id="cancel-upload-btn">
-                        {{__("Cancel")}}
+                    <button class="btn btn-sm btn-default" id="cancel-send-btn">
+                        <i class="fa fa-times"></i> {{__("Cancel")}}
                     </button>
                 </div>
             </div>

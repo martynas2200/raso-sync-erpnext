@@ -26,19 +26,24 @@ frappe.pages["raso-sync-overview"].refresh = function (wrapper) {
 
 frappe.raso_sync_overview = {
     realtime_callback: null,
+    event_namespace: ".raso_sync_overview",
 
     setup: function (page) {
         this.page = page;
+        this.$wrapper = $(page.wrapper);
         this.load_settings();
         this.attach_event_handlers();
         this.setup_realtime_updates();
     },
 
+    $: function (selector) {
+        return this.$wrapper.find(selector);
+    },
+
     load_settings: function () {
-        if (!$(this.page.wrapper).is(":visible")) {
+        if (!this.$wrapper.is(":visible")) {
             return;
         }
-        var me = this;
         frappe.call({
             method: "frappe.client.get",
             args: {
@@ -46,57 +51,65 @@ frappe.raso_sync_overview = {
             },
             callback: function (response) {
                 if (response.message) {
-                    me.settings = response.message;
-                    me.update_ui();
+                    this.settings = response.message;
+                    this.update_ui();
                 }
             },
         });
     },
 
     attach_event_handlers: function () {
-        var me = this;
+        const events = this.event_namespace;
 
-        // System Actions
-        $("#test-connection-btn").on("click", () => me.test_connection());
-        $("#check-logs-btn").on("click", () => me.check_logs());
-        $("#open-scheduled-jobs-btn").on("click", function () {
-            frappe.set_route("List", "Scheduled Job Type", {
-                method: ["like", "%raso%"],
+        this.$("#test-connection-btn")
+            .off(events)
+            .on(`click${events}`, () => this.test_connection());
+        this.$("#check-logs-btn")
+            .off(events)
+            .on(`click${events}`, () => this.check_logs());
+        this.$("#open-scheduled-jobs-btn")
+            .off(events)
+            .on(`click${events}`, () => {
+                frappe.set_route("List", "Scheduled Job Type", {
+                    method: ["like", "%raso%"],
+                });
             });
-        });
 
-        // Upload Actions
-        $("#upload-btn").on("click", function () {
-            $("#sync-buttons").hide();
-            $("#upload-options").toggleClass("show");
-            $("#fetch-options").removeClass("show");
-        });
+        this.$("#send-btn")
+            .off(events)
+            .on(`click${events}`, () => {
+                this.$("#sync-buttons").hide();
+                this.$("#send-options").toggleClass("show");
+            });
 
-        $("#cancel-upload-btn").on("click", function () {
-            $("#sync-buttons").show();
-            $("#upload-options").removeClass("show");
-        });
+        this.$("#cancel-send-btn")
+            .off(events)
+            .on(`click${events}`, () => {
+                this.$("#sync-buttons").show();
+                this.$("#send-options").removeClass("show");
+            });
 
-        $("#execute-upload-btn").on("click", () => me.execute_upload());
-
-        // Fetch
-        $("#fetch-btn").on("click", () => me.execute_fetch());
+        this.$("#execute-send-btn")
+            .off(events)
+            .on(`click${events}`, () => this.execute_send());
+        this.$("#fetch-btn")
+            .off(events)
+            .on(`click${events}`, () => this.execute_fetch());
     },
 
     setup_realtime_updates: function () {
-        var me = this;
         // Unsubscribe previous callback if exists
         if (this.realtime_callback) {
             frappe.realtime.off("raso_sync_status_update", this.realtime_callback);
         }
-        this.realtime_callback = function (data) {
-            if (!me.settings || !data) {
+        this.realtime_callback = (data) => {
+            if (!this.settings || !data) {
                 return;
             }
 
             // Update all provided fields
-            Object.assign(me.settings, data);
-            me.update_ui();
+            Object.assign(this.settings, data);
+            this.update_ui();
         };
         frappe.realtime.on("raso_sync_status_update", this.realtime_callback);
     },
@@ -105,8 +118,8 @@ frappe.raso_sync_overview = {
         if (!this.settings) return;
 
         const is_running = this.settings.is_running;
-        const $banner = $("#sync-status-banner");
-        const $status_text = $("#sync-status-text");
+        const $banner = this.$("#sync-status-banner");
+        const $status_text = this.$("#sync-status-text");
 
         if (is_running) {
             $banner.removeClass("idle").addClass("running");
@@ -116,8 +129,8 @@ frappe.raso_sync_overview = {
             $status_text.text(__("Synchronization is idle"));
         }
 
-        $("#last-sale-import").text(this.format_date(this.settings.last_sale_import));
-        $("#last-data-export").text(this.format_date(this.settings.last_data_export));
+        this.$("#last-sale-import").text(this.format_date(this.settings.last_sale_import));
+        this.$("#last-data-export").text(this.format_date(this.settings.last_data_export));
     },
     format_date: (date_str) => {
         if (!date_str) return __("Never");
@@ -174,33 +187,32 @@ frappe.raso_sync_overview = {
         });
     },
 
-    execute_upload: function () {
-        const upload_type = $("#upload-type").val();
-        const upload_mode = $("input[name='upload-mode']:checked").val();
+    execute_send: function () {
+        const send_type = this.$("#send-type").val();
+        const send_mode = this.$("input[name='send-mode']:checked").val();
 
         frappe.call({
-            method: "raso_sync.api.manual.manual_upload",
+            method: "raso_sync.api.manual.manual_send",
             args: {
-                data_type: upload_type,
-                mode: upload_mode,
+                data_type: send_type,
+                mode: send_mode,
             },
-            callback: function (r) {
+            callback: (r) => {
                 if (r.message && r.message.success) {
                     frappe.show_alert(
                         {
-                            message: r.message.message || __("Upload queued successfully"),
+                            message: r.message.message || __("Send queued successfully"),
                             indicator: "green",
                         },
                         5
                     );
-                    $("#upload-options").removeClass("show");
-                    $("#sync-buttons").show();
+                    this.$("#send-options").removeClass("show");
+                    this.$("#sync-buttons").show();
                 } else {
                     frappe.show_alert(
                         {
                             message:
-                                __("Upload queued failed: ") +
-                                (r.message?.error || "Unknown error"),
+                                __("Send queued failed: ") + (r.message?.error || "Unknown error"),
                             indicator: "red",
                         },
                         5

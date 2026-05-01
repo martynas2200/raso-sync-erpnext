@@ -66,8 +66,8 @@ msgstr "Prisijungimo testas nepavyko: {0}"
 msgid "Synchronization is already running. Please wait for it to complete."
 msgstr "Sinchronizacija jau vykdoma. Palaukite, kol ji baigsis."
 
-msgid "Uploaded {0} using {1} mode"
-msgstr "Įkelta {0} naudojant {1} režimą"
+msgid "Sent {0} using {1} mode"
+msgstr "Nusiųsta {0} naudojant {1} režimą"
 
 msgid "Fetched {0}"
 msgstr "Gauta {0}"
@@ -262,8 +262,8 @@ msgstr "Tikrinti žurnalus"
 msgid "Scheduled Jobs"
 msgstr "Suplanuotos užduotys"
 
-msgid "Upload Data"
-msgstr "Įkelti duomenis"
+msgid "Send Data"
+msgstr "Siųsti duomenis"
 
 msgid "Data Type:"
 msgstr "Duomenų tipas:"
@@ -292,8 +292,8 @@ msgstr "Pilnas sinchronizavimas (užtrunka ilgai - siunčia visus duomenis)"
 msgid "Send all changes of today"
 msgstr "Siųsti visus šiandienos pakeitimus"
 
-msgid "Execute Upload"
-msgstr "Vykdyti įkėlimą"
+msgid "Execute Send"
+msgstr "Vykdyti siuntimą"
 
 msgid "Cancel"
 msgstr "Atšaukti"
@@ -307,11 +307,11 @@ msgstr "Gauti duomenis"
 msgid "Are you sure you want to fetch data from RASO POS server?<br>Supported data types: Sales, Returns, Z Reports"
 msgstr "Ar tikrai norite gauti duomenis iš RASO POS serverio?<br>Palaikomi duomenų tipai: pardavimai, grąžinimai, Z ataskaitos"
 
-msgid "Upload completed successfully"
-msgstr "Įkėlimas sėkmingai baigtas"
+msgid "Send completed successfully"
+msgstr "Siuntimas sėkmingai baigtas"
 
-msgid "Upload failed: {0}"
-msgstr "Įkėlimas nepavyko: {0}"
+msgid "Send failed: {0}"
+msgstr "Siuntimas nepavyko: {0}"
 
 msgid "Unknown error"
 msgstr "Nežinoma klaida"
@@ -420,10 +420,10 @@ msgid "Parent Item Group"
 msgstr "Tėvinė prekių grupė"
 
 msgid "Payment validation failed"
-msgstr "Mokėjimo patvirtinimas nepavyko"
+msgstr "Mokėjimo patikra nepavyko"
 
 msgid "Payment validation failed: The sum of individual payments does not match the total payments in the document."
-msgstr "Mokėjimo patvirtinimas nepavyko: atskirų mokėjimų suma nesutampa su bendru mokėjimų dokumente."
+msgstr "Mokėjimo patikra nepavyko: atskirų mokėjimų suma nesutampa su bendra mokėjimų suma dokumente."
 
 msgid "Price List"
 msgstr "Kainoraštis"
@@ -438,7 +438,7 @@ msgid "Select the price list to use for syncing item prices to RASO. Only prices
 msgstr "Pasirinkite kainoraštį, kurį naudosite sinchronizuodami prekių kainas su RASO. Bus eksportuojamos tik kainos iš šio sąrašo."
 
 msgid "Settings loaded successfully"
-msgstr "Nustatymai sėkmingai įkelti"
+msgstr "Nustatymai sėkmingai gauti"
 
 msgid "Synchronization Is Running"
 msgstr "Sinchronizacija vykdoma"
@@ -458,14 +458,14 @@ msgstr "Nepalaikomas DataType. Palaikomas tik DataType 0 (pardavimai)."
 msgid "Send queued failed: "
 msgstr "Siuntimo užklausa į eilę nepavyko: "
 
-msgid "Upload queued successfully"
-msgstr "Užklausa įkėlimui į eilę sėkminga"
+msgid "Send queued successfully"
+msgstr "Užklausa siuntimui į eilę sėkminga"
 
 msgid "Are you sure you want to fetch {0} from RASO?"
 msgstr "Ar tikrai norite gauti {0} iš RASO?"
 
-msgid "Are you sure you want to upload {0} using {1} mode?"
-msgstr "Ar tikrai norite įkelti {0} naudojant {1} režimą?"
+msgid "Are you sure you want to send {0} using {1} mode?"
+msgstr "Ar tikrai norite siųsti {0} naudojant {1} režimą?"
 
 msgid "POS Receipt"
 msgstr "POS kvitas"
