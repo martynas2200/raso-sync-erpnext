@@ -1,12 +1,15 @@
-A custom Frappe app that enables ERPNext integration with the RASO RETAIL POS system.
+Raso Sync is a Frappe app that keeps ERPNext master data and RASO POS sales data in sync using resilient background jobs, a persisted send queue, and configurable scheduling.
 
 ## Features
 
-- Runs background jobs to fetch and send data
-- Can be manual or scheduled
-- Configurable settings for POS integration
+- Scheduler-driven automation
+- Background jobs for fetch, send, and full-sync flows
+- Manual run support
+- Settings page for POS integration behavior and sync intervals
+- Overview page for day-to-day sync inspection
+- Logging
 - Employee to Sales Person mapping
-- Payment method mapping
+- Payment Method mapping
 - Default item handling for unmatched items
 
 
@@ -16,7 +19,7 @@ A custom Frappe app that enables ERPNext integration with the RASO RETAIL POS sy
   - Item Group
   - Item
   - Item Price
-- Import of Sales and Returns from RASO to ERPNext, creates Sales Invoices with relevant items and payments
+- Import of Sales and Returns from RASO to ERPNext, creating Sales Invoices with relevant items and payments
 
 ## Installation
 
@@ -39,8 +42,8 @@ A custom Frappe app that enables ERPNext integration with the RASO RETAIL POS sy
 
 ## Constraints
 
-- Items are not send to RASO if they do not have barcode and uom of a particular barcode set.
-- Items names are cut off if it exceeds 80 characters (so we fit in two lines of text fit on the receipt)
+- Items are not sent to RASO if they do not have a barcode and the UOM for that barcode set.
+- Item names are cut off after 80 characters so they fit in two lines on the receipt.
 - When picking the price, if multiple valid prices exist for the same item and price list, the one with the most recent `valid_from` date is selected; if there are ties, the most recently modified price is used (ordered by `ip.valid_from DESC, ip.modified DESC`).
 
 ## Background Jobs & Task Logs
@@ -48,24 +51,25 @@ A custom Frappe app that enables ERPNext integration with the RASO RETAIL POS sy
 ### One-Way Sync Tasks
 - **Fetch**: Receives exported data from RASO (reads `ie.usp_SyncDataExport` table)
 - **Send**: Sends to RASO (writes to `ie.usp_SyncDataImport` table)
-- No bidirectional conflict resolution needed
 
 ### Scheduler
 
-- Enqueue Fetch Task (`raso_sync.tasks.fetch.execute_fetch_task`) configured by `fetch_interval_minutes` settings
-- Check cache for send markers (`raso_sync.tasks.send.process_cache_marks`) interval is configured by `sending_delay_minutes` settings. The task will:
-  - retrieve cache marks
-  - for each mark older than `sending_delay_minutes`, enqueue `raso_sync.tasks.send.execute_send_task` task to send relevant documents to RASO
-- Enqueue Full Sync Task (`raso_sync.tasks.full_sync.execute_full_sync_task`) once daily at configured time (`full_sync_time` setting)
+- Fetch Task `raso_sync.tasks.fetch.execute_fetch_task`
+  - The interval is configured by `fetch_interval_minutes` option.
+- Send Queue Check `raso_sync.tasks.send.process_queued_marks`
+  - The interval is configured by `send_check_interval_minutes` settings.
+  - The task reads `RASO Sync Queue Doc` rows and possibly enqueues `raso_sync.tasks.send.execute_send_task` for relevant documents.
+  - This replaces the earlier approach that used cache marks + a 15-minute recent-modified window. No oversending, and the DB-backed queue is more trustworthy and resilient because pending changes survive process restarts, scheduler delays, worker failures, etc.
+- Full Sync Task `raso_sync.tasks.full_sync.execute_full_sync_task`
+  - Run once daily at configured time (`full_sync_time` setting), mostly needed for item price records so the day to day price changes are reflected in RASO (fields of `valid_from`, `valid_to`).
 
 ---
 
-## OPTIONAL API Endpoints (unless using a custom database client)
+## OPTIONAL XML API Endpoints for Custom Client Integration
 Syncing is using done via direct database access to RASO's SQL Server database using stored procedures in background worker task.
-However, for advanced setups, the app provides XML API endpoints.
-In that case, a custom client must be implemented.
+However, for advanced setups, the app provides XML API endpoints; In that case, a custom client must be implemented.
 
-### Main Endpoint
+### Export Endpoint
 **URL**: `/api/method/raso_sync.api.exporter.export`
 **Method**: GET/POST
 **Parameters**:
@@ -81,20 +85,28 @@ In that case, a custom client must be implemented.
 | 4        | GoodsPrices    | `Item Price`      |
 
 
-### Importing to ERPNext
+### Import Endpoint
 
 **URL**: `/api/method/raso_sync.api.importer.import_data`
 **Method**: POST
 **Content-Type**: application/xml
-**Request Body**: XML data in SalesSync format
-**Supported Types**:
-- Type 0: Sales
-- Type 3: Returns (detected automatically if items have negative quantities)
-**Validation**: the sum of all individual `<Payment>` entries under each `<Sales>` node must match the corresponding `<Payments>` totals under `<SalesSync>`.
+**Request Body**: XML payload (raw body)
+**Type Detection**: inferred from XML root element (request `DataType` is not used by this endpoint)
+- `SalesSync` → processed by sales importer (sales/returns are inferred later per record)
+- `SalesZReportsDataSync` → processed by Z-report importer
+**Supported Internal Types**:
+- Type 0: SalesSync payload route
+- Type 3: Return records (handled within sales import flow)
+- Type 5: SalesZReportsDataSync payload route
+**Validation / Request Errors**:
+- Rejects request if `Content-Type` is not exactly `application/xml`
+- Rejects request if body is empty
+- Rejects request if XML is malformed
+- Rejects request if type cannot be inferred from XML root
 **Response**: JSON Object
 ```json
 {
-  "status": "success|error",
+  "status": "success|partial_success|error",
   "message": "...",
   "results": [
     {
@@ -105,8 +117,20 @@ In that case, a custom client must be implemented.
   ]
 }
 ```
-<!-- TODO: needs more clarity on what constitutes a status error -->
-<!-- - Items are matched by VCODE if it starts with 'P' or 'I', otherwise by barcode (CODE xml field) -->
-- Import status is tracked in a custom field on the Sales Invoice
-- Errors are added as comments to the Sales Invoice as well.
+- Status semantics:
+  - Top-level `status`:
+    - `success`: no per-record errors
+    - `partial_success`: mix of successful and failed records
+    - `error`: all processed records failed, or request-level validation failed before processing
+  - Per-record `status`:
+    - `success`: invoice created and submitted
+    - `accepted`: invoice created but submission failed
+    - `skipped`: receipt already imported (duplicate)
+    - `error`: record processing failed
+- Item matching order for Sales import:
+  - If `VCODE` starts with a letter and matches an existing ERPNext Item, use it as `item_code`
+  - Otherwise try Item Barcode lookup by `CODE` with leading zeros stripped
+  - Then try Item Barcode lookup by raw `CODE`
+  - If still not found, use `default_item` from RASO Sync Settings (or fail if not configured)
+- Errors saved in error log, and if it is possible, might be also added as comments to the Sales Invoice.
 

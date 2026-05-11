@@ -45,11 +45,8 @@ frappe.raso_sync_overview = {
             return;
         }
         frappe.call({
-            method: "frappe.client.get",
-            args: {
-                doctype: "RASO Sync Settings",
-            },
-            callback: function (response) {
+            method: "raso_sync.api.manual.get_sync_status",
+            callback: (response) => {
                 if (response.message) {
                     this.settings = response.message;
                     this.update_ui();
@@ -131,10 +128,165 @@ frappe.raso_sync_overview = {
 
         this.$("#last-sale-import").text(this.format_date(this.settings.last_sale_import));
         this.$("#last-data-export").text(this.format_date(this.settings.last_data_export));
+
+        this.render_queue(this.settings.queued_doc_rows || []);
+    },
+
+    parse_server_datetime: function (date_str) {
+        if (!date_str || typeof date_str !== "string") return null;
+
+        if (frappe?.datetime?.str_to_obj) {
+            const parsed = frappe.datetime.str_to_obj(date_str);
+            if (parsed instanceof Date && !isNaN(parsed.getTime())) {
+                return parsed;
+            }
+        }
+
+        const match = date_str.match(/^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})$/);
+        if (!match) return null;
+
+        const [, year, month, day, hours, minutes, seconds] = match;
+        const parsed = new Date(
+            Number(year),
+            Number(month) - 1,
+            Number(day),
+            Number(hours),
+            Number(minutes),
+            Number(seconds)
+        );
+
+        return isNaN(parsed.getTime()) ? null : parsed;
+    },
+
+    ceil_to_next_minute: function (date_obj) {
+        const rounded = new Date(date_obj.getTime());
+        rounded.setSeconds(0, 0);
+        if (rounded < date_obj) {
+            rounded.setMinutes(rounded.getMinutes() + 1);
+        }
+        return rounded;
+    },
+
+    get_next_scheduler_run: function (from_date, interval_minutes) {
+        const interval = Number(interval_minutes || 0);
+        if (interval <= 0 || !from_date) {
+            return null;
+        }
+
+        const candidate = this.ceil_to_next_minute(from_date);
+
+        if (interval <= 59) {
+            while (candidate.getMinutes() % interval !== 0) {
+                candidate.setMinutes(candidate.getMinutes() + 1);
+            }
+            return candidate;
+        }
+
+        const hours_step = Math.floor(interval / 60);
+        const minute_offset = interval % 60;
+
+        candidate.setMinutes(minute_offset, 0, 0);
+        if (candidate < from_date) {
+            candidate.setHours(candidate.getHours() + 1);
+        }
+
+        while (candidate.getHours() % hours_step !== 0 || candidate < from_date) {
+            candidate.setHours(candidate.getHours() + 1, minute_offset, 0, 0);
+        }
+
+        return candidate;
+    },
+
+    build_auto_send_message: function (rows) {
+        const check_interval_minutes = Number(this.settings?.send_check_interval_minutes || 0);
+
+        if (check_interval_minutes <= 0) {
+            return __("Automatic sending is currently disabled (Send Check Interval is 0).");
+        }
+
+        const now = new Date();
+        const next_run = this.get_next_scheduler_run(now, check_interval_minutes);
+        if (!next_run) {
+            return __("Data is queued and will be sent automatically.");
+        }
+
+        const eta_minutes = Math.max(0, Math.ceil((next_run.getTime() - now.getTime()) / 60000));
+        const next_run_display = next_run.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+        });
+
+        if (eta_minutes <= 1) {
+            return __("Data should be sent on the next scheduler check (about 1 minute).");
+        }
+
+        return (
+            __("Data should be sent automatically in about") +
+            ` ${eta_minutes} ` +
+            __("m") +
+            ` (${__("next check")}: ${next_run_display}).`
+        );
+    },
+
+    render_queue: function (rows) {
+        const $container = this.$("#queued-docs-container");
+        const $indicator = this.$("#queued-docs-indicator");
+        const safe_rows = Array.isArray(rows) ? rows : [];
+
+        if (safe_rows.length === 0) {
+            $indicator.addClass("hidden").text("");
+            $container.html(
+                '<p class="empty-state">' + __("No pending documents to be sent") + "</p>"
+            );
+            return;
+        }
+
+        const indicator_message = this.build_auto_send_message(safe_rows);
+        $indicator.removeClass("hidden").text(indicator_message);
+
+        let html = `<table class="table table-hover queued-docs-table"><thead><tr>
+            <th>${__("DocType")}</th>
+            <th>${__("Document Name")}</th>
+            <th>${__("Event")}</th>
+            <th>${__("Marked At")}</th>
+        </tr></thead><tbody>`;
+
+        for (const row of safe_rows) {
+            const marked_at = this.format_date(row.marked_at);
+            const safe_doctype = frappe.utils.escape_html(frappe._(row.doctype));
+            const safe_name = frappe.utils.escape_html(row.name);
+            const safe_event = frappe.utils.escape_html(this.format_event(row.last_event));
+
+            let name_cell = safe_name;
+            if (row.name && row.name !== "—") {
+                const doctype_route = frappe.router.slug(row.doctype);
+                const doc_route = encodeURIComponent(row.name);
+                const href = frappe.utils.escape_html(`/app/${doctype_route}/${doc_route}`);
+                name_cell = `<a href="${href}" target="_blank" rel="noopener noreferrer">${safe_name}</a>`;
+            }
+
+            html += `<tr>
+                <td>${safe_doctype}</td>
+                <td>${name_cell}</td>
+                <td>${safe_event}</td>
+                <td>${marked_at}</td>
+            </tr>`;
+        }
+
+        html += "</tbody></table>";
+        $container.html(html);
     },
     format_date: (date_str) => {
         if (!date_str) return __("Never");
         return frappe.datetime.str_to_user(date_str);
+    },
+    format_event: (event_str) => {
+        if (!event_str) return "—";
+        if (event_str == "after_insert") return frappe._("Created");
+        if (event_str == "on_update") return frappe._("Updated");
+        if (event_str == "on_trash" || event_str == "after_delete") return frappe._("Deleted");
+        return frappe._(event_str);
     },
 
     test_connection: function () {

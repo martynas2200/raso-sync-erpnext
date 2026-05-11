@@ -1,0 +1,89 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "hash",
+ "creation": "2026-03-25 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "source_doctype",
+  "source_name",
+  "last_event",
+  "marked_at",
+    "has_delete"
+ ],
+ "fields": [
+  {
+   "fieldname": "source_doctype",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Source DocType",
+   "options": "DocType",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "source_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Source Name",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "last_event",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Last Event",
+   "read_only": 1
+  },
+  {
+   "fieldname": "marked_at",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Marked At",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "has_delete",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Has Delete",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-03-25 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Raso Sync",
+ "name": "RASO Sync Queue Doc",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 0,
+   "print": 0,
+   "read": 1,
+   "role": "Raso Sync User",
+   "share": 0,
+   "write": 0
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0
+}

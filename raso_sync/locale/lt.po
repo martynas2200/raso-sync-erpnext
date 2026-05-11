@@ -180,12 +180,6 @@ msgstr "Cron užduoties intervalas duomenų tikrinimui, kurie turi būti siunči
 msgid "Send Check Interval (Minutes)"
 msgstr "Siuntimų tikrinimo intervalas (minutės)"
 
-msgid "Enqueue Sending Minimum Delay (Minutes)"
-msgstr "Minimalaus siuntimo į eilę vėlavimas (minutės)"
-
-msgid "Delay between enqueuing item sends to RASO to avoid multiple records and overload, in minutes."
-msgstr "Vėlavimas tarp prekių siuntimo į RASO eilę, siekiant išvengti kelių įrašų ir perkrovos, minutėmis."
-
 msgid "Auto Submit Sales Documents"
 msgstr "Automatiškai patvirtinti pardavimų dokumentus"
 
@@ -773,3 +767,54 @@ msgstr "Remiantis naudotojo kodo lauku"
 
 msgid "RASO Sync"
 msgstr "RASO sinchronizacija"
+
+msgid "Automatic sending is currently disabled (Send Check Interval is 0)."
+msgstr "Automatinis siuntimas šiuo metu išjungtas (siuntimų tikrinimo intervalas yra 0)."
+
+msgid "Data should be sent automatically in about"
+msgstr "Duomenys turėtų būti išsiųsti automatiškai maždaug po"
+
+msgid "next check"
+msgstr "kitas tikrinimas"
+
+msgid "Data should be sent on the next scheduler check (about 1 minute)."
+msgstr "Duomenys turėtų būti išsiųsti per kitą planuoklio tikrinimą (maždaug po 1 min.)."
+
+msgid "Data is queued and will be sent automatically."
+msgstr "Duomenys įtraukti į eilę ir bus automatiškai išsiųsti."
+
+msgid "DocType"
+msgstr "Dokumento tipas"
+
+msgid "Document Name"
+msgstr "Dokumento pavadinimas"
+
+msgid "Failed to retrieve sync status: {0}"
+msgstr "Nepavyko gauti sinchronizacijos būsenos: {0}"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Item Tax Template"
+msgstr "Prekės mokesčių šablonas"
+
+msgid "Marked At"
+msgstr "Pažymėta"
+
+msgid "Pending Documents (to be sent)"
+msgstr "Dokumentai, laukiantys siuntimo"
+
+msgid "No pending documents to be sent"
+msgstr "Nėra laukiančių dokumentų, kurie turėtų būti išsiųsti"
+
+msgid "Payment validation failed: "
+msgstr "Mokėjimo patikra nepavyko: "
+
+msgid "Payments"
+msgstr "Mokėjimai"
+
+msgid "RASO"
+msgstr "RASO"
+
+msgid "m"
+msgstr "min."

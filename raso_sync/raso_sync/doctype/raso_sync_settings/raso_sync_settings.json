@@ -41,7 +41,6 @@
     "fetch_sales_interval_minutes",
     "submit_sales_documents",
     "column_break_8",
-    "sending_delay_minutes",
     "send_check_interval_minutes",
     "synchronization_is_running",
     "working_hours_section",
@@ -264,13 +263,6 @@
     {
       "fieldname": "column_break_8",
       "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "sending_delay_minutes",
-      "fieldtype": "Int",
-      "label": "Enqueue Sending Minimum Delay (Minutes)",
-      "default": "1",
-      "description": "Delay between enqueuing item sends to RASO to avoid multiple records and overload, in minutes."
     },
     {
       "fieldname": "send_check_interval_minutes",

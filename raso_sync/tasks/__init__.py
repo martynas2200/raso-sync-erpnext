@@ -41,7 +41,6 @@ from .send import (
 	export_and_send_type,
 	get_raso_settings,
 	insert_to_raso,
-	store_export_to_disk,
 )
 
 __all__ = [
@@ -54,6 +53,5 @@ __all__ = [
 	"get_raso_settings",
 	"insert_to_raso",
 	"process_export_record",
-	"store_export_to_disk",
 	"update_export_status",
 ]

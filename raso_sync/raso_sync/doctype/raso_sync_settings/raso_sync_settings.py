@@ -28,7 +28,7 @@ class RASOSyncSettings(Document):
 		)
 		self.update_scheduler(
 			interval="send_check_interval_minutes",
-			method="raso_sync.tasks.send.process_cache_marks",
+			method="raso_sync.tasks.send.process_queued_marks",
 		)
 		self.update_scheduler(
 			time_string="full_sync_time",

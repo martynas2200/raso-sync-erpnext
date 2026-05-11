@@ -36,11 +36,7 @@ DOCTYPE_TO_RASO_TYPE = {
 
 # Reverse mapping: export code -> DocType
 CODE_TO_DOCTYPE = {code: doctype for doctype, code in DOCTYPE_TO_RASO_TYPE.items()}
-
-
-# Cache key helpers
-def _needs_attention_key(doctype: str) -> str:
-	return f"raso:needs_attention:{doctype}"
+QUEUE_DOCTYPE = "RASO Sync Queue Doc"
 
 
 def _now_str() -> str:
@@ -55,17 +51,88 @@ def _export_type_to_code(exp_t):
 	return None
 
 
-def get_delay_minutes() -> int:
-	settings = frappe.get_single("RASO Sync Settings") or {}
-	delay_minutes = settings.get("sending_delay_minutes") or 0
+def _normalize_export_types(export_type: str | int | list[str | int] | None) -> list[str]:
+	if export_type is None or export_type == "all":
+		raw_types = list(RASO_TYPES.keys())
+	elif isinstance(export_type, str | int):
+		raw_types = [export_type]
+	elif not isinstance(export_type, list):
+		raise TypeError("export_type must be a string, integer, list, or None.")
+	else:
+		raw_types = export_type
+
+	types_to_export = []
+	for exp_t in raw_types:
+		code = _export_type_to_code(exp_t)
+		if code is None:
+			raise ValueError(f"Invalid export type: {exp_t}.")
+
+		name = next((key for key, value in RASO_TYPES.items() if value == code), None)
+		if not name:
+			raise ValueError(f"Could not normalize export type: {exp_t}.")
+
+		if name not in types_to_export:
+			types_to_export.append(name)
+
+	return types_to_export
+
+
+def _update_or_insert_queue_mark(doctype: str, docname: str, method: str) -> None:
+	previous_value = (
+		frappe.db.get_value(
+			QUEUE_DOCTYPE,
+			{"source_doctype": doctype, "source_name": docname},
+			["name", "has_delete", "last_event"],
+			as_dict=True,
+		)
+		or {}
+	)
+
+	previous_has_delete = (
+		previous_value.get("has_delete") if isinstance(previous_value, dict) else False
+	) or (previous_value.get("last_event") == "after_delete" if isinstance(previous_value, dict) else False)
+	value = {
+		"source_doctype": doctype,
+		"source_name": docname,
+		"last_event": method,
+		"marked_at": _now_str(),
+		"has_delete": 1 if previous_has_delete or method == "after_delete" else 0,
+	}
+	existing_name = previous_value.get("name") if isinstance(previous_value, dict) else None
+
+	if existing_name:
+		frappe.db.set_value(QUEUE_DOCTYPE, existing_name, value, update_modified=False)
+		return
+
 	try:
-		delay_minutes = int(delay_minutes)
-	except Exception:
-		delay_minutes = 0
-	return delay_minutes
+		frappe.get_doc({"doctype": QUEUE_DOCTYPE, **value}).insert(ignore_permissions=True)
+	except frappe.DuplicateEntryError:
+		existing_name = frappe.db.get_value(
+			QUEUE_DOCTYPE,
+			{"source_doctype": doctype, "source_name": docname},
+			"name",
+		)
+		if existing_name:
+			frappe.db.set_value(QUEUE_DOCTYPE, existing_name, value, update_modified=False)
 
 
-def execute_send_task(export_type=None, date_from=None):
+def _cleanup_persisted_queue_docs(
+	doctype: str,
+	docnames: list[str],
+) -> None:
+	for docname in docnames:
+		if not isinstance(docname, str) or not docname:
+			continue
+
+		frappe.db.delete(QUEUE_DOCTYPE, {"source_doctype": doctype, "source_name": docname})
+
+
+def execute_send_task(
+	export_type=None,
+	date_from=None,
+	doc_targets=None,
+	full_sync_doctypes=None,
+):
 	"""
 	Enqueue the send task to export data to RASO.
 
@@ -85,6 +152,8 @@ def execute_send_task(export_type=None, date_from=None):
 		enqueue_after_commit=True,
 		export_type=export_type,
 		date_from=date_from,
+		doc_targets=doc_targets,
+		full_sync_doctypes=full_sync_doctypes,
 	)
 
 	return "queued"
@@ -106,104 +175,81 @@ def mark_doctype_needs_attention(doc, method):
 		logger.debug(f"RASO Sync: Ignoring document event for unsupported doctype: {doc.doctype}")
 		return {"status": "ignored", "doctype": doc.doctype}
 
-		# TODO: make into an array and get rid of 15-min window?
-	# Mark needs-attention entry in cache with last event and timestamp
-	key = _needs_attention_key(doc.doctype)
-	value = {
-		"doctype": doc.doctype,
-		"name": doc.name,
-		"last_event": method,
-		"marked_at": _now_str(),
-	}
-	frappe.cache().set_value(key, value)
+	_update_or_insert_queue_mark(doc.doctype, doc.name, method)
 	logger.debug(f"RASO Sync: Marked {doc.doctype} as needing attention ({method})")
 	return {"status": "marked", "doctype": doc.doctype, "event": method}
 
 
-def process_cache_marks():
+def process_queued_marks():
 	"""
-	Scheduler worker that checks debounced DocType events and enqueues a send task
-	once the configured delay has elapsed.
+	Scheduler worker that checks persisted DocType queue marks and enqueues a send task.
 
 	Behavior:
-	- Reads per-DocType cache marks created by execute_send_task_on_doc_event.
-	- If at least one DocType has waited past delay, enqueue a single consolidated
-	  send task (export_type=None => all types) to avoid parallel/duplicate jobs.
-	- If any marked event was a delete, we perform a full sync (date_from=None),
-	  otherwise we use the 15-minute window.
-	- Clears processed cache marks after enqueuing.
+	- Reads per-document queue rows from RASO Sync Queue Doc.
+	- Enqueues a single consolidated send task with exact pending document targets.
+	- If any marked event was a delete, we perform a full sync for that DocType.
+	- Clears processed queue marks after enqueuing.
 	"""
-	settings = RASOSyncSettings.get_settings()
-	delay_minutes = settings.get("sending_delay_minutes") or 0
-	now = datetime.now()
-
 	# Collect marks
 	marks: dict[str, dict[str, Any]] = {}
-	any_due = False
-	saw_delete = False
 
-	for doctype in DOCTYPE_TO_RASO_TYPE.keys():
-		key = _needs_attention_key(doctype)
-		value = frappe.cache().get_value(key)
-		if not value:
+	queue_rows = frappe.get_all(
+		QUEUE_DOCTYPE,
+		fields=["source_doctype", "source_name", "last_event", "has_delete"],
+		filters={"source_doctype": ["in", list(DOCTYPE_TO_RASO_TYPE.keys())]},
+		limit_page_length=0,
+	)
+
+	for row in queue_rows:
+		doctype = row.get("source_doctype")
+		docname = row.get("source_name")
+		if not isinstance(doctype, str) or not isinstance(docname, str) or not doctype or not docname:
 			continue
 
-		try:
-			marked_at_str = value.get("marked_at") if isinstance(value, dict) else None
-			last_event = value.get("last_event") if isinstance(value, dict) else None
-			marked_at = datetime.strptime(marked_at_str, "%Y-%m-%d %H:%M:%S") if marked_at_str else None
-		except Exception:
-			marked_at = None
-			last_event = None
+		if doctype not in marks:
+			marks[doctype] = {"docs": [], "has_delete": False}
 
-		marks[doctype] = {
-			"marked_at": marked_at,
-			"last_event": last_event,
-		}
+		if docname not in marks[doctype]["docs"]:
+			marks[doctype]["docs"].append(docname)
 
-		if last_event == "after_delete":
-			saw_delete = True
+		row_has_delete = bool(row.get("has_delete")) or row.get("last_event") == "after_delete"
+		marks[doctype]["has_delete"] = bool(marks[doctype]["has_delete"]) or row_has_delete
 
-		# Checking in the same loop if any are due immediately
-		if marked_at and (now - marked_at) >= timedelta(minutes=delay_minutes):
-			any_due = True
+	if not marks:
+		return {"status": "pending", "message": "No pending doctypes"}
 
-	if not any_due:
-		return {"status": "pending", "message": "No doctypes past delay yet"}
-
-	# Compute date_from: full sync if any delete, else last 15 minutes window like immediate path
-	date_from: str | None
-	if saw_delete:
-		date_from = None
-	else:
-		date_from = (now - timedelta(minutes=15)).strftime("%Y-%m-%d %H:%M:%S")
-
-	# Enqueue a send task with a array of export types based on marked doctypes
+	# Enqueue a send task with exact doc targets and full-sync fallback for deletes
 	needs_export = []
-	for doctype in marks.keys():
+	doc_targets: dict[str, list[str]] = {}
+	full_sync_doctypes: list[str] = []
+
+	for doctype, info in marks.items():
 		export_type = DOCTYPE_TO_RASO_TYPE.get(doctype)
 		if export_type and export_type not in needs_export:
 			needs_export.append(export_type)
 
-	result = execute_send_task(export_type=needs_export, date_from=date_from)
-	logger.info(
-		f"RASO Sync: Enqueued debounced send task for doctypes {list(marks.keys())} with date_from={date_from}, result: {result}"
-	)
+		doc_targets[doctype] = info.get("docs") or []
 
-	# Cleaning up cache marks only if successfully queued
-	if isinstance(result, dict) and result.get("status") == "queued":
-		delay_minutes = get_delay_minutes()
-		for doctype, info in marks.items():
-			marked_at = info.get("marked_at")
-			if marked_at and (now - marked_at) >= timedelta(minutes=delay_minutes):
-				frappe.cache().delete_value(_needs_attention_key(doctype))
+		if info.get("has_delete"):
+			if doctype not in full_sync_doctypes:
+				full_sync_doctypes.append(doctype)
+
+	result = execute_send_task(
+		export_type=needs_export,
+		date_from=None,
+		doc_targets=doc_targets,
+		full_sync_doctypes=full_sync_doctypes,
+	)
+	logger.info(f"RASO Sync: Enqueued precise send task for doctypes {list(marks.keys())}, result: {result}")
 
 	return {"status": result.get("status") if isinstance(result, dict) else "unknown", "result": result}
 
 
 def execute_send_task_worker(
-	export_type: str | list[str] | None = None,
+	export_type: str | int | list[str | int] | None = None,
 	date_from: str | None = None,
+	doc_targets: dict[str, list[str]] | None = None,
+	full_sync_doctypes: list[str] | None = None,
 	inform_user: bool = False,
 ):
 	"""
@@ -212,8 +258,11 @@ def execute_send_task_worker(
 	Worker function that performs the actual export and sending.
 
 	Args:
-		export_type (str | list[str] | None): Type(s) of data to export, or None for all types
+		export_type (str | int | list[str | int] | None): Type(s) of data to export,
+			as names or numeric codes, or None for all types
 		date_from (str, optional): Start date filter (YYYY-MM-DD format)
+		doc_targets (dict[str, list[str]] | None): Pending document names by DocType
+		full_sync_doctypes (list[str] | None): Doctypes that require full-sync fallback
 	"""
 	msgprint_handler = None
 	if inform_user:
@@ -221,7 +270,6 @@ def execute_send_task_worker(
 		msgprint_handler.setLevel(logging.INFO)
 		logger.addHandler(msgprint_handler)
 
-	# TODO: Argument check ---
 	results = {
 		"total_exported": 0,
 		"types_processed": [],
@@ -231,22 +279,8 @@ def execute_send_task_worker(
 	}
 
 	try:
-		# Read debounce delay to decide whether to clean cache at the end
-		delay_minutes = get_delay_minutes()
-		now = datetime.now()
-
-		if export_type is None or export_type == "all":
-			types_to_export = list(RASO_TYPES.keys())
-		elif isinstance(export_type, str):
-			types_to_export = [export_type]
-		elif not isinstance(export_type, list):
-			raise TypeError("export_type must be a string, list of strings, or None.")
-		else:
-			types_to_export = export_type
-
-		for export_type in types_to_export:
-			if _export_type_to_code(export_type) is None:
-				raise ValueError(f"Invalid export type: {export_type}.")
+		types_to_export = _normalize_export_types(export_type)
+		full_sync_doctypes_set = set(full_sync_doctypes or [])
 
 		# NOTE: types_to_export is ready and validated and contains only RASO_TYPES keys
 
@@ -254,14 +288,26 @@ def execute_send_task_worker(
 
 		for exp_type in types_to_export:
 			try:
+				exp_code = _export_type_to_code(exp_type)
+				doctype = CODE_TO_DOCTYPE.get(exp_code)
+				target_docnames = (doc_targets or {}).get(doctype, [])
+				force_full_sync = doctype in full_sync_doctypes_set
+
 				record_count = export_and_send_type(
 					export_type=exp_type,
 					date_from=date_from,
+					docnames=target_docnames,
+					force_full_sync=force_full_sync,
 				)
 
 				results["types_processed"].append(exp_type)
 				results["total_exported"] += record_count
 				results["successful"] += 1
+				if doctype:
+					_cleanup_persisted_queue_docs(
+						doctype,
+						target_docnames,
+					)
 				frappe.publish_realtime(
 					event="msgprint",
 					message={
@@ -301,28 +347,6 @@ def execute_send_task_worker(
 				f"Failed types: {', '.join([err['type'] for err in results['errors']])}",
 			)
 
-		if delay_minutes > 0:
-			try:
-				for key in map(
-					_needs_attention_key,
-					map(CODE_TO_DOCTYPE.get, map(_export_type_to_code, results["types_processed"])),
-				):
-					value = frappe.cache().get_value(key)
-					if not value:
-						continue
-					marked_at_str = value.get("marked_at") if isinstance(value, dict) else None
-					try:
-						marked_at = (
-							datetime.strptime(marked_at_str, "%Y-%m-%d %H:%M:%S") if marked_at_str else None
-						)
-					except Exception:
-						marked_at = None
-					if marked_at and (now - marked_at) >= timedelta(minutes=delay_minutes):
-						frappe.cache().delete_value(key)
-			except Exception as e:
-				logger.error(f"Send Task: Error cleaning cache for {key}: {e!s}")
-				pass
-
 	except Exception as e:
 		logger.error(f"Send Task: Fatal error - {e!s}")
 		raise
@@ -332,7 +356,9 @@ def execute_send_task_worker(
 			logger.removeHandler(msgprint_handler)
 
 
-def export_and_send_type(export_type, date_from=None):
+def export_and_send_type(
+	export_type, date_from=None, docnames: list[str] | None = None, force_full_sync=False
+):
 	"""
 	Export a single data type from ERPNext and send to RASO.
 
@@ -357,9 +383,27 @@ def export_and_send_type(export_type, date_from=None):
 	if export_type is None:
 		raise ValueError("Invalid export type. Must be one of the defined keys or numbers in RASO_TYPES.")
 
+	if force_full_sync:
+		full_sync = 1
+		effective_date_from = None
+		effective_docnames = None
+	elif docnames:
+		full_sync = 0
+		effective_date_from = None
+		effective_docnames = docnames
+	else:
+		full_sync = 0 if date_from else 1
+		effective_date_from = date_from
+		effective_docnames = None
+
 	logger.debug(f"Exporting type {export_type}...")
 
-	export_data = export_for_raso(data_type=export_type, full_sync=0 if date_from else 1, date_from=date_from)
+	export_data = export_for_raso(
+		data_type=export_type,
+		full_sync=full_sync,
+		date_from=effective_date_from,
+		docnames=effective_docnames,
+	)
 
 	record_count = len(export_data)
 	logger.debug(f"Exported {record_count} records of type {export_type} from ERPNext")
@@ -426,26 +470,6 @@ def insert_to_raso(data_type, sync_data, data_provider=None):
 	except Exception as e:
 		logger.error(f"Error sending data to RASO: {e!s}")
 		raise
-
-
-def store_export_to_disk(export_type, data):
-	"""
-	Store exported data to disk for audit/debugging purposes.
-	"""
-	# Create exports directory in site's private directory
-	exports_dir = Path(frappe.get_site_path()) / "private" / "raso_exports"
-	exports_dir.mkdir(parents=True, exist_ok=True)
-
-	# Create timestamped filename
-	timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-	filename = f"{export_type}_{timestamp}.json"
-	file_path = exports_dir / filename
-
-	# Write to file
-	with open(file_path, "w", encoding="utf-8") as f:
-		f.write(data)
-
-	return str(file_path)
 
 
 def get_raso_settings():
