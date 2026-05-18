@@ -13,13 +13,14 @@ Background Tasks
    - ONE-WAY: ERPNext → RASO
 """
 
+import functools
 import logging
 
 import frappe
 
 
 class MsgprintHandler(logging.Handler):
-	"""Custom logging handler that sends log messages to frappe.msgprint"""
+	"""Custom logging handler that sends log messages as toasts to frontend"""
 
 	def emit(self, record):
 		try:
@@ -27,6 +28,28 @@ class MsgprintHandler(logging.Handler):
 			frappe.msgprint(msg, realtime=True, alert=True)
 		except Exception:
 			self.handleError(record)
+
+
+def with_msgprint_logging(logger):
+	"""Decorator to send log messages to users if inform_user=True"""
+
+	def decorator(func):
+		@functools.wraps(func)
+		def wrapper(*args, **kwargs):
+			msgprint_handler = None
+			if kwargs.get("inform_user"):
+				msgprint_handler = MsgprintHandler()
+				msgprint_handler.setLevel(logging.INFO)
+				logger.addHandler(msgprint_handler)
+			try:
+				return func(*args, **kwargs)
+			finally:
+				if msgprint_handler:
+					logger.removeHandler(msgprint_handler)
+
+		return wrapper
+
+	return decorator
 
 
 from .fetch import (
@@ -54,4 +77,5 @@ __all__ = [
 	"insert_to_raso",
 	"process_export_record",
 	"update_export_status",
+	"with_msgprint_logging",
 ]

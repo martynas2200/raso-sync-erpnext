@@ -1,14 +1,12 @@
 """Send Task (ERPNext -> RASO)"""
 
 import logging
-from datetime import datetime, timedelta
-from pathlib import Path
 from typing import Any
 
 import frappe
 from frappe.utils.background_jobs import is_job_enqueued
 
-from . import MsgprintHandler
+from . import with_msgprint_logging
 
 logger = frappe.logger("raso_sync_send")
 logger.setLevel("DEBUG")
@@ -26,6 +24,9 @@ RASO_TYPES = {
 	"good_prices": 4,
 }
 
+# Reverse mapping: export code -> RASO_TYPES key
+CODE_TO_RASO_TYPE = {code: name for name, code in RASO_TYPES.items()}
+
 # Mapping from ERPNext DocType to RASO_TYPES numeric codes
 DOCTYPE_TO_RASO_TYPE = {
 	"Customer": RASO_TYPES["partners"],
@@ -39,16 +40,16 @@ CODE_TO_DOCTYPE = {code: doctype for doctype, code in DOCTYPE_TO_RASO_TYPE.items
 QUEUE_DOCTYPE = "RASO Sync Queue Doc"
 
 
-def _now_str() -> str:
-	return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-
-def _export_type_to_code(exp_t):
+def _resolve_export_type_code(exp_t):
 	if isinstance(exp_t, str):
 		return RASO_TYPES.get(exp_t)
-	if isinstance(exp_t, int) and exp_t in RASO_TYPES.values():
+	if isinstance(exp_t, int) and exp_t in CODE_TO_RASO_TYPE:
 		return exp_t
 	return None
+
+
+def _export_code_to_key(exp_code: int) -> str | None:
+	return CODE_TO_RASO_TYPE.get(exp_code)
 
 
 def _normalize_export_types(export_type: str | int | list[str | int] | None) -> list[str]:
@@ -63,11 +64,11 @@ def _normalize_export_types(export_type: str | int | list[str | int] | None) -> 
 
 	types_to_export = []
 	for exp_t in raw_types:
-		code = _export_type_to_code(exp_t)
+		code = _resolve_export_type_code(exp_t)
 		if code is None:
 			raise ValueError(f"Invalid export type: {exp_t}.")
 
-		name = next((key for key, value in RASO_TYPES.items() if value == code), None)
+		name = _export_code_to_key(code)
 		if not name:
 			raise ValueError(f"Could not normalize export type: {exp_t}.")
 
@@ -78,6 +79,7 @@ def _normalize_export_types(export_type: str | int | list[str | int] | None) -> 
 
 
 def _update_or_insert_queue_mark(doctype: str, docname: str, method: str) -> None:
+	"""Helper function to update or insert a mark in the RASO Sync Queue Doc for a given document event."""
 	previous_value = (
 		frappe.db.get_value(
 			QUEUE_DOCTYPE,
@@ -95,7 +97,7 @@ def _update_or_insert_queue_mark(doctype: str, docname: str, method: str) -> Non
 		"source_doctype": doctype,
 		"source_name": docname,
 		"last_event": method,
-		"marked_at": _now_str(),
+		"marked_at": frappe.utils.now(),
 		"has_delete": 1 if previous_has_delete or method == "after_delete" else 0,
 	}
 	existing_name = previous_value.get("name") if isinstance(previous_value, dict) else None
@@ -125,6 +127,7 @@ def _cleanup_persisted_queue_docs(
 			continue
 
 		frappe.db.delete(QUEUE_DOCTYPE, {"source_doctype": doctype, "source_name": docname})
+		frappe.db.commit()
 
 
 def execute_send_task(
@@ -134,10 +137,7 @@ def execute_send_task(
 	full_sync_doctypes=None,
 ):
 	"""
-	Enqueue the send task to export data to RASO.
-
-	Returns 'queued' if enqueued, 'skipped' if already running
-
+	Enqueue the send task to export data to RASO. Returns 'queued' if enqueued, 'skipped' if already running
 	"""
 	# Define unique job ID to prevent parallel execution
 	job_id = "raso_sync_send_task_worker"
@@ -159,16 +159,10 @@ def execute_send_task(
 	return "queued"
 
 
-def mark_doctype_needs_attention(doc, method):
+def mark_doctype_for_sync(doc, method):
 	"""
-	Enqueue send task triggered by document event hooks.
-
-	Args:
-		doc (Document): The document that triggered the event
-		method (str): The method that was called (not used here)
-
-	Returns:
-		dict: Result of enqueue operation
+	Marks a document as needing sync via the RASO Sync Queue Doc.
+	This is called from document events.
 	"""
 	# Only consider supported doctypes
 	if doc.doctype not in DOCTYPE_TO_RASO_TYPE:
@@ -245,6 +239,7 @@ def process_queued_marks():
 	return {"status": result.get("status") if isinstance(result, dict) else "unknown", "result": result}
 
 
+@with_msgprint_logging(logger)
 def execute_send_task_worker(
 	export_type: str | int | list[str | int] | None = None,
 	date_from: str | None = None,
@@ -264,12 +259,6 @@ def execute_send_task_worker(
 		doc_targets (dict[str, list[str]] | None): Pending document names by DocType
 		full_sync_doctypes (list[str] | None): Doctypes that require full-sync fallback
 	"""
-	msgprint_handler = None
-	if inform_user:
-		msgprint_handler = MsgprintHandler()
-		msgprint_handler.setLevel(logging.INFO)
-		logger.addHandler(msgprint_handler)
-
 	results = {
 		"total_exported": 0,
 		"types_processed": [],
@@ -282,13 +271,11 @@ def execute_send_task_worker(
 		types_to_export = _normalize_export_types(export_type)
 		full_sync_doctypes_set = set(full_sync_doctypes or [])
 
-		# NOTE: types_to_export is ready and validated and contains only RASO_TYPES keys
-
 		logger.info(f"Send Task: started for {types_to_export}")
 
 		for exp_type in types_to_export:
 			try:
-				exp_code = _export_type_to_code(exp_type)
+				exp_code = _resolve_export_type_code(exp_type)
 				doctype = CODE_TO_DOCTYPE.get(exp_code)
 				target_docnames = (doc_targets or {}).get(doctype, [])
 				force_full_sync = doctype in full_sync_doctypes_set
@@ -313,7 +300,7 @@ def execute_send_task_worker(
 					message={
 						"message": frappe._("{0} records of {1} were sent to RASO").format(
 							record_count,
-							frappe._(CODE_TO_DOCTYPE.get(_export_type_to_code(exp_type), exp_type)),
+							frappe._(CODE_TO_DOCTYPE.get(_resolve_export_type_code(exp_type), exp_type)),
 						),
 						"alert": 1,
 					},
@@ -350,10 +337,6 @@ def execute_send_task_worker(
 	except Exception as e:
 		logger.error(f"Send Task: Fatal error - {e!s}")
 		raise
-	finally:
-		# Remove msgprint handler after task completion
-		if msgprint_handler:
-			logger.removeHandler(msgprint_handler)
 
 
 def export_and_send_type(
@@ -371,39 +354,20 @@ def export_and_send_type(
 	Raises:
 		Exception: If export or send fails
 	"""
-	# Parse and validate export_type argument
-	if isinstance(export_type, str):
-		export_type = RASO_TYPES.get(export_type, None)
-	elif isinstance(export_type, int):
-		if export_type not in RASO_TYPES.values():
-			raise ValueError(f"Invalid export type number: {export_type}. Must be between 1 and 4.")
-	else:
-		raise TypeError("export_type must be a string or an integer.")
 
+	export_type = _resolve_export_type_code(export_type)
 	if export_type is None:
 		raise ValueError("Invalid export type. Must be one of the defined keys or numbers in RASO_TYPES.")
 
 	if force_full_sync:
-		full_sync = 1
-		effective_date_from = None
-		effective_docnames = None
+		export_data = export_for_raso(export_type, full_sync=1)
+
 	elif docnames:
-		full_sync = 0
-		effective_date_from = None
-		effective_docnames = docnames
+		export_data = export_for_raso(export_type, full_sync=0, docnames=docnames)
 	else:
-		full_sync = 0 if date_from else 1
-		effective_date_from = date_from
-		effective_docnames = None
+		export_data = export_for_raso(export_type, full_sync=0 if date_from else 1, date_from=date_from)
 
 	logger.debug(f"Exporting type {export_type}...")
-
-	export_data = export_for_raso(
-		data_type=export_type,
-		full_sync=full_sync,
-		date_from=effective_date_from,
-		docnames=effective_docnames,
-	)
 
 	record_count = len(export_data)
 	logger.debug(f"Exported {record_count} records of type {export_type} from ERPNext")

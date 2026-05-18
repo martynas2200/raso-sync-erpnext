@@ -62,20 +62,21 @@ def export_for_raso(data_type, full_sync=1, date_from=None, docnames=None):
 	try:
 		data_type = int(data_type)
 
-		if data_type == 1:
-			root = partners_internal(full_sync, date_from, docnames=docnames)
-		elif data_type == 2:
-			root = good_groups_internal(full_sync, date_from, docnames=docnames)
-		elif data_type == 3:
-			root = goods_internal(full_sync, date_from, docnames=docnames)
-		elif data_type == 4:
-			root = good_prices_internal(full_sync, date_from, docnames=docnames)
-		else:
+		handlers = {
+			1: partners_internal,
+			2: good_groups_internal,
+			3: goods_internal,
+			4: good_prices_internal,
+		}
+
+		try:
+			handler = handlers[data_type]
+		except KeyError:
 			frappe.throw(
 				f"Invalid DataType '{data_type}'. Supported values: 1 (Partners), 2 (GoodsGroups), 3 (Goods), 4 (GoodsPrices)"
 			)
 
-		return root
+		return handler(full_sync, date_from, docnames)
 
 	except Exception as e:
 		error_root = Element("Error")

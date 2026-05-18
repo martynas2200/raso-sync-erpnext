@@ -5,7 +5,7 @@ from collections import Counter
 import frappe
 from frappe.utils.background_jobs import is_job_enqueued
 
-from . import MsgprintHandler, get_exports, process_export_record
+from . import get_exports, process_export_record, with_msgprint_logging
 
 logger = frappe.logger("raso_sync_maintenance")
 logger.setLevel("DEBUG")
@@ -34,6 +34,7 @@ def execute_maintenance_task():
 	return {"status": "queued", "job_id": job_id}
 
 
+@with_msgprint_logging(logger)
 def execute_maintenance_task_worker(inform_user=False):
 	"""
 	NEEDS TO BE ENQUEUED WITH JOB-ID: raso_sync_maintenance_task_worker
@@ -45,12 +46,6 @@ def execute_maintenance_task_worker(inform_user=False):
 	Args:
 		inform_user: If True, sends log messages to users via frappe.msgprint
 	"""
-	# Add msgprint handler to send log messages to user interface
-	msgprint_handler = None
-	if inform_user:
-		msgprint_handler = MsgprintHandler()
-		msgprint_handler.setLevel(logging.INFO)
-		logger.addHandler(msgprint_handler)
 	logger.debug("Starting Maintenance Task")
 
 	# check if fetch period is set
@@ -71,9 +66,6 @@ def execute_maintenance_task_worker(inform_user=False):
 		logger.error(f"Maintenance Task: Fatal error - {e!s}")
 		frappe.log_error("RASO: execute_maintenance_task", traceback.format_exc())
 		raise  # So RQ Job is marked as failed
-	finally:
-		if msgprint_handler:
-			logger.removeHandler(msgprint_handler)
 
 
 def check_for_errors_in_previous_imports():

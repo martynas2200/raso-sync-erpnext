@@ -11,7 +11,7 @@ from raso_sync.api.importer import import_data_internal
 from raso_sync.utils.working_hours import is_within_working_hours
 
 from ..db.executor import ProcedureBuilder
-from . import MsgprintHandler
+from . import with_msgprint_logging
 
 logger = frappe.logger("raso_sync_fetch")
 logger.setLevel("DEBUG")
@@ -48,6 +48,7 @@ def execute_fetch_task(type=None):
 	return {"status": "queued", "job_id": job_id}
 
 
+@with_msgprint_logging(logger)
 def execute_fetch_task_worker(type=None, inform_user=False, ignore_workhours=False):
 	"""
 	NEEDS TO BE ENQUEUED WITH JOB-ID: raso_sync_fetch_task_worker
@@ -58,66 +59,55 @@ def execute_fetch_task_worker(type=None, inform_user=False, ignore_workhours=Fal
 		type: Optional filter for data type
 		inform_user: If True, sends log messages to users via frappe.msgprint
 	"""
-	# Add msgprint handler to send log messages to user interface
-	msgprint_handler = None
-	if inform_user:
-		msgprint_handler = MsgprintHandler()
-		msgprint_handler.setLevel(logging.INFO)
-		logger.addHandler(msgprint_handler)
+	if not ignore_workhours and not is_within_working_hours():
+		logger.info("Fetch Task: Skipped due to outside of working hours.")
+		return
+
+	results_counter = Counter()
+
 	try:
-		if not ignore_workhours and not is_within_working_hours():
-			logger.info("Fetch Task: Skipped due to outside of working hours.")
+		new_exports = get_exports()
+		total_processed = len(new_exports)
+
+		if not new_exports:
+			logger.info("Fetch Task: No new data exports to process")
 			return
 
-		results_counter = Counter()
+		logger.info(f"Fetch Task: Found {len(new_exports)} new export records to process")
 
-		try:
-			new_exports = get_exports()
-			total_processed = len(new_exports)
+		# Process each export record
+		for export_record in new_exports:
+			try:
+				status = process_export_record(export_record)
+				results_counter[status] += 1
+			except Exception as e:
+				results_counter["failed"] += 1
+				logger.error(f"Fetch Task: Error processing export {export_record}: {e!s}")
+				if export_record.get("SyncData", 0):
+					logger.error(export_record.get("SyncData", ""))
+				ui_error_msg = f"Error processing export: {e!s}"
+				frappe.msgprint(ui_error_msg)
+				# Log full exception with traceback
+				error_details = f"Export Record: {export_record}\n\nException:\n{traceback.format_exc()}"
+				document = frappe.log_error("execute_fetch_task", error_details)
+				error_name = document.name if document else ""
 
-			if not new_exports:
-				logger.info("Fetch Task: No new data exports to process")
-				return
+				update_export_status(
+					export_record.get("SyncDataExportId"),
+					status=STATUS_CODE_MAP["error"],
+					message="See error log " + error_name + " for details in ERPNext logs.",
+				)
+		logger.info(
+			"Fetch Task Completed. Processed: %s, Success: %s, Partial: %s, Failed: %s",
+			total_processed,
+			results_counter.get("success", 0),
+			results_counter.get("partial_success", 0),
+			results_counter.get("failed", 0),
+		)
 
-			logger.info(f"Fetch Task: Found {len(new_exports)} new export records to process")
-
-			# Process each export record
-			for export_record in new_exports:
-				try:
-					status = process_export_record(export_record)
-					results_counter[status] += 1
-				except Exception as e:
-					results_counter["failed"] += 1
-					logger.error(f"Fetch Task: Error processing export {export_record}: {e!s}")
-					if export_record.get("SyncData", 0):
-						logger.error(export_record.get("SyncData", ""))
-					ui_error_msg = f"Error processing export: {e!s}"
-					frappe.msgprint(ui_error_msg)
-					# Log full exception with traceback
-					error_details = f"Export Record: {export_record}\n\nException:\n{traceback.format_exc()}"
-					document = frappe.log_error("execute_fetch_task", error_details)
-					error_name = document.name if document else ""
-
-					update_export_status(
-						export_record.get("SyncDataExportId"),
-						status=STATUS_CODE_MAP["error"],
-						message="See error log " + error_name + " for details in ERPNext logs.",
-					)
-			logger.info(
-				"Fetch Task Completed. Processed: %s, Success: %s, Partial: %s, Failed: %s",
-				total_processed,
-				results_counter.get("success", 0),
-				results_counter.get("partial_success", 0),
-				results_counter.get("failed", 0),
-			)
-
-		except Exception as e:
-			logger.error(f"Fetch Task: Fatal error - {e!s}")
-			raise
-	finally:
-		# Remove msgprint handler after task completion
-		if msgprint_handler:
-			logger.removeHandler(msgprint_handler)
+	except Exception as e:
+		logger.error(f"Fetch Task: Fatal error - {e!s}")
+		raise
 
 
 def get_exports(status=0, data_type=None, data_provider=None):
