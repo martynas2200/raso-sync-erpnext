@@ -62,7 +62,6 @@ from .send import (
 	RASO_TYPES,
 	execute_send_task,
 	export_and_send_type,
-	get_raso_settings,
 	insert_to_raso,
 )
 
@@ -73,7 +72,6 @@ __all__ = [
 	"execute_send_task",
 	"export_and_send_type",
 	"get_exports",
-	"get_raso_settings",
 	"insert_to_raso",
 	"process_export_record",
 	"update_export_status",

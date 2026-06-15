@@ -80,6 +80,11 @@ def _normalize_export_types(export_type: str | int | list[str | int] | None) -> 
 
 def _update_or_insert_queue_mark(doctype: str, docname: str, method: str) -> None:
 	"""Helper function to update or insert a mark in the RASO Sync Queue Doc for a given document event."""
+
+	if doctype == "Item Price":
+		if not frappe.db.get_value("Item Price", docname, "selling"):
+			return
+
 	previous_value = (
 		frappe.db.get_value(
 			QUEUE_DOCTYPE,
@@ -91,8 +96,8 @@ def _update_or_insert_queue_mark(doctype: str, docname: str, method: str) -> Non
 	)
 
 	previous_has_delete = (
-		previous_value.get("has_delete") if isinstance(previous_value, dict) else False
-	) or (previous_value.get("last_event") == "after_delete" if isinstance(previous_value, dict) else False)
+		previous_value.get("has_delete") or previous_value.get("last_event") == "after_delete"
+	)
 	value = {
 		"source_doctype": doctype,
 		"source_name": docname,
@@ -100,7 +105,7 @@ def _update_or_insert_queue_mark(doctype: str, docname: str, method: str) -> Non
 		"marked_at": frappe.utils.now(),
 		"has_delete": 1 if previous_has_delete or method == "after_delete" else 0,
 	}
-	existing_name = previous_value.get("name") if isinstance(previous_value, dict) else None
+	existing_name = previous_value.get("name")
 
 	if existing_name:
 		frappe.db.set_value(QUEUE_DOCTYPE, existing_name, value, update_modified=False)
@@ -137,7 +142,8 @@ def execute_send_task(
 	full_sync_doctypes=None,
 ):
 	"""
-	Enqueue the send task to export data to RASO. Returns 'queued' if enqueued, 'skipped' if already running
+	Enqueue the send task to export data to RASO.
+	Returns 'queued' if enqueued, 'skipped' if already running
 	"""
 	# Define unique job ID to prevent parallel execution
 	job_id = "raso_sync_send_task_worker"
@@ -253,11 +259,11 @@ def execute_send_task_worker(
 	Worker function that performs the actual export and sending.
 
 	Args:
-		export_type (str | int | list[str | int] | None): Type(s) of data to export,
-			as names or numeric codes, or None for all types
-		date_from (str, optional): Start date filter (YYYY-MM-DD format)
-		doc_targets (dict[str, list[str]] | None): Pending document names by DocType
-		full_sync_doctypes (list[str] | None): Doctypes that require full-sync fallback
+	    export_type (str | int | list[str | int] | None): Type(s) of data to export,
+	        as names or numeric codes, or None for all types
+	    date_from (str, optional): Start date filter (YYYY-MM-DD format)
+	    doc_targets (dict[str, list[str]] | None): Pending document names by DocType
+	    full_sync_doctypes (list[str] | None): Doctypes that require full-sync fallback
 	"""
 	results = {
 		"total_exported": 0,
@@ -346,13 +352,13 @@ def export_and_send_type(
 	Export a single data type from ERPNext and send to RASO.
 
 	Args:
-		export_type (str): Type of data to export RASO_TYPE
-		date_from (str, optional): Start date filter
+	    export_type (str): Type of data to export RASO_TYPE
+	    date_from (str, optional): Start date filter
 
 	Returns the number of records exported
 
 	Raises:
-		Exception: If export or send fails
+	    Exception: If export or send fails
 	"""
 
 	export_type = _resolve_export_type_code(export_type)
@@ -385,7 +391,7 @@ def export_and_send_type(
 	return record_count
 
 
-def insert_to_raso(data_type, sync_data, data_provider=None):
+def insert_to_raso(data_type, sync_data):
 	"""
 	Sends formatted data to RASO database.
 
@@ -393,54 +399,37 @@ def insert_to_raso(data_type, sync_data, data_provider=None):
 	Records are inserted with Status = 0 ("New Data").
 
 	Args:
-		data_type (int): Data type identifier
-		sync_data (str): Data payload
-		data_provider (str, optional): Data provider name (defaults from settings)
+	    data_type (int): Data type identifier
+	    sync_data (str): Data payload
 
 	Returns:
-		int: SyncDataImportId of the newly created record
+	    int: SyncDataImportId of the newly created record
 
 	Raises:
-		Exception: If database insert fails
+	    Exception: If database insert fails
 	"""
-	try:
-		params = {
-			"DataType": data_type,
-			"DataProvider": "KVITAS",
-			"SyncData": sync_data,
-		}
+	params = {
+		"DataType": data_type,
+		"DataProvider": "KVITAS",  # defines which API contract RASO follows, more information in RASO UI of Common configuration, setting 63
+		"SyncData": sync_data,
+	}
 
-		# Execute stored procedure to insert import record
-		# The procedure returns the newly created SyncDataImportId
-		result = ProcedureBuilder.execute_procedure("ie.usp_SyncDataImport_i", params)
+	# Execute stored procedure to insert import record
+	# The procedure returns the newly created SyncDataImportId
+	result = ProcedureBuilder.execute_procedure("ie.usp_SyncDataImport_i", params)
 
-		# Extract the ID from result
-		if isinstance(result, dict) and result.get("result_set") and len(result["result_set"]) > 0:
-			sync_import_id = result["result_set"][0].get("SyncDataImportId")
-		else:
-			sync_import_id = result.get("SyncDataImportId") if result else None
+	# Extract the ID from result
+	if isinstance(result, dict) and result.get("result_set") and len(result["result_set"]) > 0:
+		sync_import_id = result["result_set"][0].get("SyncDataImportId")
+	else:
+		sync_import_id = result.get("SyncDataImportId") if result else None
 
-		if not sync_import_id:
-			logger.error(f"No SyncDataImportId returned from procedure. Full result: {result}")
-			frappe.log_error(
-				"No SyncDataImportId in RASO send task",
-				f"RASO Sync: insert_to_raso failed, data_type={data_type}, data_provider={data_provider}, the full result: {result}",
-			)
-			raise Exception("No SyncDataImportId returned from RASO database.")
+	if not sync_import_id:
+		frappe.log_error(
+			"No SyncDataImportId in RASO send task",
+			f"RASO Sync: insert_to_raso failed, data_type={data_type}, result: {result}",
+		)
+		raise Exception("No SyncDataImportId returned from RASO database.")
 
-		logger.debug(f"Created import record {sync_import_id} in RASO")
-		return sync_import_id
-
-	except Exception as e:
-		logger.error(f"Error sending data to RASO: {e!s}")
-		raise
-
-
-def get_raso_settings():
-	"""Retrieve RASO Sync Settings document."""
-	try:
-		settings = frappe.get_doc("RASO Sync Settings")
-		return settings.as_dict()
-	except frappe.DoesNotExistError:
-		logger.warning("RASO Sync Settings not configured")
-		return {}
+	logger.debug(f"Created import record {sync_import_id} in RASO")
+	return sync_import_id
