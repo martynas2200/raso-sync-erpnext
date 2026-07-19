@@ -365,7 +365,6 @@ def add_item_to_invoice(invoice, sale_node):
 	name_element = sale_node.find("NAME")
 	if name_element is None:  # Check for alternate field name
 		name_element = sale_node.find("n")
-	item_name = name_element.text if name_element is not None else "Unknown Item"
 
 	qty = flt(sale_node.find("QTY").text) if sale_node.find("QTY") is not None else 0
 	amount = flt(sale_node.find("AMOUNT").text) if sale_node.find("AMOUNT") is not None else 0
@@ -386,31 +385,30 @@ def add_item_to_invoice(invoice, sale_node):
 
 	rate = abs((final_amount - vat) / final_qty) if final_qty != 0 else 0
 
-	# Determine item
+	# Determine item - lookup priority: barcode (stripped) > barcode (full) > VCODE
 	item_code = None
+	barcode_uom = None
 
-	# If VCODE starts with uppercase letter, take it as item code
-	if vcode and vcode[0].isalpha():
+	# 1. Barcode lookup by stripped code (no leading zeros)
+	stripped_code = code.lstrip("0")
+	barcode_record = frappe.db.get_value("Item Barcode", {"barcode": stripped_code}, ["parent", "uom"])
+	if barcode_record:
+		item_code = barcode_record[0]
+		barcode_uom = barcode_record[1]
+
+		# 2. Barcode lookup by full code
+	if not item_code:
+		barcode_record = frappe.db.get_value("Item Barcode", {"barcode": code}, ["parent", "uom"])
+		if barcode_record:
+			item_code = barcode_record[0]
+			barcode_uom = barcode_record[1]
+
+	# 3. Fall back to VCODE
+	if not item_code and vcode and vcode[0].isalpha():
 		item_code = vcode
-
-	if item_code:
-		# Verify that VCODE is item_code
 		item_exists = frappe.db.exists("Item", item_code)
 		if not item_exists:
 			item_code = None
-
-	if not item_code:
-		# Barcode lookup instead, no leading zeros
-		stripped_code = code.lstrip("0")
-		item_code_from_barcode = frappe.db.get_value("Item Barcode", {"barcode": stripped_code}, "parent")
-		if item_code_from_barcode:
-			item_code = item_code_from_barcode
-
-	if not item_code:
-		# Direct item barcode lookup
-		item_code_from_barcode = frappe.db.get_value("Item Barcode", {"barcode": code}, "parent")
-		if item_code_from_barcode:
-			item_code = item_code_from_barcode
 
 	if not item_code:
 		# Use default item
@@ -422,12 +420,16 @@ def add_item_to_invoice(invoice, sale_node):
 		else:
 			raise ValueError("No item found and no default item set in RASO Sync Settings.")
 
-	item_doc = frappe.get_doc("Item", item_code)
-	stock_uom = item_doc.stock_uom if item_doc and item_doc.stock_uom else "Nos"
-	if not item_doc:
-		raise ValueError(f"Item {item_code} does not exist.")
-	if not stock_uom:
-		raise ValueError(f"Item {item_code} does not have a stock UOM defined.")
+	# Determine UOM - use barcode's UOM if found via barcode, otherwise Item's stock UOM
+	if barcode_uom:
+		stock_uom = barcode_uom
+	else:
+		item_doc = frappe.get_doc("Item", item_code)
+		stock_uom = item_doc.stock_uom if item_doc and item_doc.stock_uom else "Nos"
+		if not item_doc:
+			raise ValueError(f"Item {item_code} does not exist.")
+		if not stock_uom:
+			raise ValueError(f"Item {item_code} does not have a stock UOM defined.")
 
 	if discount > 0:
 		enhanced_description = f"Discount: {discount:.2f} EUR"
