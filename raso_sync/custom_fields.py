@@ -23,11 +23,11 @@ definitions = {
 	"Item": [
 		{
 			"fieldname": "deposit_package_count",
-			"label": "Deposit Package Count",
+			"label": "Deposit Items per Stock UOM",
 			"fieldtype": "Int",
 			"default": 0,
 			"insert_after": "weight_per_unit",
-			"description": "Number of items in a deposit package, e.g., 6 bottles in a pack",
+			"description": "Number of deposit-bearing items (e.g., bottles or cans) in one stock UOM of this item, e.g., 6 for a pack of 6 bottles.",
 		}
 	],
 	"Item Group": [
