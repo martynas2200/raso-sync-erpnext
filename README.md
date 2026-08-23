@@ -20,10 +20,11 @@ Raso Sync is a Frappe app that keeps ERPNext master data and RASO POS sales data
   - Item
   - Item Price
 - Import of Sales and Returns from RASO to ERPNext, creating Sales Invoices with relevant items and payments
+- Import of Z Reports from RASO into the `Z Report` doctype
 
 ## Installation
 
-- Make sure the environment has pymssql installed, if it is production environment, it is highly recommended to use custom docker image. More information can be found at [Frappe Docker documentation](https://github.com/frappe/frappe_docker/blob/main/docs/container-setup/02-build-setup.md).
+- Make sure the environment has pymssql installed, if it is production environment, it is highly recommended to use custom docker image. More information can be found at [Frappe Docker documentation](https://github.com/frappe/frappe_docker).
 - Scheduler must be enabled in Frappe setup to run background jobs.
 - Precision of Field `Rate` in `Sales Invoice Item` doctype must be increased to at least 3 decimal places to avoid rounding issues.
 - Consider enabling `Allow Negative Stock` if auto submit of Sales Invoices is desired.
@@ -62,6 +63,8 @@ Raso Sync is a Frappe app that keeps ERPNext master data and RASO POS sales data
   - This replaces the earlier approach that used cache marks + a 15-minute recent-modified window. No oversending, and the DB-backed queue is more trustworthy and resilient because pending changes survive process restarts, scheduler delays, worker failures, etc.
 - Full Sync Task `raso_sync.tasks.full_sync.execute_full_sync_task`
   - Run once daily at configured time (`full_sync_time` setting), mostly needed for item price records so the day to day price changes are reflected in RASO (fields of `valid_from`, `valid_to`).
+- Maintenance Task `raso_sync.tasks.maintenance.execute_maintenance_task`
+  - Runs daily to check for previous import errors (RASO export Status 3 "Error" and 4 "Partial Success") and retry processing them.
 
 ---
 

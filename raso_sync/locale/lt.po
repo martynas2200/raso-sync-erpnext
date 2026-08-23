@@ -818,3 +818,9 @@ msgstr "RASO"
 
 msgid "m"
 msgstr "min."
+
+msgid "Sync could not be executed"
+msgstr "Sinchronizacijos atlikti nepavyko"
+
+msgid "Raso Retail server appears to be offline or unreachable."
+msgstr "Raso Retail serveris yra kaip ir atsijungęs arba nepasiekiamas."

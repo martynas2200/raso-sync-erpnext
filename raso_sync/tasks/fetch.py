@@ -10,7 +10,9 @@ from frappe.utils.background_jobs import is_job_enqueued
 from raso_sync.api.importer import import_data_internal
 from raso_sync.utils.working_hours import is_within_working_hours
 
+from ..db.exceptions import RASOServerUnavailableError
 from ..db.executor import ProcedureBuilder
+from ..utils.system_notifications import notify_server_unavailable
 from . import with_msgprint_logging
 
 logger = frappe.logger("raso_sync_fetch")
@@ -105,6 +107,10 @@ def execute_fetch_task_worker(type=None, inform_user=False, ignore_workhours=Fal
 			results_counter.get("failed", 0),
 		)
 
+	except RASOServerUnavailableError as e:
+		logger.error(f"Fetch Task: RASO server unavailable - {e!s}")
+		notify_server_unavailable()
+		raise
 	except Exception as e:
 		logger.error(f"Fetch Task: Fatal error - {e!s}")
 		raise

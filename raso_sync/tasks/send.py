@@ -14,7 +14,9 @@ logger.setLevel("DEBUG")
 from raso_sync.api.exporter import export_for_raso, format_xml_response
 from raso_sync.raso_sync.doctype.raso_sync_settings.raso_sync_settings import RASOSyncSettings
 
+from ..db.exceptions import RASOServerUnavailableError
 from ..db.executor import ProcedureBuilder
+from ..utils.system_notifications import notify_server_unavailable
 
 # Supported export data types
 RASO_TYPES = {
@@ -340,6 +342,10 @@ def execute_send_task_worker(
 				f"Failed types: {', '.join([err['type'] for err in results['errors']])}",
 			)
 
+	except RASOServerUnavailableError as e:
+		logger.error(f"Send Task: RASO server unavailable - {e!s}")
+		notify_server_unavailable()
+		raise
 	except Exception as e:
 		logger.error(f"Send Task: Fatal error - {e!s}")
 		raise

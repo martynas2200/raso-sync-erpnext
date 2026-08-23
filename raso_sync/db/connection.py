@@ -7,6 +7,9 @@ from typing import Any, ClassVar
 import frappe
 import pymssql
 
+from ..utils.system_notifications import clear_server_unavailable_notification_mark
+from .exceptions import RASOServerUnavailableError
+
 logger = frappe.logger("raso_sync.db")
 logger.setLevel(logging.INFO)
 
@@ -72,11 +75,19 @@ class MSSQLConnection:
 
 			logger.info(f"Connected to MSSQL database at {self.host}:{self.port}/{self.database}")
 			return conn
+		except pymssql.OperationalError as e:
+			# Server unreachable or connection timed out
+			self._is_connected = False
+			self._update_sync_status(is_running=False)
+			frappe.log_error("RASO DB Connection", f"MSSQL Server Unavailable/Timeout: {e!s}")
+			raise RASOServerUnavailableError(
+				f"Database connection failed (server unavailable or timed out): {e!s}"
+			) from e
 		except pymssql.Error as e:
 			self._is_connected = False
 			self._update_sync_status(is_running=False)
 			frappe.log_error("RASO DB Connection", f"MSSQL Connection Error: {e!s}")
-			raise frappe.ValidationError(f"Database connection failed: {e!s}")
+			raise frappe.ValidationError(f"Database connection failed: {e!s}") from e
 
 	def connect(self) -> pymssql.Connection:
 		"""
@@ -101,7 +112,7 @@ class MSSQLConnection:
 				self._connection = None
 				self._is_connected = False
 
-				# Update synchronization status
+				clear_server_unavailable_notification_mark()
 				self._update_sync_status(is_running=False)
 
 	def is_connected(self) -> bool:

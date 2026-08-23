@@ -224,7 +224,7 @@ frappe.raso_sync_overview = {
         return (
             __("Data should be sent automatically in about") +
             ` ${eta_minutes} ` +
-            __("m") +
+            __("min.") +
             ` (${__("next check")}: ${next_run_display}).`
         );
     },
