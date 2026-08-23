@@ -345,7 +345,6 @@ def execute_send_task_worker(
 	except RASOServerUnavailableError as e:
 		logger.error(f"Send Task: RASO server unavailable - {e!s}")
 		notify_server_unavailable()
-		raise
 	except Exception as e:
 		logger.error(f"Send Task: Fatal error - {e!s}")
 		raise

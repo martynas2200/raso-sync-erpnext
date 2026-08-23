@@ -110,7 +110,6 @@ def execute_fetch_task_worker(type=None, inform_user=False, ignore_workhours=Fal
 	except RASOServerUnavailableError as e:
 		logger.error(f"Fetch Task: RASO server unavailable - {e!s}")
 		notify_server_unavailable()
-		raise
 	except Exception as e:
 		logger.error(f"Fetch Task: Fatal error - {e!s}")
 		raise
