@@ -2,6 +2,7 @@
 
 import frappe
 from frappe import _
+from frappe.translate import get_user_lang
 
 DEFAULT_NOTIFICATION_ROLE = "Raso Sync User"
 SERVER_UNAVAILABLE_DEDUP_KEY = "raso_sync:server_unavailable_notified"
@@ -21,7 +22,7 @@ def _localized_text(text: str | None, user: str) -> str | None:
 	"""Translate text into the user's preferred language."""
 	if not text:
 		return None
-	return _(text, lang=frappe.get_user_lang(user))
+	return _(text, lang=get_user_lang(user))
 
 
 def notify_server_unavailable() -> None:

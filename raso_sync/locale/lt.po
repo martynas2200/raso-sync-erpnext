@@ -322,9 +322,6 @@ msgstr "Testuojamas prisijungimas prie RASO..."
 msgid "Connection test completed successfully"
 msgstr "Prisijungimo testas sėkmingai baigtas"
 
-msgid "Connection test failed"
-msgstr "Prisijungimo testas nepavyko"
-
 msgid "Never"
 msgstr "Niekada"
 
@@ -364,9 +361,6 @@ msgstr "Ištrinti"
 
 msgid "Duplicate row"
 msgstr "Dublikuoti eilutę"
-
-msgid "Connection test failed: "
-msgstr "Prisijungimo testas nepavyko: "
 
 msgid "Connection test successful"
 msgstr "Prisijungimo testas sėkmingas"
@@ -440,9 +434,6 @@ msgstr "Sinchronizacija vykdoma"
 msgid "Synchronization is running"
 msgstr "Sinchronizacija vykdoma"
 
-msgid "The enqueue failed: {0}"
-msgstr "Į eilę įtraukti nepavyko: {0}"
-
 msgid "These settings define synchronization intervals and behavior on the <b>ERPNext side only</b>. RASO RETAIL (RR) has its own independent schedulers.<br>In other words, ERPNext sends data to the secondary RR database, and RR updates its main database within 10 (default setting) minutes. <br>RR exports new data to the secondary database every 20 (default setting) minutes, meaning if a sale is made in RR, it may take up to 20 minutes before it exported, and then an additional interval defined here before it appears in ERPNext."
 msgstr "Šie nustatymai apibrėžia sinchronizavimo intervalus ir elgseną <b>tik ERPNext pusėje</b>. RASO RETAIL (RR) turi savo nepriklausomus planuotojus.<br>Kitais žodžiais tariant, ERPNext siunčia duomenis į antrinę RR duomenų bazę, o RR atnaujina savo pagrindinę duomenų bazę kas 10 (numatytasis nustatymas) minučių. <br>RR eksportuoja naujus duomenis į antrinę duomenų bazę kas 20 (numatytasis nustatymas) minučių, tai reiškia, kad jei RR buvo atliktas pardavimas, gali praeiti iki 20 minučių, kol jis bus eksportuotas, o tada dar papildomas čia apibrėžtas intervalas, kol jis pasirodys ERPNext."
 
@@ -467,8 +458,8 @@ msgstr "POS kvitas"
 msgid "{0} records of {1} were sent to RASO"
 msgstr "Į RASO išsiųsti {0} {1} įrašai"
 
-msgid "Connection successful, db_time not retrieved....?"
-msgstr "Prisijungimas sėkmingas, db_time negautas....?"
+msgid "Connection successful, database time not retrieved..."
+msgstr "Prisijungimas sėkmingas, duomenų bazės laikas negautas..."
 
 msgid "Connection successful. Database time: {0}"
 msgstr "Prisijungimas sėkmingas. Duomenų bazės laikas: {0}"
@@ -812,12 +803,6 @@ msgstr "Mokėjimo patikra nepavyko: "
 
 msgid "Payments"
 msgstr "Mokėjimai"
-
-msgid "RASO"
-msgstr "RASO"
-
-msgid "m"
-msgstr "min."
 
 msgid "Sync could not be executed"
 msgstr "Sinchronizacijos atlikti nepavyko"

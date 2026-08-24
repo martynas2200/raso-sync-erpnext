@@ -1,5 +1,3 @@
-// Page API documentation: https://frappeframework.com/docs/user/en/api/page
-
 frappe.pages["raso-sync-overview"].on_page_load = function (wrapper) {
     var page = frappe.ui.make_app_page({
         parent: wrapper,
@@ -132,33 +130,7 @@ frappe.raso_sync_overview = {
         this.render_queue(this.settings.queued_doc_rows || []);
     },
 
-    parse_server_datetime: function (date_str) {
-        if (!date_str || typeof date_str !== "string") return null;
-
-        if (frappe?.datetime?.str_to_obj) {
-            const parsed = frappe.datetime.str_to_obj(date_str);
-            if (parsed instanceof Date && !isNaN(parsed.getTime())) {
-                return parsed;
-            }
-        }
-
-        const match = date_str.match(/^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})$/);
-        if (!match) return null;
-
-        const [, year, month, day, hours, minutes, seconds] = match;
-        const parsed = new Date(
-            Number(year),
-            Number(month) - 1,
-            Number(day),
-            Number(hours),
-            Number(minutes),
-            Number(seconds)
-        );
-
-        return isNaN(parsed.getTime()) ? null : parsed;
-    },
-
-    ceil_to_next_minute: function (date_obj) {
+    ceil_to_next_minute: (date_obj) => {
         const rounded = new Date(date_obj.getTime());
         rounded.setSeconds(0, 0);
         if (rounded < date_obj) {
@@ -197,9 +169,7 @@ frappe.raso_sync_overview = {
         return candidate;
     },
 
-    build_auto_send_message: function (rows) {
-        const check_interval_minutes = Number(this.settings?.send_check_interval_minutes || 0);
-
+    build_auto_send_message: function (check_interval_minutes) {
         if (check_interval_minutes <= 0) {
             return __("Automatic sending is currently disabled (Send Check Interval is 0).");
         }
@@ -242,7 +212,8 @@ frappe.raso_sync_overview = {
             return;
         }
 
-        const indicator_message = this.build_auto_send_message(safe_rows);
+        const check_interval_minutes = Number(this.settings?.send_check_interval_minutes || 0);
+        const indicator_message = this.build_auto_send_message(check_interval_minutes);
         $indicator.removeClass("hidden").text(indicator_message);
 
         let html = `<table class="table table-hover queued-docs-table"><thead><tr>
@@ -254,14 +225,14 @@ frappe.raso_sync_overview = {
 
         for (const row of safe_rows) {
             const marked_at = this.format_date(row.marked_at);
-            const safe_doctype = frappe.utils.escape_html(frappe._(row.doctype));
-            const safe_name = frappe.utils.escape_html(row.name);
+            const safe_doctype = frappe.utils.escape_html(frappe._(row.source_doctype));
+            const safe_name = frappe.utils.escape_html(row.source_name);
             const safe_event = frappe.utils.escape_html(this.format_event(row.last_event));
 
             let name_cell = safe_name;
-            if (row.name && row.name !== "—") {
-                const doctype_route = frappe.router.slug(row.doctype);
-                const doc_route = encodeURIComponent(row.name);
+            if (row.source_name && row.source_name !== "—") {
+                const doctype_route = frappe.router.slug(row.source_doctype);
+                const doc_route = encodeURIComponent(row.source_name);
                 const href = frappe.utils.escape_html(`/app/${doctype_route}/${doc_route}`);
                 name_cell = `<a href="${href}" target="_blank" rel="noopener noreferrer">${safe_name}</a>`;
             }
@@ -289,6 +260,14 @@ frappe.raso_sync_overview = {
         return frappe._(event_str);
     },
 
+    nl2br: (text) => {
+        if (!text) return "";
+        return frappe.utils
+            .escape_html(String(text))
+            .replace(/\\n/g, "<br>")
+            .replace(/\n/g, "<br>");
+    },
+
     test_connection: function () {
         frappe.show_alert(
             {
@@ -300,7 +279,7 @@ frappe.raso_sync_overview = {
 
         frappe.call({
             method: "raso_sync.api.manual.test_connection",
-            callback: function (r) {
+            callback: (r) => {
                 if (r.message && r.message.success) {
                     frappe.show_alert(
                         {
@@ -312,9 +291,7 @@ frappe.raso_sync_overview = {
                 } else {
                     frappe.show_alert(
                         {
-                            message:
-                                __("Connection test failed: ") +
-                                (r.message?.error || __("Unknown error")),
+                            message: this.nl2br(r.message?.error || __("Unknown error")),
                             indicator: "red",
                         },
                         5
@@ -324,7 +301,7 @@ frappe.raso_sync_overview = {
             error: function () {
                 frappe.show_alert(
                     {
-                        message: __("Connection test failed"),
+                        message: __("Connection test failed: {0}").format(__("Unknown error")),
                         indicator: "red",
                     },
                     5
@@ -333,7 +310,7 @@ frappe.raso_sync_overview = {
         });
     },
 
-    check_logs: function () {
+    check_logs: () => {
         frappe.set_route("List", "Error Log", {
             error: ["like", "%raso%"],
         });
@@ -363,8 +340,9 @@ frappe.raso_sync_overview = {
                 } else {
                     frappe.show_alert(
                         {
-                            message:
-                                __("Send queued failed: ") + (r.message?.error || "Unknown error"),
+                            message: this.nl2br(
+                                __("Send queued failed: ") + (r.message?.error || "Unknown error")
+                            ),
                             indicator: "red",
                         },
                         5
@@ -382,7 +360,7 @@ frappe.raso_sync_overview = {
             () => {
                 frappe.call({
                     method: "raso_sync.api.manual.manual_fetch",
-                    callback: function (r) {
+                    callback: (r) => {
                         if (r.message && r.message.success) {
                             frappe.show_alert(
                                 {
@@ -394,9 +372,10 @@ frappe.raso_sync_overview = {
                         } else {
                             frappe.show_alert(
                                 {
-                                    message:
+                                    message: this.nl2br(
                                         __("Fetch queued failed: ") +
-                                        (r.message?.error || "Unknown error"),
+                                            (r.message?.error || "Unknown error")
+                                    ),
                                     indicator: "red",
                                 },
                                 5
