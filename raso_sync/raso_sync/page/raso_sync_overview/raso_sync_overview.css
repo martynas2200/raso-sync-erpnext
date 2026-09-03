@@ -31,6 +31,7 @@
 	background-color: var(--alert-bg-success);
 	border-color: var(--green-500);
 	color: var(--alert-text-success);
+    display: none;
 }
 
 .sync-status-banner .indicator {
@@ -87,6 +88,12 @@
 	font-size: 16px;
 	font-weight: 500;
 	color: var(--text-color);
+}
+
+.status-card .value.stale {
+	color: var(--red-500);
+	font-weight: 600;
+	cursor: help;
 }
 
 .action-section {

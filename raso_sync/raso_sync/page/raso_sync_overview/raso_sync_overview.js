@@ -112,22 +112,64 @@ frappe.raso_sync_overview = {
     update_ui: function () {
         if (!this.settings) return;
 
-        const is_running = this.settings.is_running;
         const $banner = this.$("#sync-status-banner");
-        const $status_text = this.$("#sync-status-text");
-
-        if (is_running) {
+        if (this.settings.is_running) {
             $banner.removeClass("idle").addClass("running");
-            $status_text.text(__("Synchronization is running"));
         } else {
             $banner.removeClass("running").addClass("idle");
-            $status_text.text(__("Synchronization is idle"));
         }
 
-        this.$("#last-sale-import").text(this.format_date(this.settings.last_sale_import));
-        this.$("#last-data-export").text(this.format_date(this.settings.last_data_export));
+        this.render_timestamp_card("#last-sale-import", this.settings.last_sale_import);
+        this.render_timestamp_card("#last-data-export", this.settings.last_data_export);
 
         this.render_queue(this.settings.queued_doc_rows || []);
+    },
+
+    STALE_HOURS: 15,
+
+    relative_time_label: function (minutes) {
+        if (minutes < 1) return __("Just now");
+        if (minutes < 60) return __("{0} minutes ago", [minutes]);
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return __("{0} hours ago", [hours]);
+        const days = Math.floor(hours / 24);
+        return __("{0} days ago", [days]);
+    },
+
+    render_timestamp_card: function (selector, value) {
+        const $value = this.$(selector);
+        $value.removeClass("stale").removeAttr("title");
+
+        if (!value) {
+            $value.text(__("Never"));
+            return;
+        }
+
+        // last_sale_import / last_data_export arrive from the server in the system
+        // time zone, so parse them as such (moment.tz) rather than as browser-local
+        // time; this keeps the elapsed time correct regardless of the user's zone.
+        const ts = moment.tz(value, frappe.defaultDatetimeFormat, frappe.boot.time_zone.system);
+        if (!ts.isValid()) {
+            $value.text(value);
+            return;
+        }
+
+        const now = moment();
+        let label = this.relative_time_label(
+            Math.max(0, Math.floor(now.diff(ts, "minutes", true)))
+        );
+
+        // shown in the user's timezone
+        $value.attr(
+            "title",
+            ts.tz(frappe.boot.time_zone.user).format(frappe.defaultDatetimeFormat)
+        );
+
+        if (now.diff(ts) > this.STALE_HOURS * 60 * 60 * 1000) {
+            $value.addClass("stale");
+        }
+
+        $value.text(label);
     },
 
     ceil_to_next_minute: (date_obj) => {
@@ -169,34 +211,41 @@ frappe.raso_sync_overview = {
         return candidate;
     },
 
-    build_auto_send_message: function (check_interval_minutes) {
-        if (check_interval_minutes <= 0) {
-            return __("Automatic sending is currently disabled (Send Check Interval is 0).");
+    build_auto_send_message: function (send_job) {
+        if (!send_job) {
+            return __(
+                "No scheduled job is configured. Save the settings to create a scheduled job for automatic sending."
+            );
+        }
+        if (send_job.stopped) {
+            return __("Automatic sending is disabled.");
         }
 
-        const now = new Date();
-        const next_run = this.get_next_scheduler_run(now, check_interval_minutes);
-        if (!next_run) {
-            return __("Data is queued and will be sent automatically.");
+        const now = moment();
+
+        if (send_job.next_execution) {
+            const next_run = moment.tz(
+                send_job.next_execution,
+                frappe.defaultDatetimeFormat,
+                frappe.boot.time_zone.system
+            );
+            if (next_run.isAfter(now)) {
+                const eta_minutes = Math.max(0, Math.ceil(next_run.diff(now, "minutes", true)));
+                const next_run_display = next_run.tz(frappe.boot.time_zone.user).format("HH:mm");
+
+                if (eta_minutes <= 1) {
+                    return __("Data should be sent on the next scheduler check (about 1 minute).");
+                }
+
+                return (
+                    __("Data should be sent automatically in about") +
+                    ` ${eta_minutes} ` +
+                    __("min.") +
+                    ` (${__("next check")}: ${next_run_display}).`
+                );
+            }
         }
-
-        const eta_minutes = Math.max(0, Math.ceil((next_run.getTime() - now.getTime()) / 60000));
-        const next_run_display = next_run.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-        });
-
-        if (eta_minutes <= 1) {
-            return __("Data should be sent on the next scheduler check (about 1 minute).");
-        }
-
-        return (
-            __("Data should be sent automatically in about") +
-            ` ${eta_minutes} ` +
-            __("min.") +
-            ` (${__("next check")}: ${next_run_display}).`
-        );
+        return "";
     },
 
     render_queue: function (rows) {
@@ -212,8 +261,8 @@ frappe.raso_sync_overview = {
             return;
         }
 
-        const check_interval_minutes = Number(this.settings?.send_check_interval_minutes || 0);
-        const indicator_message = this.build_auto_send_message(check_interval_minutes);
+        const send_job = this.settings?.send_job || null;
+        const indicator_message = this.build_auto_send_message(send_job);
         $indicator.removeClass("hidden").text(indicator_message);
 
         let html = `<table class="table table-hover queued-docs-table"><thead><tr>

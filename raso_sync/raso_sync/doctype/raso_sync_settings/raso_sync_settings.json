@@ -42,7 +42,6 @@
     "submit_sales_documents",
     "column_break_8",
     "send_check_interval_minutes",
-    "synchronization_is_running",
     "working_hours_section",
     "working_hours_from",
     "column_break_9",
@@ -273,13 +272,6 @@
       "non_negative": 1
     },
     {
-      "fieldname": "synchronization_is_running",
-      "fieldtype": "Check",
-      "label": "Synchronization Is Running",
-      "read_only": 1,
-      "description": "System flag indicating if synchronization is currently in progress"
-    },
-    {
       "fieldname": "working_hours_section",
       "fieldtype": "Section Break",
       "label": "Working Hours"
@@ -340,7 +332,7 @@
   "links": [],
   "modified": "2025-10-20 10:00:00.000000",
   "modified_by": "Administrator",
-  "module": "Raso Sync",
+  "module": "RASO Sync",
   "name": "RASO Sync Settings",
   "owner": "Administrator",
   "permissions": [

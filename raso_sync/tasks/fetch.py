@@ -1,6 +1,5 @@
 """Fetch Task (RASO -> ERPNext)"""
 
-import logging
 import traceback
 from collections import Counter
 
@@ -51,15 +50,15 @@ def execute_fetch_task(type=None):
 
 
 @with_msgprint_logging(logger)
-def execute_fetch_task_worker(type=None, inform_user=False, ignore_workhours=False):
+def execute_fetch_task_worker(inform_user=False, ignore_workhours=False):
 	"""
 	NEEDS TO BE ENQUEUED WITH JOB-ID: raso_sync_fetch_task_worker
 
 	Worker function that performs the actual fetching and importing.
 
 	Args:
-		type: Optional filter for data type
 		inform_user: If True, sends log messages to users via frappe.msgprint
+		ignore_workhours: If True, runs the task regardless of working hours
 	"""
 	if not ignore_workhours and not is_within_working_hours():
 		logger.info("Fetch Task: Skipped due to outside of working hours.")

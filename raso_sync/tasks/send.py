@@ -1,6 +1,5 @@
 """Send Task (ERPNext -> RASO)"""
 
-import logging
 from typing import Any
 
 import frappe

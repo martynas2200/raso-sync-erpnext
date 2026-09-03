@@ -2,9 +2,26 @@ from datetime import datetime
 
 import frappe
 from frappe import _
+from frappe.utils.background_jobs import is_job_enqueued
 
 from ..db.connection import MSSQLConnectionManager
 from ..tasks.send import DOCTYPE_TO_RASO_TYPE, QUEUE_DOCTYPE
+
+SEND_SCHEDULER_METHOD = "raso_sync.tasks.send.process_queued_marks"
+
+
+def _get_scheduled_job_state(method: str) -> dict | None:
+	"""Return scheduler state for a RASO scheduled job method or None."""
+	name = frappe.db.get_value("Scheduled Job Type", {"method": method}, "name")
+	if not name:
+		return None
+
+	job = frappe.get_doc("Scheduled Job Type", name)
+	return {
+		"stopped": bool(job.stopped),
+		"last_execution": job.last_execution,
+		"next_execution": job.next_execution,  # next_execution is a virtual field
+	}
 
 
 def _get_queue_mark_rows() -> list[dict]:
@@ -59,10 +76,10 @@ def manual_send(data_type, mode):
 	    mode: Sync mode (fullsync or today)
 	"""
 	try:
-		if frappe.get_single_value("RASO Sync Settings", "synchronization_is_running"):
+		if is_job_enqueued("raso_sync_send_task_worker"):
 			return {
 				"success": False,
-				"error": _("Synchronization is already running. Please wait for it to complete."),
+				"error": _("Synchronisation is in queue. Please wait for it to start."),
 			}
 
 		date_from = None
@@ -92,14 +109,12 @@ def manual_send(data_type, mode):
 
 @frappe.whitelist()
 def manual_fetch():
-	"""
-	Manually trigger fetch of data from RASO
-	"""
+	"""Manually trigger fetch of data from RASO"""
 	try:
-		if frappe.get_single_value("RASO Sync Settings", "synchronization_is_running"):
+		if is_job_enqueued("raso_sync_fetch_task_worker"):
 			return {
 				"success": False,
-				"error": _("Synchronization is already running. Please wait for it to complete."),
+				"error": _("Synchronisation is in queue. Please wait for it to start."),
 			}
 
 		frappe.enqueue(
@@ -121,17 +136,16 @@ def manual_fetch():
 
 @frappe.whitelist()
 def get_sync_status():
-	"""
-	Get current sync status including dates, sync state, and some pending queue marks.
-	"""
+	"""Get current sync status including dates, sync state, and some pending queue marks."""
 	try:
 		settings = frappe.get_single("RASO Sync Settings")
+		send_job = _get_scheduled_job_state(SEND_SCHEDULER_METHOD)
 
 		return {
 			"last_sale_import": settings.last_sale_import,
 			"last_data_export": settings.last_data_export,
-			"is_running": bool(settings.synchronization_is_running),
-			"send_check_interval_minutes": int(settings.send_check_interval_minutes or 0),
+			"is_running": False,  # This will be updated in real-time via websocket events
+			"send_job": send_job,
 			"queued_doc_rows": _get_queue_mark_rows(),
 		}
 

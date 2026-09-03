@@ -119,23 +119,12 @@ class MSSQLConnection:
 		"""Check if connection is active."""
 		return self._is_connected and self._connection is not None
 
-	def _update_sync_status(self, is_running: bool):
+	@staticmethod
+	def _update_sync_status(is_running: bool):
 		"""
-		Update the synchronization_is_running status in RASO Sync Settings.
-
-		Args:
-		    is_running: True when connection opens, False when it closes
+		Send a real-time notification to the front-end about the synchronisation status.
 		"""
-		try:
-			settings = frappe.get_single("RASO Sync Settings")
-			if settings.synchronization_is_running != is_running:
-				settings.synchronization_is_running = is_running
-				settings.save(ignore_permissions=True)
-				frappe.db.commit()
-				logger.info(f"Synchronization status set to: {is_running}")
-				frappe.publish_realtime("raso_sync_status_update", {"is_running": is_running})
-		except Exception as e:
-			logger.warning(f"Could not update synchronization status: {e!s}")
+		frappe.publish_realtime("raso_sync_status_update", {"is_running": is_running})
 
 	@contextmanager
 	def cursor(self):
