@@ -151,7 +151,7 @@ def validate_sales_payments(root):
 				"error": _("Payment validation failed: ") + str(e),
 			}
 		amount = flt(payment.find("AMOUNT").text)
-		total_payments[code] = amount
+		total_payments[code] += amount
 
 	# Validate that sums match for each payment code
 	all_payment_codes = set(sales_payments.keys()) | set(total_payments.keys())

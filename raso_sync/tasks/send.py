@@ -13,6 +13,7 @@ logger.setLevel("DEBUG")
 from raso_sync.api.exporter import export_for_raso, format_xml_response
 from raso_sync.raso_sync.doctype.raso_sync_settings.raso_sync_settings import RASOSyncSettings
 
+from ..db.connection import mssql_session
 from ..db.exceptions import RASOServerUnavailableError
 from ..db.executor import ProcedureBuilder
 from ..utils.system_notifications import notify_server_unavailable
@@ -246,6 +247,7 @@ def process_queued_marks():
 	return {"status": result.get("status") if isinstance(result, dict) else "unknown", "result": result}
 
 
+@mssql_session
 @with_msgprint_logging(logger)
 def execute_send_task_worker(
 	export_type: str | int | list[str | int] | None = None,

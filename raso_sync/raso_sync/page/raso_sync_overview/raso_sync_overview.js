@@ -127,49 +127,23 @@ frappe.raso_sync_overview = {
 
     STALE_HOURS: 15,
 
-    relative_time_label: function (minutes) {
-        if (minutes < 1) return __("Just now");
-        if (minutes < 60) return __("{0} minutes ago", [minutes]);
-        const hours = Math.floor(minutes / 60);
-        if (hours < 24) return __("{0} hours ago", [hours]);
-        const days = Math.floor(hours / 24);
-        return __("{0} days ago", [days]);
-    },
-
     render_timestamp_card: function (selector, value) {
         const $value = this.$(selector);
-        $value.removeClass("stale").removeAttr("title");
+        $value.removeClass("stale").empty();
 
         if (!value) {
             $value.text(__("Never"));
             return;
         }
 
-        // last_sale_import / last_data_export arrive from the server in the system
-        // time zone, so parse them as such (moment.tz) rather than as browser-local
-        // time; this keeps the elapsed time correct regardless of the user's zone.
         const ts = moment.tz(value, frappe.defaultDatetimeFormat, frappe.boot.time_zone.system);
-        if (!ts.isValid()) {
-            $value.text(value);
-            return;
-        }
+        const stale = ts.isValid() && moment().diff(ts) > this.STALE_HOURS * 60 * 60 * 1000;
 
-        const now = moment();
-        let label = this.relative_time_label(
-            Math.max(0, Math.floor(now.diff(ts, "minutes", true)))
-        );
+        $value.html(comment_when(value));
 
-        // shown in the user's timezone
-        $value.attr(
-            "title",
-            ts.tz(frappe.boot.time_zone.user).format(frappe.defaultDatetimeFormat)
-        );
-
-        if (now.diff(ts) > this.STALE_HOURS * 60 * 60 * 1000) {
+        if (stale) {
             $value.addClass("stale");
         }
-
-        $value.text(label);
     },
 
     ceil_to_next_minute: (date_obj) => {
@@ -273,7 +247,7 @@ frappe.raso_sync_overview = {
         </tr></thead><tbody>`;
 
         for (const row of safe_rows) {
-            const marked_at = this.format_date(row.marked_at);
+            const marked_at = row.marked_at ? comment_when(row.marked_at, true) : "";
             const safe_doctype = frappe.utils.escape_html(frappe._(row.source_doctype));
             const safe_name = frappe.utils.escape_html(row.source_name);
             const safe_event = frappe.utils.escape_html(this.format_event(row.last_event));
@@ -296,10 +270,6 @@ frappe.raso_sync_overview = {
 
         html += "</tbody></table>";
         $container.html(html);
-    },
-    format_date: (date_str) => {
-        if (!date_str) return __("Never");
-        return frappe.datetime.str_to_user(date_str);
     },
     format_event: (event_str) => {
         if (!event_str) return "—";

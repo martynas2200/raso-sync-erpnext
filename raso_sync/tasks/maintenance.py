@@ -5,6 +5,7 @@ from collections import Counter
 import frappe
 from frappe.utils.background_jobs import is_job_enqueued
 
+from ..db.connection import mssql_session
 from . import get_exports, process_export_record, with_msgprint_logging
 
 logger = frappe.logger("raso_sync_maintenance")
@@ -34,6 +35,7 @@ def execute_maintenance_task():
 	return {"status": "queued", "job_id": job_id}
 
 
+@mssql_session
 @with_msgprint_logging(logger)
 def execute_maintenance_task_worker(inform_user=False):
 	"""

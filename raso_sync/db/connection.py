@@ -1,3 +1,4 @@
+import functools
 import logging
 from contextlib import contextmanager
 
@@ -42,6 +43,8 @@ class MSSQLConnection:
 		self.login_timeout = login_timeout
 		self._connection: pymssql.Connection | None = None
 		self._is_connected = False
+		# Number of job-scoped sessions currently using this connection
+		self._session_depth = 0
 
 	def _connect(self) -> pymssql.Connection:
 		"""
@@ -151,12 +154,9 @@ class MSSQLConnection:
 			raise
 		finally:
 			cursor.close()
-			# Ensure running flag is reset when cursor usage is finished
-			try:
+			# if cursor used WITHOUT a session, like manual.test_connection
+			if self._session_depth <= 0:
 				self.close()
-			except Exception:
-				# close() already logs/handles its own errors
-				pass
 
 	def __del__(self):
 		"""Cleanup connection on garbage collection."""
@@ -303,6 +303,39 @@ class MSSQLConnectionManager:
 		"""Reset all connections (close and clear)."""
 		MSSQLConnectionManager.close_all()
 		MSSQLConnectionManager._connections.clear()
+
+	@staticmethod
+	@contextmanager
+	def session():
+		"""Job-scoped connection session for the current site.
+
+		Opens (or reuses) a single MSSQL connection and keeps it alive for the duration of the block.
+
+		Prefer the @mssql_session decorator on the enqueued job workers.
+		"""
+		site_key = MSSQLConnectionManager._get_site_key()
+		connection = MSSQLConnectionManager.get_connection()
+		connection.connect()  # open the socket once for this session
+
+		connection._session_depth += 1
+		try:
+			yield connection
+		finally:
+			connection._session_depth -= 1
+			# Only the outermost session is responsible for closing.
+			if connection._session_depth <= 0:
+				MSSQLConnectionManager.close_connection(site_key)
+
+
+def mssql_session(func):
+	"""Decorator that runs a job worker within a single MSSQL connection session."""
+
+	@functools.wraps(func)
+	def wrapper(*args, **kwargs):
+		with MSSQLConnectionManager.session():
+			return func(*args, **kwargs)
+
+	return wrapper
 
 
 def cleanup_connections():

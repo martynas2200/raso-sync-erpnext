@@ -9,6 +9,7 @@ from frappe.utils.background_jobs import is_job_enqueued
 from raso_sync.api.importer import import_data_internal
 from raso_sync.utils.working_hours import is_within_working_hours
 
+from ..db.connection import mssql_session
 from ..db.exceptions import RASOServerUnavailableError
 from ..db.executor import ProcedureBuilder
 from ..utils.system_notifications import notify_server_unavailable
@@ -26,7 +27,7 @@ STATUS_CODE_MAP = {
 }
 
 
-def execute_fetch_task(type=None):
+def execute_fetch_task():
 	"""
 	Enqueue the fetch task to import data from RASO.
 	Returns:
@@ -43,12 +44,12 @@ def execute_fetch_task(type=None):
 		job_id=job_id,
 		enqueue_after_commit=True,
 		queue="long",
-		type=type,
 	)
 
 	return {"status": "queued", "job_id": job_id}
 
 
+@mssql_session
 @with_msgprint_logging(logger)
 def execute_fetch_task_worker(inform_user=False, ignore_workhours=False):
 	"""
