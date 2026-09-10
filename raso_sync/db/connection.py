@@ -309,13 +309,13 @@ class MSSQLConnectionManager:
 	def session():
 		"""Job-scoped connection session for the current site.
 
-		Opens (or reuses) a single MSSQL connection and keeps it alive for the duration of the block.
+		Reuses a single MSSQL connection and keeps it alive for the duration of the block.
 
 		Prefer the @mssql_session decorator on the enqueued job workers.
 		"""
 		site_key = MSSQLConnectionManager._get_site_key()
 		connection = MSSQLConnectionManager.get_connection()
-		connection.connect()  # open the socket once for this session
+		# NOTE: No eager connect
 
 		connection._session_depth += 1
 		try:

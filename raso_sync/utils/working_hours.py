@@ -15,11 +15,6 @@ def is_within_working_hours():
 	"""
 	settings = RASOSyncSettings.get_settings()
 
-	# If no working hours are set, always consider it as within working hours
-	if not settings.working_hours_from and not settings.working_hours_to:
-		return True
-
-	# If only one is set, it's ambiguous, so we treat it as no restriction
 	if not settings.working_hours_from or not settings.working_hours_to:
 		return True
 
