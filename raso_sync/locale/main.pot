@@ -357,10 +357,6 @@ msgstr ""
 msgid "Data should be sent automatically in about"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:191
-msgid "Data should be sent on the next scheduler check (about 1 minute)."
-msgstr ""
-
 #: raso_sync/api/importer.py:77
 msgid "DataType not specified and could not be inferred from XML."
 msgstr ""
@@ -998,10 +994,6 @@ msgstr ""
 
 #: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:26
 msgid "Send Data"
-msgstr ""
-
-#: raso_sync/tasks/send.py:335
-msgid "Send Task: Completed with errors. Failed types: {0}"
 msgstr ""
 
 #: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:63

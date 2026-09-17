@@ -321,10 +321,6 @@ msgstr "Duomenų tipas:"
 msgid "Data should be sent automatically in about"
 msgstr "Duomenys turėtų būti išsiųsti automatiškai maždaug po"
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:191
-msgid "Data should be sent on the next scheduler check (about 1 minute)."
-msgstr "Duomenys turėtų būti išsiųsti per kitą planuoklio tikrinimą (maždaug po 1 min.)."
-
 #: raso_sync/api/importer.py:77
 msgid "DataType not specified and could not be inferred from XML."
 msgstr "Nenurodytas DataType ir jo negalima nustatyti iš XML."
@@ -963,10 +959,6 @@ msgstr "Siuntimų tikrinimo intervalas (minutės)"
 #: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:26
 msgid "Send Data"
 msgstr "Siųsti duomenis"
-
-#: raso_sync/tasks/send.py:335
-msgid "Send Task: Completed with errors. Failed types: {0}"
-msgstr "Siuntimo užduotis: baigta su klaidomis. Nepavykę tipai: {0}"
 
 #: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:63
 msgid "Send all changes of today"

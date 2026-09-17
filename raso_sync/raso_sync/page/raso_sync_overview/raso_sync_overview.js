@@ -203,21 +203,15 @@ frappe.raso_sync_overview = {
                 frappe.defaultDatetimeFormat,
                 frappe.boot.time_zone.system
             );
-            if (next_run.isAfter(now)) {
-                const eta_minutes = Math.max(0, Math.ceil(next_run.diff(now, "minutes", true)));
-                const next_run_display = next_run.tz(frappe.boot.time_zone.user).format("HH:mm");
+            const eta_minutes = Math.max(0, Math.ceil(next_run.diff(now, "minutes", true)));
+            const next_run_display = next_run.tz(frappe.boot.time_zone.user).format("HH:mm");
 
-                if (eta_minutes <= 1) {
-                    return __("Data should be sent on the next scheduler check (about 1 minute).");
-                }
-
-                return (
-                    __("Data should be sent automatically in about") +
-                    ` ${eta_minutes} ` +
-                    __("min.") +
-                    ` (${__("next check")}: ${next_run_display}).`
-                );
-            }
+            return (
+                __("Data should be sent automatically in about") +
+                ` ${eta_minutes} ` +
+                __("min.") +
+                ` (${__("next check")}: ${next_run_display}).`
+            );
         }
         return "";
     },
@@ -254,9 +248,9 @@ frappe.raso_sync_overview = {
 
             let name_cell = safe_name;
             if (row.source_name && row.source_name !== "—") {
-                const doctype_route = frappe.router.slug(row.source_doctype);
-                const doc_route = encodeURIComponent(row.source_name);
-                const href = frappe.utils.escape_html(`/app/${doctype_route}/${doc_route}`);
+                const href = frappe.utils.escape_html(
+                    frappe.utils.get_form_link(row.source_doctype, row.source_name)
+                );
                 name_cell = `<a href="${href}" target="_blank" rel="noopener noreferrer">${safe_name}</a>`;
             }
 

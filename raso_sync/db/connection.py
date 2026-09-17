@@ -1,8 +1,6 @@
 import functools
 import logging
 from contextlib import contextmanager
-
-# TODO: import threading
 from typing import Any, ClassVar
 
 import frappe
@@ -198,7 +196,7 @@ class MSSQLConnectionManager:
 		# Return existing connection if available
 		if site_key in MSSQLConnectionManager._connections:
 			conn = MSSQLConnectionManager._connections[site_key]
-			if conn.is_connected():
+			if conn.is_connected() or conn._session_depth > 0:
 				return conn
 			else:
 				# Connection was closed, remove it
@@ -213,7 +211,6 @@ class MSSQLConnectionManager:
 			database=config["database"],
 			port=config.get("port", 1433),
 			encryption=config.get("encryption", "request"),
-			login_timeout=config.get("login_timeout", 60),
 		)
 
 		MSSQLConnectionManager._connections[site_key] = connection
@@ -257,12 +254,6 @@ class MSSQLConnectionManager:
 				f"Missing required MSSQL configuration fields: {', '.join(missing_fields)}"
 			)
 
-		# Optional login timeout (in seconds) for slow SQL servers
-		try:
-			login_timeout = int(getattr(settings_doc, "login_timeout", 60) or 60)
-		except Exception:
-			login_timeout = 60
-
 		config = {
 			"host": settings_doc.ip,
 			"user": settings_doc.database_username,
@@ -270,7 +261,6 @@ class MSSQLConnectionManager:
 			"database": settings_doc.database_name,
 			"port": settings_doc.port or 1433,
 			"encryption": settings_doc.encryption or "request",
-			"login_timeout": login_timeout,
 		}
 
 		return config
@@ -336,34 +326,3 @@ def mssql_session(func):
 			return func(*args, **kwargs)
 
 	return wrapper
-
-
-def cleanup_connections():
-	"""
-	Close all MSSQL connections after request/job completes.
-	Called by Frappe's lifecycle hooks.
-	"""
-	try:
-		MSSQLConnectionManager.close_all()
-		logger.info("MSSQL connections closed up after request/job")
-	except Exception as e:
-		logger.error(f"Error closing connections in cleanup: {e!s}")
-
-
-# Register cleanup hooks for both web requests and background jobs
-def register_cleanup_hooks():
-	"""Register connection cleanup for various Frappe lifecycle events."""
-	# Web requests
-	if hasattr(frappe, "after_request") and cleanup_connections not in frappe.after_request:
-		frappe.after_request.append(cleanup_connections)
-
-	# Background jobs - cleanup after job completes
-	if hasattr(frappe, "after_job") and cleanup_connections not in frappe.after_job:
-		frappe.after_job.append(cleanup_connections)
-
-
-# Auto-register on module import
-try:
-	register_cleanup_hooks()
-except Exception as e:
-	logger.warning(f"Could not register cleanup hooks: {e!s}")
