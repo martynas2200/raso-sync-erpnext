@@ -148,7 +148,7 @@ def _cleanup_persisted_queue_docs(
 			frappe.db.commit()
 		except Exception as cleanup_error:
 			logger.warning(
-				f"Queue mark retained after concurrent update for {doctype} {docname}: {cleanup_error}"
+				"Queue mark retained after concurrent update for %s %s: %s", doctype, docname, cleanup_error
 			)
 
 
@@ -172,7 +172,6 @@ def execute_send_task(
 		"raso_sync.tasks.send.execute_send_task_worker",
 		job_id=job_id,
 		queue="long",
-		enqueue_after_commit=True,
 		export_type=export_type,
 		date_from=date_from,
 		queue_marks=queue_marks,
@@ -188,14 +187,14 @@ def mark_doctype_for_sync(doc, method):
 	This is called from document events.
 	"""
 	if doc.doctype not in DOCTYPE_TO_RASO_TYPE:
-		logger.debug(f"Ignoring document event for unsupported doctype {doc.doctype}")
+		logger.debug("Ignoring document event for unsupported doctype %s", {doc.doctype})
 		return {"status": "ignored", "doctype": doc.doctype}
 
 	if doc.doctype == "Item Price" and not doc.get("selling"):
 		return
 
 	_update_or_insert_queue_mark(doc.doctype, doc.name, method)
-	logger.debug(f"Marked {doc.doctype} {doc.name} for sync due to event {method}")
+	logger.debug("Marked %s %s for sync due to event %s", {doc.doctype}, {doc.name}, {method})
 	return {"status": "marked", "doctype": doc.doctype, "event": method}
 
 
@@ -203,7 +202,7 @@ def process_queued_marks():
 	"""
 	Scheduler worker that checks persisted DocType queue marks and enqueues a send task.
 
-	Behavior:
+	Behaviour:
 	- Reads per-document queue rows from RASO Sync Queue Doc.
 	- Enqueues a single consolidated send task with exact pending document targets.
 	- If any marked event was a delete, we perform a full sync for that DocType.
@@ -259,9 +258,7 @@ def process_queued_marks():
 		queue_marks=queue_marks,
 		full_sync_doctypes=full_sync_doctypes,
 	)
-	logger.info(f"Enqueued precise send task for doctypes {list(marks.keys())}, result: {result}")
-
-	return {"status": result.get("status") if isinstance(result, dict) else "unknown", "result": result}
+	logger.info("Enqueued detailed send task for doctypes %s, result: %s", list(marks.keys()), result)
 
 
 @mssql_session
@@ -297,7 +294,7 @@ def execute_send_task_worker(
 		types_to_export = _normalize_export_types(export_type)
 		full_sync_doctypes_set = set(full_sync_doctypes or [])
 
-		logger.info(f"Started for {types_to_export}")
+		logger.info("Started for %s", {types_to_export})
 
 		for exp_type in types_to_export:
 			try:
@@ -335,9 +332,8 @@ def execute_send_task_worker(
 
 			except Exception as e:
 				results["failed"] += 1
-				error_msg = str(e)
-				results["errors"].append({"type": exp_type, "error": error_msg})
-				logger.exception(f"Failed to export and send type {exp_type}: {error_msg}")
+				results["errors"].append({"type": exp_type, "error": str(e)})
+				logger.exception("Failed to export and send type %s", exp_type)
 
 		logger.info(
 			"Send Task is completed. Exported: %s, Successful: %s, Failed: %s"
@@ -360,10 +356,10 @@ def execute_send_task_worker(
 			)
 
 	except RASOServerUnavailableError as e:
-		logger.error(f"RASO server unavailable - {e!s}")
+		logger.error("RASO server unavailable %s", str(e), exc_info=True)
 		notify_server_unavailable()
-	except Exception as e:
-		logger.exception(f"Fatal error - {e!s}")
+	except Exception:
+		logger.exception("Fatal error")
 		raise
 
 
@@ -394,10 +390,10 @@ def export_and_send_type(
 	else:
 		export_data = export_for_raso(export_type, full_sync=0 if date_from else 1, date_from=date_from)
 
-	logger.debug(f"Exporting type {export_type}...")
+	logger.debug("Exporting type %s...", export_type)
 
 	record_count = len(export_data)
-	logger.debug(f"Exported {record_count} records of type {export_type} from ERPNext")
+	logger.debug("Exported %s records of type %s from ERPNext", record_count, export_type)
 
 	if record_count == 0:
 		return 0
@@ -407,7 +403,7 @@ def export_and_send_type(
 
 	# Send to RASO database using ie.usp_SyncDataImport_i
 	sync_import_id = insert_to_raso(data_type=export_type, sync_data=xml_payload)
-	logger.debug(f"Sent type {export_type} to RASO (SyncDataImportId: {sync_import_id})")
+	logger.debug("Sent type %s to RASO (SyncDataImportId: %s)", export_type, sync_import_id)
 
 	return record_count
 
@@ -452,5 +448,5 @@ def insert_to_raso(data_type, sync_data):
 		)
 		raise Exception("No SyncDataImportId returned from RASO database.")
 
-	logger.debug(f"Created import record {sync_import_id} in RASO")
+	logger.debug("Created import record %s in RASO", sync_import_id)
 	return sync_import_id

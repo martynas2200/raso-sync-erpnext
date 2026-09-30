@@ -25,6 +25,11 @@ def _localized_text(text: str | None, user: str) -> str | None:
 	return _(text, lang=get_user_lang(user))
 
 
+def ____translations_to_be_collected_by_pot_generation() -> None:
+	_("RASO Retail server is unavailable")
+	_("Raso Retail server appears to be offline or unreachable.")
+
+
 def notify_server_unavailable() -> None:
 	"""
 	    Create a system notification for a RASO server-unavailable failure.
@@ -35,7 +40,7 @@ def notify_server_unavailable() -> None:
 		return
 
 	create_system_notification(
-		subject="Sync could not be executed",
+		subject="RASO Retail server is unavailable",
 		message="Raso Retail server appears to be offline or unreachable.",
 	)
 

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: RASO Sync VERSION\n"
 "Report-Msgid-Bugs-To: raso@ekranas.info\n"
-"POT-Creation-Date: 2026-09-03 13:36+0018\n"
-"PO-Revision-Date: 2026-09-03 13:36+0018\n"
+"POT-Creation-Date: 2026-09-28 16:47+0141\n"
+"PO-Revision-Date: 2026-09-28 16:47+0141\n"
 "Last-Translator: raso@ekranas.info\n"
 "Language-Team: raso@ekranas.info\n"
 "MIME-Version: 1.0\n"
@@ -214,7 +214,7 @@ msgstr ""
 msgid "Amount Without VAT 5"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:361
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:370
 msgid "Are you sure you want to fetch data from RASO POS server?<br>Supported data types: Sales, Returns, Z Reports"
 msgstr ""
 
@@ -224,7 +224,7 @@ msgstr ""
 msgid "Auto Submit Sales Documents"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:172
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:195
 msgid "Automatic sending is disabled."
 msgstr ""
 
@@ -282,19 +282,19 @@ msgstr ""
 msgid "Comma-separated list of RASO payment codes that are used to indicate rounding."
 msgstr ""
 
-#: raso_sync/api/manual.py:97
+#: raso_sync/api/manual.py:63
 msgid "Connection successful, database time not retrieved..."
 msgstr ""
 
-#: raso_sync/api/manual.py:95
+#: raso_sync/api/manual.py:61
 msgid "Connection successful. Database time: {0}"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:308
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:317
 msgid "Connection test failed: {0}"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:290
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:299
 msgid "Connection test successful"
 msgstr ""
 
@@ -353,7 +353,7 @@ msgstr ""
 msgid "Data Type:"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:195
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:210
 msgid "Data should be sent automatically in about"
 msgstr ""
 
@@ -382,7 +382,7 @@ msgstr ""
 msgid "Database Username"
 msgstr ""
 
-#: raso_sync/api/manual.py:83
+#: raso_sync/api/manual.py:49
 msgid "Database connection settings are incomplete"
 msgstr ""
 
@@ -436,11 +436,11 @@ msgstr ""
 msgid "Discounts & Errors"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:224
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:237
 msgid "DocType"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:225
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:238
 msgid "Document Name"
 msgstr ""
 
@@ -482,7 +482,7 @@ msgstr ""
 msgid "Error Count"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:226
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:239
 msgid "Event"
 msgstr ""
 
@@ -490,7 +490,7 @@ msgstr ""
 msgid "Execute Send"
 msgstr ""
 
-#: raso_sync/api/manual.py:101
+#: raso_sync/api/manual.py:67
 msgid "Failed to connect to RASO database: {0}"
 msgstr ""
 
@@ -504,11 +504,11 @@ msgstr ""
 msgid "Fetch Sales Interval must be either 0 (disabled) or between 10 and 1440 minutes"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:380
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:389
 msgid "Fetch queued failed: "
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:371
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:380
 msgid "Fetch queued successfully"
 msgstr ""
 
@@ -581,27 +581,32 @@ msgstr ""
 msgid "If checked, receipt_no field will contain ShopNo and PosNo, used in preventing duplicate receipts."
 msgstr ""
 
-#: raso_sync/data_imports/sales.py:314
+#: raso_sync/data_imports/sales.py:353
 msgid "Insufficient stock for item"
 msgstr ""
 
-#: raso_sync/data_imports/sales.py:317
+#: raso_sync/data_imports/sales.py:356
 msgid "Invoice Creation Failed"
 msgstr ""
 
-#: raso_sync/data_imports/sales.py:328
+#. Label of the invoice_price_list (Link) field in DocType 'RASO Sync Settings'
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+msgid "Invoice Price List"
+msgstr ""
+
+#: raso_sync/data_imports/sales.py:367
 msgid "Invoice created (not submitted as per settings)"
 msgstr ""
 
-#: raso_sync/data_imports/sales.py:337
+#: raso_sync/data_imports/sales.py:376
 msgid "Invoice created and submitted"
 msgstr ""
 
-#: raso_sync/data_imports/sales.py:322
+#: raso_sync/data_imports/sales.py:361
 msgid "Invoice created but not submitted"
 msgstr ""
 
-#: raso_sync/data_imports/sales.py:347
+#: raso_sync/data_imports/sales.py:386
 msgid "Invoice created but submission failed"
 msgstr ""
 
@@ -658,7 +663,7 @@ msgstr ""
 
 #. Label of the marked_at (Datetime) field in DocType 'RASO Sync Queue Doc'
 #: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:227
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:240
 msgid "Marked At"
 msgstr ""
 
@@ -684,16 +689,16 @@ msgstr ""
 msgid "Naming series for Sales Invoices created from RASO sales (e.g., EKA-.YYYY.- for EKA-2025-0001)"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:256
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:135
 msgid "Never"
 msgstr ""
 
 #: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:81
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:214
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:227
 msgid "No pending documents to be sent"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:169
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:190
 msgid "No scheduled job is configured. Save the settings to create a scheduled job for automatic sending."
 msgstr ""
 
@@ -711,7 +716,7 @@ msgstr ""
 msgid "POS No"
 msgstr ""
 
-#: raso_sync/data_imports/sales.py:259
+#: raso_sync/data_imports/sales.py:298
 msgid "POS Receipt"
 msgstr ""
 
@@ -774,6 +779,12 @@ msgstr ""
 msgid "Price List"
 msgstr ""
 
+#. Description of the 'Invoice Price List' (Link) field in DocType 'RASO Sync
+#. Settings'
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+msgid "Price list to use for imported Sales Invoices. If left empty, the Selling Settings price list is used."
+msgstr ""
+
 #. Name of a Workspace
 #: raso_sync/raso_sync/workspace/raso_sync/raso_sync.json
 msgid "RASO"
@@ -812,8 +823,8 @@ msgstr ""
 msgid "RASO Payment Mapping"
 msgstr ""
 
-#: raso_sync/data_imports/sales.py:342
-msgid "RASO Sales {} Invoice Submission Failed"
+#: raso_sync/utils/system_notifications.py:28
+msgid "RASO Retail server is unavailable"
 msgstr ""
 
 #. Title of a Workspace Sidebar
@@ -850,12 +861,12 @@ msgstr ""
 msgid "RASO Sync User"
 msgstr ""
 
-#: raso_sync/api/manual.py:55
-msgid "RASO Sync Warning"
+#: raso_sync/data_imports/sales.py:381
+msgid "RASO sale receipt {} Invoice Submission Failed"
 msgstr ""
 
-#: raso_sync/api/manual.py:52
-msgid "RASO Sync has not imported any data for over {0} hours."
+#: raso_sync/utils/system_notifications.py:29
+msgid "Raso Retail server appears to be offline or unreachable."
 msgstr ""
 
 #. Name of a role
@@ -1000,11 +1011,11 @@ msgstr ""
 msgid "Send all changes of today"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:348
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:357
 msgid "Send queued failed: "
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:337
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:346
 msgid "Send queued successfully"
 msgstr ""
 
@@ -1044,7 +1055,7 @@ msgstr ""
 msgid "Sync Status"
 msgstr ""
 
-#: raso_sync/api/manual.py:116 raso_sync/api/manual.py:153
+#: raso_sync/api/manual.py:82 raso_sync/api/manual.py:117
 msgid "Synchronisation is in queue. Please wait for it to start."
 msgstr ""
 
@@ -1079,7 +1090,7 @@ msgstr ""
 msgid "Test Connection"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:278
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:287
 msgid "Testing connection to RASO..."
 msgstr ""
 
@@ -1100,8 +1111,8 @@ msgstr ""
 msgid "Unique identifier for the Z Report"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:298
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:308
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:307
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:317
 msgid "Unknown error"
 msgstr ""
 
@@ -1199,11 +1210,11 @@ msgstr ""
 msgid "Z Report Date"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:197
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:212
 msgid "min."
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:198
+#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:213
 msgid "next check"
 msgstr ""
 
@@ -1225,7 +1236,7 @@ msgstr ""
 msgid "require"
 msgstr ""
 
-#: raso_sync/tasks/send.py:308
+#: raso_sync/tasks/send.py:324
 msgid "{0} records of {1} were sent to RASO"
 msgstr ""
 

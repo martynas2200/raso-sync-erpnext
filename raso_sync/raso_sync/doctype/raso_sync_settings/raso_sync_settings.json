@@ -15,6 +15,7 @@
     "default_customer",
     "default_item",
     "default_naming_series",
+    "invoice_price_list",
     "column_break_5",
     "use_shop_no_and_pos_no",
     "item_section",
@@ -114,6 +115,13 @@
       "label": "Default Naming Series",
       "default": "EKA-.YYYY.-",
       "description": "Naming series for Sales Invoices created from RASO sales (e.g., EKA-.YYYY.- for EKA-2025-0001)"
+    },
+    {
+      "fieldname": "invoice_price_list",
+      "fieldtype": "Link",
+      "label": "Invoice Price List",
+      "options": "Price List",
+      "description": "Price list to use for imported Sales Invoices. If left empty, the Selling Settings price list is used."
     },
     {
       "fieldname": "column_break_5",
@@ -330,7 +338,7 @@
   ],
   "issingle": 1,
   "links": [],
-  "modified": "2025-10-20 10:00:00.000000",
+  "modified": "2026-09-28 12:00:00.000000",
   "modified_by": "Administrator",
   "module": "RASO Sync",
   "name": "RASO Sync Settings",

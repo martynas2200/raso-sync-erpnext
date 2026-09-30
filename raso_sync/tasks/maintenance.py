@@ -1,5 +1,3 @@
-import logging
-import traceback
 from collections import Counter
 
 import frappe
@@ -9,16 +7,11 @@ from ..db.connection import mssql_session
 from . import get_exports, process_export_record, with_msgprint_logging
 
 logger = frappe.logger("raso_sync_maintenance")
-logger.setLevel("DEBUG")
 
 
 def execute_maintenance_task():
 	"""
 	Enqueue the maintenance task to check and retry previous import errors.
-
-	Returns:
-		status: str: 'queued' if enqueued, 'skipped' if already running
-		job_id: str: ID of the enqueued job
 	"""
 	job_id = "raso_sync_maintenance_task_worker"
 
@@ -32,7 +25,7 @@ def execute_maintenance_task():
 		queue="long",
 	)
 
-	return {"status": "queued", "job_id": job_id}
+	return {"status": "queued"}
 
 
 @mssql_session
@@ -41,16 +34,13 @@ def execute_maintenance_task_worker(inform_user=False):
 	"""
 	NEEDS TO BE ENQUEUED WITH JOB-ID: raso_sync_maintenance_task_worker
 
-	Worker function that performs maintenance tasks including:
-	- Checking for previous import errors (Status 3 and 4)
-	- Retrying failed imports
+	Worker function that performs checking for previous import errors and retries processing them.
 
-	Args:
-		inform_user: If True, sends log messages to users via frappe.msgprint
+	:param inform_user: If True, sends log messages to users via frappe.msgprint
 	"""
 	logger.debug("Starting Maintenance Task")
 
-	# check if fetch period is set
+	# check if we automatically fetch in the first place
 	fetch_period = frappe.db.get_single_value("RASO Sync Settings", "fetch_sales_interval_minutes")
 	if not fetch_period:
 		logger.warning("Fetch period is not set. Skipping maintenance task.")
@@ -60,14 +50,13 @@ def execute_maintenance_task_worker(inform_user=False):
 		error_exports = check_for_errors_in_previous_imports()
 
 		if error_exports:
-			logger.info(f"Maintenance Task: Completed. Processed {len(error_exports)} error records")
+			logger.info("Maintenance Task completed. Processed %d error records", len(error_exports))
 		else:
-			logger.info("Maintenance Task: No error records found")
+			logger.debug("Maintenance Task completed. No error records found")
 
 	except Exception as e:
-		logger.error(f"Maintenance Task: Fatal error - {e!s}")
-		frappe.log_error("RASO: execute_maintenance_task", traceback.format_exc())
-		raise  # So RQ Job is marked as failed
+		logger.exception("Maintenance Task")
+		raise e  # job is marked as Failed.
 
 
 def check_for_errors_in_previous_imports():
@@ -75,47 +64,34 @@ def check_for_errors_in_previous_imports():
 	Check for errors in previous imports by querying exports with Status = 3 (Error) or 4 (Partial Success).
 	Attempts to retry processing these exports.
 
-	Returns:
-		list: List of error export records that were processed
+	Returns the list of error export records that were processed
 	"""
-	try:
-		error_exports = get_exports(status=3) + get_exports(status=4)
+	error_exports = get_exports(status=3) + get_exports(status=4)
 
-		if not error_exports:
-			logger.info("No previous import errors found")
-			return []
+	if not error_exports:
+		return []
 
-		logger.warning(f"Found {len(error_exports)} previous import errors to retry")
-		results = Counter()
+	logger.info("Found %d previous import errors to retry", len(error_exports))
+	results = Counter()
 
-		# Retry processing each error export
-		for export_record in error_exports:
-			sync_id = export_record.get("SyncDataExportId")
-			data_type = export_record.get("DataType")
-			shop_no = export_record.get("ShopNo")
+	# Retry processing each error export
+	for export_record in error_exports:
+		sync_id = export_record.get("SyncDataExportId")
 
-			logger.info(f"Retrying Export ID: {sync_id}, DataType: {data_type}, ShopNo: {shop_no}")
+		try:
+			status = process_export_record(export_record)
+			results[status] += 1
+		except Exception:
+			results["failed"] += 1
+			logger.exception("Error while retrying export %d record", sync_id)
+			frappe.log_error("RASO Retry of Failed Export")
 
-			try:
-				status = process_export_record(export_record)
-				results[status] += 1
-			except Exception as e:
-				results["failed"] += 1
-				logger.error(f"Error retrying export {sync_id}: {e!s}")
-				error_details = f"Export Record: {export_record}\n\nException:\n{traceback.format_exc()}"
-				frappe.log_error("RASO: maintenance_retry_failed", error_details)
+	logger.info(
+		"Maintenance task completed. Processed: %s, Success: %s, Partial: %s, Failed: %s",
+		len(error_exports),
+		results.get("success", 0),
+		results.get("partial_success", 0),
+		results.get("failed", 0),
+	)
 
-		logger.info(
-			"Maintenance completed. Processed: %s, Success: %s, Partial: %s, Failed: %s",
-			len(error_exports),
-			results.get("success", 0),
-			results.get("partial_success", 0),
-			results.get("failed", 0),
-		)
-
-		return error_exports
-
-	except Exception as e:
-		logger.error(f"Error checking for previous import errors: {e!s}")
-		frappe.log_error("RASO: check_for_errors_in_previous_imports", traceback.format_exc())
-		raise
+	return error_exports

@@ -1,7 +1,4 @@
-import traceback
 import xml.etree.ElementTree as ET
-from collections import defaultdict
-from datetime import datetime
 
 import frappe
 from frappe import _

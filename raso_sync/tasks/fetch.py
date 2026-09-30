@@ -75,7 +75,7 @@ def execute_fetch_task_worker(inform_user=False, ignore_workhours=False):
 			logger.info("Fetch Task: No new data exports to process")
 			return
 
-		logger.info(f"Fetch Task: Found {len(new_exports)} new export records to process")
+		logger.info("Fetch Task: Found %s new export records to process", len(new_exports))
 
 		# Process each export record
 		for export_record in new_exports:
@@ -84,14 +84,20 @@ def execute_fetch_task_worker(inform_user=False, ignore_workhours=False):
 				results_counter[status] += 1
 			except Exception as e:
 				results_counter["failed"] += 1
-				logger.error(f"Fetch Task: Error processing export {export_record}: {e!s}")
+				logger.error(
+					"Fetch Task: Error processing export %s: %s", export_record, str(e), exc_info=True
+				)
 				if export_record.get("SyncData", 0):
-					logger.error(export_record.get("SyncData", ""))
+					logger.error(
+						"Fetch Task: SyncData for export %s: %s",
+						export_record,
+						export_record.get("SyncData", ""),
+					)
 				ui_error_msg = f"Error processing export: {e!s}"
 				frappe.msgprint(ui_error_msg)
 				# Log full exception with traceback
 				error_details = f"Export Record: {export_record}\n\nException:\n{traceback.format_exc()}"
-				document = frappe.log_error("execute_fetch_task", error_details)
+				document = frappe.log_error("Raso Fetch Record Failed", error_details)
 				error_name = document.name if document else ""
 
 				update_export_status(
@@ -108,10 +114,10 @@ def execute_fetch_task_worker(inform_user=False, ignore_workhours=False):
 		)
 
 	except RASOServerUnavailableError as e:
-		logger.error(f"Fetch Task: RASO server unavailable - {e!s}")
+		logger.error("Fetch Task: RASO server unavailable %s", str(e), exc_info=True)
 		notify_server_unavailable()
-	except Exception as e:
-		logger.error(f"Fetch Task: Fatal error - {e!s}")
+	except Exception:
+		logger.exception("Fatal error in fetch task")
 		raise
 
 
@@ -148,8 +154,8 @@ def get_exports(status=0, data_type=None, data_provider=None):
 			return result["result_set"] if result["result_set"] else []
 		return result if result else []
 
-	except Exception as e:
-		logger.error(f"Error retrieving new exports: {e!s}")
+	except Exception:
+		logger.exception("Error retrieving new exports")
 		raise
 
 
@@ -177,7 +183,7 @@ def process_export_record(export_record):
 	sync_data_str = export_record.get("SyncData")
 	shop_no = export_record.get("ShopNo")
 
-	logger.info(f"Processing export {sync_id} (Type: {data_type}, Shop: {shop_no})")
+	logger.info("Processing export %s (Type: %s, Shop: %s)", sync_id, data_type, shop_no)
 
 	update_export_status(sync_id, status=STATUS_CODE_MAP["processing"])
 
@@ -198,6 +204,7 @@ def process_export_record(export_record):
 	if not sync_data_str:
 		raise Exception(f"Empty SyncData for export {sync_id}")
 
+	logger.info("Processing export %s (Type: %s, Shop: %s)", sync_id, data_type, shop_no)
 	# Import data to ERPNext
 	import_result = import_data_internal(type=data_type, xml_data=sync_data_str)
 	frappe.db.commit()
@@ -243,8 +250,8 @@ def update_export_status(sync_id, status, message=None):
 
 		ProcedureBuilder.execute_procedure("ie.usp_SyncDataExport_u", params)
 
-		logger.debug(f"Updated export {sync_id} status to {status}")
+		logger.debug("Updated export %s status to %s", sync_id, status)
 
-	except Exception as e:
-		logger.error(f"Error updating export status: {e!s}")
+	except Exception:
+		logger.exception("Error updating export status for %s", sync_id)
 		raise

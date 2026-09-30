@@ -180,10 +180,7 @@ def validate_sales_payments(root):
 
 
 def add_comment(doc, subject, content):
-	if doc:
-		doc.add_comment("Comment", f"{subject}: {content}")
-	else:
-		frappe.log_error("RASO: Failed to add a comment", f"{subject}: {content}")
+	doc.add_comment("Comment", f"{subject}: {content}")
 
 
 def get_receipt_number(receipt_no, shop_no, pos_no, settings=None):
@@ -204,6 +201,24 @@ def check_existing_invoice(receipt):
 	Returns the name of the invoice if it exists, otherwise None.
 	"""
 	return frappe.db.get_value("Sales Invoice", {"raso_receipt_no": receipt}, "name")
+
+
+def get_invoice_price_list():
+	"""Return the selling price list to use for imported invoices."""
+	candidates = (
+		RASOSyncSettings.get_settings().invoice_price_list,
+		frappe.db.get_single_value("Selling Settings", "selling_price_list"),
+	)
+
+	for price_list in candidates:
+		if not price_list:
+			continue
+
+		details = frappe.db.get_value("Price List", price_list, ["enabled", "selling"], as_dict=True)
+		if details and details.enabled and details.selling:
+			return price_list
+
+	raise ValueError("No enabled selling price list is configured.")
 
 
 def process_sales(sales_node, type=0):
@@ -254,7 +269,15 @@ def process_sales(sales_node, type=0):
 		invoice.customer = settings.default_customer
 		invoice.ignore_pricing_rule = 1
 		invoice.is_pos = 1
+		invoice.flags.ignore_pos_profile = 1
 		invoice.update_stock = 1
+		invoice.selling_price_list = get_invoice_price_list()
+		company_currency = frappe.get_cached_value("Company", invoice.company, "default_currency")
+		if not company_currency:
+			raise ValueError(_("Default currency is not set for company {0}.").format(invoice.company))
+
+		invoice.currency = company_currency
+		invoice.conversion_rate = 1.0
 		invoice.raso_receipt_no = receipt
 		invoice.title = _("POS Receipt") + f" {receipt}"
 		invoice.naming_series = settings.default_naming_series
@@ -339,7 +362,11 @@ def process_sales(sales_node, type=0):
 		except Exception as e:
 			error_msg = str(e)
 
-			add_comment(invoice, _("RASO Sales {} Invoice Submission Failed").format(receipt_no), error_msg)
+			frappe.log_error(f"RASO Receipt {receipt_no} Submission Failed", error_msg)
+
+			add_comment(
+				invoice, _("RASO sale receipt {} Invoice Submission Failed").format(receipt_no), error_msg
+			)
 
 			return {
 				"receipt_no": receipt_no,
@@ -347,7 +374,7 @@ def process_sales(sales_node, type=0):
 				"message": _("Invoice created but submission failed"),
 			}
 	except Exception as e:
-		frappe.log_error(f"RASO Sales {receipt_no} processing Error:", traceback.format_exc())
+		frappe.log_error(f"RASO Receipt {receipt_no} Error", traceback.format_exc())
 		return {
 			"receipt_no": receipt_no if "receipt_no" in locals() else "Unknown",
 			"status": "error",
@@ -413,7 +440,7 @@ def add_item_to_invoice(invoice, sale_node):
 	if not item_code:
 		# Use default item
 		error_msg = f"Item not found: CODE={code}, VCODE={vcode}. Using default item: {settings.default_item}"
-		frappe.log_error("RASO Import while looking up item", error_msg)
+		frappe.log_error("RASO Import - No item", error_msg)
 
 		if settings.default_item:
 			item_code = settings.default_item
@@ -485,7 +512,7 @@ def get_payment_account(payment_method_name, company):
 					return acc_row.default_account
 	except Exception as e:
 		frappe.log_error(
-			"RASO: Error fetching payment account",
+			"RASO error fetching payment account",
 			f"Payment method: {payment_method_name}, Company: {company}, Error: {e!s}",
 		)
 
