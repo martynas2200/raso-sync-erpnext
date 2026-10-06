@@ -44,16 +44,12 @@ msgstr ""
 msgid "5 (E)"
 msgstr ""
 
-#. Name of a role
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
-msgid "Account Manager"
-msgstr ""
 
 #. Description of the 'Debit To Account (Returns)' (Link) field in DocType
 #. 'RASO Sync Settings'
 #: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
 msgid "Account to use for return transactions. If not set, the default debit account will be used."
-msgstr "Sąskaita, kurią naudoti grąžinimo operacijoms. Jei nenurodyta, bus naudojama numatytoji debeto sąskaita"
+msgstr "Sąskaita, kurią naudoti grąžinimo operacijoms. Jei nenurodyta, bus naudojama numatytoji debeto sąskaita."
 
 #. Label of the general_section (Section Break) field in DocType 'RASO Sync
 #. Settings'
@@ -796,7 +792,7 @@ msgstr "RASO darbuotojo kodas"
 #. Name of a DocType
 #: raso_sync/raso_sync/doctype/raso_employee_mapping/raso_employee_mapping.json
 msgid "RASO Employee Mapping"
-msgstr "Raso darbuotojo siejimas"
+msgstr "RASO darbuotojo siejimas"
 
 #. Label of the raso_employee_name (Data) field in DocType 'RASO Employee
 #. Mapping'
@@ -822,7 +818,7 @@ msgstr "RASO mokėjimo siejimas"
 
 #: raso_sync/utils/system_notifications.py:28
 msgid "RASO Retail server is unavailable"
-msgstr "Raso Retail serveris nepasiekiamas"
+msgstr "RASO Retail serveris nepasiekiamas"
 
 #. Title of a Workspace Sidebar
 #: raso_sync/config/desktop.py:12 raso_sync/workspace_sidebar/raso_sync.json
@@ -861,17 +857,17 @@ msgstr "RASO sinchronizacijos vartotojas"
 
 #: raso_sync/data_imports/sales.py:381
 msgid "RASO sale receipt {} Invoice Submission Failed"
-msgstr ""
+msgstr "RASO pardavimo kvitas {}: sąskaitos pateikimas nepavyko"
 
 #: raso_sync/utils/system_notifications.py:29
 msgid "Raso Retail server appears to be offline or unreachable."
-msgstr "Raso Retail serveris atrodo, kad neveikia arba yra nepasiekiamas."
+msgstr "RASO Retail serveris atrodo, kad neveikia arba yra nepasiekiamas."
 
 #. Name of a role
 #: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json
 #: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
 msgid "Raso Sync User"
-msgstr "Raso sinchronizacijos vartotojas"
+msgstr "RASO sinchronizacijos vartotojas"
 
 #. Label of the receipt_cancellation_amount (Currency) field in DocType 'Z
 #. Report'
@@ -1011,11 +1007,11 @@ msgstr "Siųsti visus šiandienos pakeitimus"
 
 #: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:357
 msgid "Send queued failed: "
-msgstr "Siuntimo užklausa į eilę nepavyko: "
+msgstr "Siuntimo užklausos įtraukimas į eilę nepavyko: "
 
 #: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:346
 msgid "Send queued successfully"
-msgstr "Užklausa siuntimui į eilę sėkminga"
+msgstr "Siuntimo užklausa sėkmingai įtraukta į eilę"
 
 #. Label of the ip (Data) field in DocType 'RASO Sync Settings'
 #: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
@@ -1211,7 +1207,7 @@ msgstr "Z ataskaitos data"
 
 #: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:212
 msgid "min."
-msgstr ""
+msgstr "min."
 
 #: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:213
 msgid "next check"
@@ -1221,19 +1217,19 @@ msgstr "kitas tikrinimas"
 #. Settings'
 #: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
 msgid "off"
-msgstr ""
+msgstr "išjungta"
 
 #. Option for the 'Database Encryption' (Select) field in DocType 'RASO Sync
 #. Settings'
 #: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
 msgid "request"
-msgstr ""
+msgstr "jei galima"
 
 #. Option for the 'Database Encryption' (Select) field in DocType 'RASO Sync
 #. Settings'
 #: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
 msgid "require"
-msgstr ""
+msgstr "tik šifruota"
 
 #: raso_sync/tasks/send.py:324
 msgid "{0} records of {1} were sent to RASO"

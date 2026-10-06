@@ -187,14 +187,14 @@ def mark_doctype_for_sync(doc, method):
 	This is called from document events.
 	"""
 	if doc.doctype not in DOCTYPE_TO_RASO_TYPE:
-		logger.debug("Ignoring document event for unsupported doctype %s", {doc.doctype})
+		logger.debug("Ignoring document event for unsupported doctype %s", doc.doctype)
 		return {"status": "ignored", "doctype": doc.doctype}
 
 	if doc.doctype == "Item Price" and not doc.get("selling"):
 		return
 
 	_update_or_insert_queue_mark(doc.doctype, doc.name, method)
-	logger.debug("Marked %s %s for sync due to event %s", {doc.doctype}, {doc.name}, {method})
+	logger.debug("Marked %s %s for sync due to event %s", doc.doctype, doc.name, method)
 	return {"status": "marked", "doctype": doc.doctype, "event": method}
 
 
@@ -294,7 +294,7 @@ def execute_send_task_worker(
 		types_to_export = _normalize_export_types(export_type)
 		full_sync_doctypes_set = set(full_sync_doctypes or [])
 
-		logger.info("Started for %s", {types_to_export})
+		logger.info("Started for %s", types_to_export)
 
 		for exp_type in types_to_export:
 			try:

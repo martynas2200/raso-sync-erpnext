@@ -183,6 +183,52 @@ def add_comment(doc, subject, content):
 	doc.add_comment("Comment", f"{subject}: {content}")
 
 
+# Deadlock-class DB errors roll back the whole transaction, but can safely be retried.
+# MariaDB 1020 (ER_CHECKREAD, "Record has changed since last read in table ...") is raised by
+# InnoDB snapshot isolation (innodb_snapshot_isolation=ON) when a row - e.g. the single
+# `tabCompany` row updated by `update_company_current_month_sales()` on submit - was modified
+# by a concurrent transaction after our snapshot was taken. Frappe re-raises such errors as
+# `frappe.QueryDeadlockError`, wrapping the original driver error.
+MAX_SUBMIT_ATTEMPTS = 3
+
+
+def is_retryable_submission_error(exc):
+	"""True for deadlock-class DB errors (including MariaDB 1020) that may be retried.
+
+	Walks the exception chain because Frappe wraps these errors in ``frappe.QueryDeadlockError``.
+	"""
+	seen = set()
+	while exc is not None and id(exc) not in seen:
+		seen.add(id(exc))
+		if isinstance(exc, frappe.QueryDeadlockError) or frappe.db.is_deadlocked(exc):
+			return True
+		exc = exc.__cause__ or exc.__context__
+	return False
+
+
+def submit_invoice(invoice, receipt_no, max_attempts=MAX_SUBMIT_ATTEMPTS):
+	"""Save and submit ``invoice``, retrying on transient (deadlock / 1020) errors.
+
+	MariaDB rolls back the whole transaction when error 1020 is raised, so before each retry we
+	roll back, reload the still-draft invoice from the database and try again.
+	"""
+	for attempt in range(1, max_attempts + 1):
+		try:
+			invoice.save()
+			invoice.submit()
+			return
+		except Exception as e:
+			if attempt == max_attempts or not is_retryable_submission_error(e):
+				raise
+
+			frappe.db.rollback()
+			frappe.log_error(
+				f"RASO Receipt {receipt_no} Submission Retry",
+				f"Attempt {attempt}/{max_attempts} failed with a retryable DB error: {e!s}",
+			)
+			invoice.reload()
+
+
 def get_receipt_number(receipt_no, shop_no, pos_no, settings=None):
 	"""
 	Generate the receipt number based on settings.
@@ -351,8 +397,7 @@ def process_sales(sales_node, type=0):
 				"message": _("Invoice created (not submitted as per settings)"),
 			}
 		try:
-			invoice.save()
-			invoice.submit()
+			submit_invoice(invoice, receipt_no)
 			frappe.db.commit()
 			return {
 				"receipt_no": receipt_no,
