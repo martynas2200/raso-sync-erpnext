@@ -25,6 +25,10 @@ class QueueMark:
 	docname: str
 	marked_at: Any
 
+	def __json__(self) -> dict[str, Any]:
+		"""Serializable form for frappe.as_json"""
+		return {"docname": self.docname, "marked_at": self.marked_at}
+
 
 # Supported export data types
 RASO_TYPES = {

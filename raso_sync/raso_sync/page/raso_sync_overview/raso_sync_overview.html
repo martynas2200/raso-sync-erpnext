@@ -23,20 +23,35 @@
             <h4>{{__("Manual Sync and other actions")}}</h4>
             <div class="action-buttons" id="sync-buttons">
                 <button class="btn btn-sm btn-success" id="send-btn">
-                    <i class="fa fa-send"></i> {{__("Send Data")}}
+                    <svg class="icon icon-sm" aria-hidden="true">
+                        <use href="#icon-send"></use>
+                    </svg>
+                    {{__("Send Data")}}
                 </button>
                 <button class="btn btn-sm btn-info" id="fetch-btn">
-                    <i class="fa fa-download"></i> {{__("Get Data")}}
+                    <svg class="icon icon-sm" aria-hidden="true">
+                        <use href="#icon-arrow-down-from-line"></use>
+                    </svg>
+                    {{__("Get Data")}}
                 </button>
                 <div class="divider"></div>
                 <button class="btn btn-sm btn-default" id="test-connection-btn">
-                    <i class="fa fa-plug"></i> {{__("Test Connection")}}
+                        <svg class="icon icon-sm" aria-hidden="true">
+                            <use href="#icon-plug"></use>
+                        </svg>
+                        {{__("Test Connection")}}
                 </button>
                 <button class="btn btn-sm btn-default" id="check-logs-btn">
-                    <i class="fa fa-file-text-o"></i> {{__("Check Logs")}}
+                        <svg class="icon icon-sm" aria-hidden="true">
+                            <use href="#icon-logs"></use>
+                        </svg>
+                        {{__("Check Logs")}}
                 </button>
                 <button class="btn btn-sm btn-default" id="open-scheduled-jobs-btn">
-                    <i class="fa fa-clock-o"></i> {{__("Scheduled Jobs")}}
+                        <svg class="icon icon-sm" aria-hidden="true">
+                            <use href="#icon-clipboard-clock"></use>
+                        </svg>
+                        {{__("Scheduled Jobs")}}
                 </button>
             </div>
             <div class="action-group">
@@ -66,10 +81,16 @@
                     </div>
 
                     <button class="btn btn-sm btn-primary" id="execute-send-btn">
-                        <i class="fa fa-check"></i> {{__("Execute Send")}}
+                        <svg class="icon icon-sm" aria-hidden="true">
+                            <use href="#icon-check"></use>
+                        </svg>
+                        {{__("Execute Send")}}
                     </button>
                     <button class="btn btn-sm btn-default" id="cancel-send-btn">
-                        <i class="fa fa-times"></i> {{__("Cancel")}}
+                        <svg class="icon icon-sm" aria-hidden="true">
+                            <use href="#icon-x"></use>
+                        </svg>
+                        {{__("Cancel")}}
                     </button>
                 </div>
             </div>
