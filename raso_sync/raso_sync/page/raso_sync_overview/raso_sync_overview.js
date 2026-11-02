@@ -101,7 +101,10 @@ frappe.raso_sync_overview = {
             if (!this.settings || !data) {
                 return;
             }
-
+            const clear_queue = this.settings.last_data_export !== data.last_data_export;
+            if (clear_queue) {
+                data.queued_doc_rows = [];
+            }
             // Update all provided fields
             Object.assign(this.settings, data);
             this.update_ui();

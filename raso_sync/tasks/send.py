@@ -197,6 +197,20 @@ def mark_doctype_for_sync(doc, method):
 	if doc.doctype == "Item Price" and not doc.get("selling"):
 		return
 
+	# RASO links prices to items via barcodes
+	if doc.doctype == "Item" and doc.has_value_changed("barcodes") and len(doc.get("barcodes")) > 0:
+		item_code = doc.get("item_code")
+		price_docs = frappe.get_all(
+			"Item Price",
+			filters={"item_code": item_code, "selling": 1},
+			fields=["name"],
+		)
+		for price_doc in price_docs:
+			_update_or_insert_queue_mark("Item Price", price_doc.name, method)
+			logger.debug(
+				"Marked Item Price %s for sync due to barcode change in Item %s", price_doc.name, item_code
+			)
+
 	_update_or_insert_queue_mark(doc.doctype, doc.name, method)
 	logger.debug("Marked %s %s for sync due to event %s", doc.doctype, doc.name, method)
 	return {"status": "marked", "doctype": doc.doctype, "event": method}
@@ -285,6 +299,7 @@ def execute_send_task_worker(
 	    date_from (str, optional): Start date filter (YYYY-MM-DD format)
 	    queue_marks (dict[str, list[QueueMark]] | None): Queue marks captured before enqueueing
 	    full_sync_doctypes (list[str] | None): Doctypes that require full-sync fallback
+			inform_user (bool): Whether to inform the user via real-time message (default: False)
 	"""
 	results = {
 		"total_exported": 0,
