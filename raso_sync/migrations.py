@@ -10,13 +10,11 @@ def run_migrations():
 
 
 def recreate_scheduler_jobs():
-	"""
-	Recreate scheduler jobs after migration/container rebuild.
-	Called by after_migrate hook to ensure scheduled jobs are restored.
-	"""
+	"""Recreate scheduler jobs after migration/container rebuild."""
 	try:
 		settings = RASOSyncSettings.get_settings()
 		settings.on_update()
-		frappe.logger().info("RASO Sync scheduler jobs recreated after migration")
 	except Exception as e:
-		frappe.log_error(f"Error recreating RASO Sync scheduler jobs: {e}", "Migration")
+		frappe.log_error(
+			"RASO Jobs creation failed during migration", f"Error recreating RASO Sync scheduler jobs: {e!s}"
+		)

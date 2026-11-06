@@ -6,18 +6,17 @@ from typing import Any
 import frappe
 from frappe.utils.background_jobs import is_job_enqueued
 
-from . import with_msgprint_logging
-
-logger = frappe.logger("raso_sync_send")
-logger.setLevel("DEBUG")
-
 from raso_sync.api.exporter import export_for_raso, format_xml_response
 from raso_sync.raso_sync.doctype.raso_sync_settings.raso_sync_settings import RASOSyncSettings
 
 from ..db.connection import mssql_session
 from ..db.exceptions import RASOServerUnavailableError
 from ..db.executor import ProcedureBuilder
+from ..utils.app_logging import get_logger
 from ..utils.system_notifications import notify_server_unavailable
+from . import with_msgprint_logging
+
+logger = get_logger("raso_sync.send")
 
 
 @dataclass
@@ -226,7 +225,6 @@ def process_queued_marks():
 	- If any marked event was a delete, we perform a full sync for that DocType.
 	- Clears processed queue marks after enqueuing.
 	"""
-	# Collect marks
 	marks: dict[str, dict[str, Any]] = {}
 
 	queue_rows = frappe.get_all(
@@ -252,7 +250,7 @@ def process_queued_marks():
 		marks[doctype]["has_delete"] = bool(marks[doctype]["has_delete"]) or row_has_delete
 
 	if not marks:
-		return {"status": "pending", "message": "No pending doctypes"}
+		return
 
 	# Enqueue a send task with exact doc targets and full-sync fallback for deletes
 	needs_export = []
@@ -303,9 +301,6 @@ def execute_send_task_worker(
 	"""
 	results = {
 		"total_exported": 0,
-		"types_processed": [],
-		"failed": 0,
-		"successful": 0,
 		"errors": [],
 	}
 
@@ -329,9 +324,7 @@ def execute_send_task_worker(
 					force_full_sync=force_full_sync,
 				)
 
-				results["types_processed"].append(exp_type)
 				results["total_exported"] += record_count
-				results["successful"] += 1
 				if doctype:
 					_cleanup_persisted_queue_docs(
 						doctype,
@@ -349,29 +342,19 @@ def execute_send_task_worker(
 					room="all",
 				)
 
+			except RASOServerUnavailableError:
+				raise
 			except Exception as e:
-				results["failed"] += 1
-				results["errors"].append({"type": exp_type, "error": str(e)})
+				results["errors"].append(f"Export type {exp_type} failed: {e!s}")
 				logger.exception("Failed to export and send type %s", exp_type)
 
-		logger.info(
-			"Send Task is completed. Exported: %s, Successful: %s, Failed: %s"
-			% (
-				results["total_exported"],
-				results["successful"],
-				results["failed"],
-			)
-		)
+		logger.info("Send Task is completed. Exported records %s", results["total_exported"])
 		if results["total_exported"] > 0:
 			RASOSyncSettings.update_last_data_export()
-		if results["failed"] > 0:
-			failed_details = "; ".join(
-				f"{err.get('type', 'unknown')}: {err.get('error', 'unknown error')}"
-				for err in results["errors"]
-			)
+		if results["errors"]:
 			frappe.log_error(
 				"RASO Sync: Send task completed with errors",
-				failed_details,
+				"; ".join(results["errors"]),
 			)
 
 	except RASOServerUnavailableError as e:
@@ -417,10 +400,8 @@ def export_and_send_type(
 	if record_count == 0:
 		return 0
 
-	# Convert XML Element to string payload expected by MSSQL
 	xml_payload = format_xml_response(export_data)
 
-	# Send to RASO database using ie.usp_SyncDataImport_i
 	sync_import_id = insert_to_raso(data_type=export_type, sync_data=xml_payload)
 	logger.debug("Sent type %s to RASO (SyncDataImportId: %s)", export_type, sync_import_id)
 
@@ -429,10 +410,7 @@ def export_and_send_type(
 
 def insert_to_raso(data_type, sync_data):
 	"""
-	Sends formatted data to RASO database.
-
-	Uses ie.usp_SyncDataImport_i stored procedure to insert new import records.
-	Records are inserted with Status = 0 ("New Data").
+	Uses ie.usp_SyncDataImport_i stored procedure to insert new import records to RASO database.
 
 	Args:
 	    data_type (int): Data type identifier
@@ -450,11 +428,8 @@ def insert_to_raso(data_type, sync_data):
 		"SyncData": sync_data,
 	}
 
-	# Execute stored procedure to insert import record
-	# The procedure returns the newly created SyncDataImportId
 	result = ProcedureBuilder.execute_procedure("ie.usp_SyncDataImport_i", params)
 
-	# Extract the ID from result
 	if isinstance(result, dict) and result.get("result_set") and len(result["result_set"]) > 0:
 		sync_import_id = result["result_set"][0].get("SyncDataImportId")
 	else:

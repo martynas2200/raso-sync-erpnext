@@ -8,9 +8,10 @@ from xml.etree import ElementTree as ET
 import frappe
 import pymssql
 
+from ..utils.app_logging import get_logger
 from .connection import MSSQLConnectionManager
 
-logger = frappe.logger("raso_sync.db")
+logger = get_logger("raso_sync.db")
 
 
 class ProcedureParameter:
@@ -139,7 +140,7 @@ class ProcedureExecutor:
 				command = self._build_command()
 				values = self._get_input_values()
 
-				logger.info(
+				logger.debug(
 					f"Executing procedure: {self.procedure_name} with {len(self.parameters)} parameters"
 				)
 

@@ -4,9 +4,10 @@ import frappe
 from frappe.utils.background_jobs import is_job_enqueued
 
 from ..db.connection import mssql_session
+from ..utils.app_logging import get_logger
 from . import get_exports, process_export_record, with_msgprint_logging
 
-logger = frappe.logger("raso_sync_maintenance")
+logger = get_logger("raso_sync.fetch")
 
 
 def execute_maintenance_task():
@@ -16,7 +17,7 @@ def execute_maintenance_task():
 	job_id = "raso_sync_maintenance_task_worker"
 
 	if is_job_enqueued(job_id):
-		return {"status": "skipped"}
+		return
 
 	frappe.enqueue(
 		"raso_sync.tasks.maintenance.execute_maintenance_task_worker",
@@ -24,8 +25,6 @@ def execute_maintenance_task():
 		enqueue_after_commit=True,
 		queue="long",
 	)
-
-	return {"status": "queued"}
 
 
 @mssql_session
@@ -40,7 +39,6 @@ def execute_maintenance_task_worker(inform_user=False):
 	"""
 	logger.debug("Starting Maintenance Task")
 
-	# check if we automatically fetch in the first place
 	fetch_period = frappe.db.get_single_value("RASO Sync Settings", "fetch_sales_interval_minutes")
 	if not fetch_period:
 		logger.warning("Fetch period is not set. Skipping maintenance task.")

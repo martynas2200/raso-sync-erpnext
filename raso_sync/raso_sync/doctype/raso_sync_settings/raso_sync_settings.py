@@ -142,23 +142,17 @@ class RASOSyncSettings(Document):
 			try:
 				parts = str(time_value).split(":")
 				cron_expression = f"{parts[1]} {parts[0]} * * *"
-				result = create_or_update_scheduled_job(
+				create_or_update_scheduled_job(
 					method=method,
 					cron_format=cron_expression,
 				)
-				frappe.logger().info(f"{method.capitalize()} scheduler {result['status']}: {time_value}")
 			except Exception as e:
 				frappe.log_error(f"Error setting {method} scheduler: {e}", "Scheduler Update")
-				if disable_scheduled_job(method):
-					frappe.logger().info(f"Disabled {method} scheduler due to error")
+				disable_scheduled_job(method)
 		elif interval_value and int(interval_value) > 0:
-			result = create_or_update_scheduled_job(
+			create_or_update_scheduled_job(
 				method=method,
 				interval=int(interval_value),
 			)
-			frappe.logger().info(
-				f"{method.capitalize()} scheduler {result['status']}: {interval_value} minutes"
-			)
 		else:
-			if disable_scheduled_job(method):
-				frappe.logger().info(f"Disabled {method} scheduler")
+			disable_scheduled_job(method)

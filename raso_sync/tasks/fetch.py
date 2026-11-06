@@ -12,11 +12,11 @@ from raso_sync.utils.working_hours import is_within_working_hours
 from ..db.connection import mssql_session
 from ..db.exceptions import RASOServerUnavailableError
 from ..db.executor import ProcedureBuilder
+from ..utils.app_logging import get_logger
 from ..utils.system_notifications import notify_server_unavailable
 from . import with_msgprint_logging
 
-logger = frappe.logger("raso_sync_fetch")
-logger.setLevel("DEBUG")
+logger = get_logger("raso_sync.fetch")
 
 STATUS_CODE_MAP = {
 	"new": 0,
@@ -82,6 +82,8 @@ def execute_fetch_task_worker(inform_user=False, ignore_workhours=False):
 			try:
 				status = process_export_record(export_record)
 				results_counter[status] += 1
+			except RASOServerUnavailableError:
+				raise
 			except Exception as e:
 				results_counter["failed"] += 1
 				logger.error(

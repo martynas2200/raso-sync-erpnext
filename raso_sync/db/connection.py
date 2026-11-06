@@ -6,11 +6,11 @@ from typing import Any, ClassVar
 import frappe
 import pymssql
 
+from ..utils.app_logging import get_logger
 from ..utils.system_notifications import clear_server_unavailable_notification_mark
 from .exceptions import RASOServerUnavailableError
 
-logger = frappe.logger("raso_sync.db")
-logger.setLevel(logging.INFO)
+logger = get_logger("raso_sync.db")
 
 
 class MSSQLConnection:

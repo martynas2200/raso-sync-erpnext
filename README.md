@@ -5,7 +5,7 @@ Raso Sync is a Frappe app that keeps ERPNext master data and RASO POS sales data
 - Scheduler-driven automation
 - Background jobs for fetch, send, and full-sync flows
 - Manual run support
-- Settings page for POS integration behavior and sync intervals
+- Settings page for POS integration behaviour and sync intervals
 - Overview page for day-to-day sync inspection
 - Logging
 - Employee to Sales Person mapping
@@ -14,6 +14,7 @@ Raso Sync is a Frappe app that keeps ERPNext master data and RASO POS sales data
 
 
 ## Types of Data Synced
+
 - One-way sync from ERPNext to RASO:
   - Customer
   - Item Group
@@ -24,22 +25,24 @@ Raso Sync is a Frappe app that keeps ERPNext master data and RASO POS sales data
 
 ## Installation
 
-- Make sure the environment has pymssql installed, if it is production environment, it is highly recommended to use custom docker image. More information can be found at [Frappe Docker documentation](https://github.com/frappe/frappe_docker).
 - Scheduler must be enabled in Frappe setup to run background jobs.
+- Logging verbosity is controlled per site by `raso_sync_log_level` in `site_config.json` — one of `DEBUG`, `INFO` (default), `WARNING`, `ERROR`, `CRITICAL`. Each task writes to its own file under site logs directory, e.g. `logs/raso_sync.fetch.log`.
 - Precision of Field `Rate` in `Sales Invoice Item` doctype must be increased to at least 3 decimal places to avoid rounding issues.
 - Consider enabling `Allow Negative Stock` if auto submit of Sales Invoices is desired.
 - Consider making `uom` field in `Item Barcode` doctype mandatory, otherwise item prices might not be sent.
 
+Python dependencies are installed by bench itself. A custom image (see [Frappe Docker documentation](https://github.com/frappe/frappe_docker)) is only required when pip cannot find a wheel for the target platform.
+
 ### Bench Commands for local development
-1. Get the app `bench get-app <repository-url>`
+
+1. Get the app `bench get-app https://github.com/martynas2200/raso-sync-erpnext`
 2. Enable scheduler: `bench config set-common-config --key enable_scheduler --value true`
 3. Install the app on your site: `bench --site <site-name> install-app raso_sync`
 
 ## Pages
 
-- `/app/raso-sync` - RASO Sync Home (workspace, only shortcuts)
-- `/app/raso-sync-overview` - RASO Sync Dashboard
-- `/app/raso-sync-settings` - RASO Sync Settings document
+- `/desk/raso-sync-overview` - RASO Sync Dashboard
+- `/desk/raso-sync-settings` - RASO Sync Settings
 
 ## Constraints
 
@@ -50,6 +53,7 @@ Raso Sync is a Frappe app that keeps ERPNext master data and RASO POS sales data
 ## Background Jobs & Task Logs
 
 ### One-Way Sync Tasks
+
 - **Fetch**: Receives exported data from RASO (reads `ie.usp_SyncDataExport` table)
 - **Send**: Sends to RASO (writes to `ie.usp_SyncDataImport` table)
 

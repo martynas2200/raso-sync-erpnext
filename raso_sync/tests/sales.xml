@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SalesSync ShopNo="48" PosNo="" LASTZ="Z123">
+  <Sales SaleDate="2026-01-06" SaleTime="08:34:44" UserId="55" ShopNo="48" PosNo="2" ReceiptNo="228105">
+    <Sale>
+      <CODE>4779039600166</CODE>
+      <VCODE>P1091</VCODE>
+      <NAME>Replay 330ml dsl</NAME>
+      <QTY>2.000</QTY>
+      <AMOUNT>1.40</AMOUNT>
+      <VATSUM>0.24</VATSUM>
+      <QTYMANUAL>0.000</QTYMANUAL>
+      <AMOUNTMANUAL>0.00</AMOUNTMANUAL>
+      <VATSUMMANUAL>0.00</VATSUMMANUAL>
+      <DISCOUNT>0.00</DISCOUNT>
+    </Sale>
+    <Sale>
+      <CODE>0000002201100</CODE>
+      <VCODE>P0001</VCODE>
+      <NAME>Užstatinė tara</NAME>
+      <QTY>2.000</QTY>
+      <AMOUNT>0.20</AMOUNT>
+      <VATSUM>0.00</VATSUM>
+      <QTYMANUAL>0.000</QTYMANUAL>
+      <AMOUNTMANUAL>0.00</AMOUNTMANUAL>
+      <VATSUMMANUAL>0.00</VATSUMMANUAL>
+      <DISCOUNT>0.00</DISCOUNT>
+    </Sale>
+    <Sale>
+      <CODE>0000047775008</CODE>
+      <VCODE>P7576</VCODE>
+      <NAME>Cig. LD Compact (Blue)</NAME>
+      <QTY>2.000</QTY>
+      <AMOUNT>10.50</AMOUNT>
+      <VATSUM>1.83</VATSUM>
+      <QTYMANUAL>0.000</QTYMANUAL>
+      <AMOUNTMANUAL>0.00</AMOUNTMANUAL>
+      <VATSUMMANUAL>0.00</VATSUMMANUAL>
+      <DISCOUNT>0.00</DISCOUNT>
+    </Sale>
+    <Payment>
+      <CODE>2</CODE>
+      <AMOUNT>12.100</AMOUNT>
+      <PAYMETHOD>2</PAYMETHOD>
+    </Payment>
+  </Sales>
+  <Sales SaleDate="2026-01-06" SaleTime="08:36:20" UserId="55" ShopNo="48" PosNo="1" ReceiptNo="228106">
+    <Sale>
+      <CODE>4770190130073</CODE>
+      <VCODE>P5750</VCODE>
+      <NAME>Silkių filė VIČI MAP 200g</NAME>
+      <QTY>2.000</QTY>
+      <AMOUNT>3.46</AMOUNT>
+      <VATSUM>0.60</VATSUM>
+      <QTYMANUAL>0.000</QTYMANUAL>
+      <AMOUNTMANUAL>0.00</AMOUNTMANUAL>
+      <VATSUMMANUAL>0.00</VATSUMMANUAL>
+      <DISCOUNT>0.00</DISCOUNT>
+    </Sale>
+    <Payment>
+      <CODE>0</CODE>
+      <AMOUNT>3.450</AMOUNT>
+      <PAYMETHOD>0</PAYMETHOD>
+    </Payment>
+    <Payment>
+      <CODE>1001</CODE>
+      <AMOUNT>0.010</AMOUNT>
+      <PAYMETHOD>1001</PAYMETHOD>
+    </Payment>
+  </Sales>
+  <Sales SaleDate="2026-01-06" SaleTime="08:43:22" UserId="55" ShopNo="48" PosNo="3" ReceiptNo="228107">
+    <Sale>
+      <CODE>4779039600166</CODE>
+      <VCODE>P1091</VCODE>
+      <NAME>Replay 330ml dsl</NAME>
+      <QTY>1.000</QTY>
+      <AMOUNT>0.70</AMOUNT>
+      <VATSUM>0.12</VATSUM>
+      <QTYMANUAL>0.000</QTYMANUAL>
+      <AMOUNTMANUAL>0.00</AMOUNTMANUAL>
+      <VATSUMMANUAL>0.00</VATSUMMANUAL>
+      <DISCOUNT>0.00</DISCOUNT>
+    </Sale>
+    <Sale>
+      <CODE>0000002201100</CODE>
+      <VCODE>P0001</VCODE>
+      <NAME>Užstatinė tara</NAME>
+      <QTY>1.000</QTY>
+      <AMOUNT>0.10</AMOUNT>
+      <VATSUM>0.00</VATSUM>
+      <QTYMANUAL>0.000</QTYMANUAL>
+      <AMOUNTMANUAL>0.00</AMOUNTMANUAL>
+      <VATSUMMANUAL>0.00</VATSUMMANUAL>
+      <DISCOUNT>0.00</DISCOUNT>
+    </Sale>
+    <Sale>
+      <CODE>4770078197310</CODE>
+      <VCODE>P2304</VCODE>
+      <NAME>Bandelė Sraigė su spanguolėmis, 70 g</NAME>
+      <QTY>1.000</QTY>
+      <AMOUNT>0.69</AMOUNT>
+      <VATSUM>0.12</VATSUM>
+      <QTYMANUAL>0.000</QTYMANUAL>
+      <AMOUNTMANUAL>0.00</AMOUNTMANUAL>
+      <VATSUMMANUAL>0.00</VATSUMMANUAL>
+      <DISCOUNT>0.00</DISCOUNT>
+    </Sale>
+    <Sale>
+      <CODE>0000001101102</CODE>
+      <VCODE>P5322</VCODE>
+      <NAME>Fasavimo maišelis</NAME>
+      <QTY>1.000</QTY>
+      <AMOUNT>0.01</AMOUNT>
+      <VATSUM>0.00</VATSUM>
+      <QTYMANUAL>0.000</QTYMANUAL>
+      <AMOUNTMANUAL>0.00</AMOUNTMANUAL>
+      <VATSUMMANUAL>0.00</VATSUMMANUAL>
+      <DISCOUNT>0.00</DISCOUNT>
+    </Sale>
+    <Sale>
+      <CODE>4770179104354</CODE>
+      <VCODE>P5264</VCODE>
+      <NAME>Saldainiai VELIUONA</NAME>
+      <QTY>0.030</QTY>
+      <AMOUNT>0.27</AMOUNT>
+      <VATSUM>0.05</VATSUM>
+      <QTYMANUAL>0.000</QTYMANUAL>
+      <AMOUNTMANUAL>0.00</AMOUNTMANUAL>
+      <VATSUMMANUAL>0.00</VATSUMMANUAL>
+      <DISCOUNT>0.00</DISCOUNT>
+    </Sale>
+    <Payment>
+      <CODE>1001</CODE>
+      <AMOUNT>0.020</AMOUNT>
+      <PAYMETHOD>1001</PAYMETHOD>
+    </Payment>
+    <Payment>
+      <CODE>0</CODE>
+      <AMOUNT>1.750</AMOUNT>
+      <PAYMETHOD>0</PAYMETHOD>
+    </Payment>
+  </Sales>
+  <Payments>
+    <CODE>2</CODE>
+    <AMOUNT>12.100</AMOUNT>
+    <PAYMETHOD>2</PAYMETHOD>
+  </Payments>
+  <Payments>
+    <CODE>0</CODE>
+    <AMOUNT>5.200</AMOUNT>
+    <PAYMETHOD>0</PAYMETHOD>
+  </Payments>
+  <Payments>
+    <CODE>1001</CODE>
+    <AMOUNT>0.030</AMOUNT>
+    <PAYMETHOD>1001</PAYMETHOD>
+  </Payments>
+</SalesSync>

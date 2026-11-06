@@ -9,8 +9,9 @@ from frappe.utils.background_jobs import is_job_enqueued
 
 from raso_sync.tasks.fetch import execute_fetch_task_worker
 from raso_sync.tasks.send import execute_send_task_worker
+from raso_sync.utils.app_logging import get_logger
 
-logger = frappe.logger("raso_sync")
+logger = get_logger("raso_sync.full_sync")
 
 
 def execute_full_sync_task():
