@@ -1,8 +1,21 @@
 import frappe
+from frappe.custom.doctype.custom_field.custom_field import delete_custom_fields
 
 from raso_sync.raso_sync.doctype.raso_sync_settings.raso_sync_settings import RASOSyncSettings
 
 RASO_ID_FIELD = "raso_id"
+
+REMOVABLE_CUSTOM_FIELDS = {
+	"Sales Invoice": ["raso_receipt_no"],
+	"Item Group": [
+		"raso_id",
+		"pos_section",
+		"pos_department_no",
+		"is_refundable",
+		"is_visible_in_catalog",
+		"column_break_raso",
+	],
+}
 
 
 def run_migrations():
@@ -44,19 +57,6 @@ def recreate_scheduler_jobs():
 
 
 def remove_custom_fields():
-	"""Clean up custom fields added by RASO."""
-	names = [
-		"Sales Invoice-raso_receipt_no",
-		"Item Group-raso_id",
-		"Item Group-pos_section",
-		"Item Group-pos_department_no",
-		"Item Group-is_refundable",
-		"Item Group-is_visible_in_catalog",
-		"Item Group-column_break_raso",
-	]
-
-	for name in names:
-		if frappe.db.exists("Custom Field", name):
-			frappe.delete_doc("Custom Field", name, ignore_permissions=True)
-			print(f"Deleted custom field: {name}")
+	"""Delete the custom fields this app owns; runs before uninstall."""
+	delete_custom_fields(REMOVABLE_CUSTOM_FIELDS, bypass_hooks=True)
 	frappe.db.commit()

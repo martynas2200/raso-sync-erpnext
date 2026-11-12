@@ -1,0 +1,64 @@
+[
+ {
+  "doctype": "Workspace",
+  "name": "RASO Dashboard",
+  "label": "RASO Dashboard",
+  "title": "RASO Dashboard",
+  "type": "Workspace",
+  "public": 1,
+  "module": "RASO Sync",
+  "icon": "layout-dashboard",
+  "indicator_color": "blue",
+  "sequence_id": 900.0,
+  "is_hidden": 0,
+  "content": "[{\"id\":\"raso00000001\",\"type\":\"header\",\"data\":{\"text\":\"Today\",\"level\":4}},{\"id\":\"raso00000002\",\"type\":\"paragraph\",\"data\":{\"text\":\"Imported POS receipts, stamped with the RASO receipt number. Refunds are kept out of turnover.\"}},{\"id\":\"raso00000003\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"RASO Turnover Today\",\"col\":3}},{\"id\":\"raso00000004\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"RASO Receipts Today\",\"col\":3}},{\"id\":\"raso00000005\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"RASO Refunds Today\",\"col\":3}},{\"id\":\"raso00000006\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"RASO Average Ticket Today\",\"col\":3}},{\"id\":\"raso00000007\",\"type\":\"header\",\"data\":{\"text\":\"Z reports (last 30 days)\",\"level\":4}},{\"id\":\"raso00000009\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Z Turnover 30 Days\",\"col\":4}},{\"id\":\"raso00000011\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Z Returns 30 Days\",\"col\":4}},{\"id\":\"raso00000012\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Z Discounts 30 Days\",\"col\":4}},{\"id\":\"raso00000017\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Card Share 30 Days\",\"col\":4}},{\"id\":\"raso00000018\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"RASO Average Ticket 30 Days\",\"col\":4}},{\"id\":\"raso00000019\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Department 2 Share 30 Days\",\"col\":4}},{\"id\":\"raso00000015\",\"type\":\"chart\",\"data\":{\"chart_name\":\"RASO Z Turnover Daily\",\"col\":12}}]",
+  "number_cards": [
+   {
+    "label": "RASO Turnover Today",
+    "number_card_name": "RASO Turnover Today"
+   },
+   {
+    "label": "RASO Receipts Today",
+    "number_card_name": "RASO Receipts Today"
+   },
+   {
+    "label": "RASO Refunds Today",
+    "number_card_name": "RASO Refunds Today"
+   },
+   {
+    "label": "RASO Average Ticket Today",
+    "number_card_name": "RASO Average Ticket Today"
+   },
+   {
+    "label": "Z Turnover 30 Days",
+    "number_card_name": "Z Turnover 30 Days"
+   },
+   {
+    "label": "Z Returns 30 Days",
+    "number_card_name": "Z Returns 30 Days"
+   },
+   {
+    "label": "Z Discounts 30 Days",
+    "number_card_name": "Z Discounts 30 Days"
+   },
+   {
+    "label": "Card Share 30 Days",
+    "number_card_name": "Card Share 30 Days"
+   },
+   {
+    "label": "RASO Average Ticket 30 Days",
+    "number_card_name": "RASO Average Ticket 30 Days"
+   },
+   {
+    "label": "Department 2 Share 30 Days",
+    "number_card_name": "Department 2 Share 30 Days"
+   }
+  ],
+  "charts": [
+   {
+    "chart_name": "RASO Z Turnover Daily",
+    "label": "RASO Z Turnover Daily"
+   }
+  ]
+ }
+]

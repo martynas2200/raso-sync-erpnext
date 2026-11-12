@@ -378,7 +378,7 @@ def process_sales(sales_node, type=0):
 			if (
 				not company_uses_negative_stock
 				and flt(item.actual_qty) < flt(item.qty)
-				and item.maintain_stock
+				and frappe.get_cached_value("Item", item.item_code, "is_stock_item")
 			):
 				error_list += _("Insufficient stock for item") + f"- {item.item_code}"
 

@@ -5,7 +5,7 @@ app_description = "RASO POS System Sync API for ERPNext"
 app_email = "raso@ekranas.info"
 app_license = "MIT"
 app_logo_url = "/assets/raso_sync/raso_icon.svg"
-app_home = "/desk/raso-sync-overview"
+app_home = "/desk/raso-dashboard"
 
 fixtures = [
 	{
@@ -29,6 +29,9 @@ fixtures = [
 			],
 		],
 	},
+	{"dt": "Number Card", "filters": [["module", "=", "RASO Sync"]]},
+	{"dt": "Dashboard Chart", "filters": [["module", "=", "RASO Sync"]]},
+	{"dt": "Workspace", "filters": [["module", "=", "RASO Sync"]]},
 ]
 
 after_sync = "raso_sync.migrations.fill_missing_raso_ids"
@@ -41,7 +44,7 @@ add_to_apps_screen = [
 	{
 		"name": app_name,
 		"logo": app_logo_url,
-		"title": app_title,
+		"title": "RASO",
 		"route": app_home,
 		"has_permission": "raso_sync.api.permission.has_app_permission",
 		"sequence_id": 900,  # low priority

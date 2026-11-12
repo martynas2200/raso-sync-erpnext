@@ -6,7 +6,9 @@ Raso Sync is a Frappe app that keeps ERPNext master data and RASO POS sales data
 - Background jobs for fetch, send, and full-sync flows
 - Manual run support
 - Settings page for POS integration behaviour and sync intervals
-- Overview page for day-to-day sync inspection
+- Dashboard workspace with sales and Z report metrics
+- Reconciliation report comparing Z reports against imported Sales Invoices
+- Status page indicating last import/export times with links to do diagnostics
 - Logging
 - Employee to Sales Person mapping
 - Payment Method mapping
@@ -41,7 +43,9 @@ Python dependencies are installed by bench itself. A custom image (see [Frappe D
 
 ## Pages
 
-- `/desk/raso-sync-overview` - RASO Sync Dashboard
+- `/desk/raso-dashboard` - RASO Dashboard workspace: gives figures on turnover, receipts and refunds.
+- `/desk/raso-sync-status` - RASO Sync status page: last import/export, manual send and fetch, pending documents, diagnostics
+- `/desk/query-report/RASO Reconciliation` - RASO Reconciliation report: per-day comparison of Z report turnover and receipt counts against the imported Sales Invoices
 - `/desk/raso-sync-settings` - RASO Sync Settings
 
 ## Constraints

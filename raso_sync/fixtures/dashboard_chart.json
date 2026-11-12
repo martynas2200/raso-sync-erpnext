@@ -1,0 +1,20 @@
+[
+ {
+  "doctype": "Dashboard Chart",
+  "name": "RASO Z Turnover Daily",
+  "chart_name": "RASO Z Turnover Daily",
+  "chart_type": "Sum",
+  "document_type": "Z Report",
+  "based_on": "date",
+  "value_based_on": "daily_turnover",
+  "timespan": "Last Month",
+  "time_interval": "Daily",
+  "timeseries": 1,
+  "type": "Line",
+  "filters_json": "[]",
+  "is_public": 1,
+  "module": "RASO Sync",
+  "color": "#2490ef",
+  "empty_state_message": "No Z reports received yet."
+ }
+]
