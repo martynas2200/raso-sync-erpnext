@@ -1,4 +1,4 @@
-<div class="container raso-sync-overview">
+<div class="container raso-sync-status">
     <div class="overview-description">
         <p>{{__("Manage and monitor RASO Sync status from this overview page.")}}</p>
     </div>
@@ -52,6 +52,12 @@
                             <use href="#icon-clipboard-clock"></use>
                         </svg>
                         {{__("Scheduled Jobs")}}
+                </button>
+                <button class="btn btn-sm btn-default" id="reconciliation-report-btn">
+                        <svg class="icon icon-sm" aria-hidden="true">
+                            <use href="#icon-table"></use>
+                        </svg>
+                        {{__("Reconciliation Report")}}
                 </button>
             </div>
             <div class="action-group">

@@ -1,14 +1,14 @@
-frappe.pages["raso-sync-overview"].on_page_load = function (wrapper) {
+frappe.pages["raso-sync-status"].on_page_load = function (wrapper) {
     var page = frappe.ui.make_app_page({
         parent: wrapper,
-        title: __("RASO Sync Overview"),
+        title: __("RASO Sync Status"),
         single_column: true,
     });
 
-    $(frappe.render_template("raso_sync_overview")).appendTo(page.main);
+    $(frappe.render_template("raso_sync_status")).appendTo(page.main);
 
-    if (frappe.raso_sync_overview) {
-        frappe.raso_sync_overview.setup(page);
+    if (frappe.raso_sync_status) {
+        frappe.raso_sync_status.setup(page);
     }
 
     page.set_primary_action(__("Open Settings"), () => {
@@ -16,15 +16,15 @@ frappe.pages["raso-sync-overview"].on_page_load = function (wrapper) {
     });
 };
 
-frappe.pages["raso-sync-overview"].refresh = function (wrapper) {
-    if (frappe.raso_sync_overview) {
-        frappe.raso_sync_overview.load_settings();
+frappe.pages["raso-sync-status"].refresh = function (wrapper) {
+    if (frappe.raso_sync_status) {
+        frappe.raso_sync_status.load_settings();
     }
 };
 
-frappe.raso_sync_overview = {
+frappe.raso_sync_status = {
     realtime_callback: null,
-    event_namespace: ".raso_sync_overview",
+    event_namespace: ".raso_sync_status",
 
     setup: function (page) {
         this.page = page;
@@ -68,6 +68,11 @@ frappe.raso_sync_overview = {
                 frappe.set_route("List", "Scheduled Job Type", {
                     method: ["like", "%raso%"],
                 });
+            });
+        this.$("#reconciliation-report-btn")
+            .off(events)
+            .on(`click${events}`, () => {
+                frappe.set_route("query-report", "RASO Reconciliation");
             });
 
         this.$("#send-btn")
@@ -317,7 +322,7 @@ frappe.raso_sync_overview = {
             error: function () {
                 frappe.show_alert(
                     {
-                        message: __("Connection test failed: {0}").format(__("Unknown error")),
+                        message: __("Connection test failed: {0}", [__("Unknown error")]),
                         indicator: "red",
                     },
                     5

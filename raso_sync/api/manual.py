@@ -49,13 +49,12 @@ def test_connection():
 		return {"success": False, "error": _("Database connection settings are incomplete")}
 
 	try:
-		connection = MSSQLConnectionManager.get_connection()
+		connection = MSSQLConnectionManager.new_connection()
 
 		with connection.cursor() as cursor:
 			cursor.execute("SELECT GETDATE() AS test_time;")
 			row = cursor.fetchone()
 			db_time = row["test_time"] if row else None
-		connection.close()
 
 		if db_time is not None:
 			message = _("Connection successful. Database time: {0}").format(db_time)

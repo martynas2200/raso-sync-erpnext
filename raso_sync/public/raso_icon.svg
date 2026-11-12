@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="325" height="321" viewBox="0 0 325 321">
+  <!-- <path fill="#000000" fill-rule="evenodd" d="M0 0h325v321H0Zm50 50h225v221H50Z"/> -->
+  <!-- The original black border does look good, but comes across as a bit heavy, thus we do grey-700 color, and add rounded corners. -->
+  <path fill="#525252" fill-rule="evenodd" d="
+      M92.8571 0H232.1429
+      A92.8571 91.7143 0 0 1 325 91.7143
+      V229.2857
+      A92.8571 91.7143 0 0 1 232.1429 321
+      H92.8571
+      A92.8571 91.7143 0 0 1 0 229.2857
+      V91.7143
+      A92.8571 91.7143 0 0 1 92.8571 0Z
+
+      M92.8571 50H232.1429
+      A42.8571 41.7143 0 0 1 275 91.7143
+      V229.2857
+      A42.8571 41.7143 0 0 1 232.1429 271
+      H92.8571
+      A42.8571 41.7143 0 0 1 50 229.2857
+      V91.7143
+      A42.8571 41.7143 0 0 1 92.8571 50Z
+    " />
+  <path fill="#eb5c2e"
+    d="M94 93H232V142H207C193.3 142 182 142.3 182 142.8C182 143.2 193.3 154.8 207 168.5L232 193.5V228H196.5L143 174.5V228H94Z" />
+</svg>

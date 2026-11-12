@@ -103,7 +103,7 @@ class MSSQLConnection:
 
 	def close(self):
 		"""Close the active connection if it exists."""
-		if self._connection is not None and self._is_connected:
+		if self._connection is not None:
 			try:
 				self._connection.close()
 				logger.info("Database connection closed")
@@ -157,8 +157,12 @@ class MSSQLConnection:
 				self.close()
 
 	def __del__(self):
-		"""Cleanup connection on garbage collection."""
-		self.close()
+		connection = getattr(self, "_connection", None)
+		if connection is not None:
+			try:
+				connection.close()
+			except Exception:
+				pass
 
 
 class MSSQLConnectionManager:
@@ -202,9 +206,17 @@ class MSSQLConnectionManager:
 				# Connection was closed, remove it
 				del MSSQLConnectionManager._connections[site_key]
 
-		# Create new connection from settings
-		config = MSSQLConnectionManager._get_config_from_settings()
-		connection = MSSQLConnection(
+		connection = MSSQLConnectionManager.new_connection()
+
+		MSSQLConnectionManager._connections[site_key] = connection
+		logger.info(f"Created new MSSQL connection for site: {site_key}")
+
+		return connection
+
+	@staticmethod
+	def _create_connection(config: dict[str, Any]) -> MSSQLConnection:
+		"""Build a connection instance from settings config, without caching it."""
+		return MSSQLConnection(
 			host=config["host"],
 			user=config["user"],
 			password=config["password"],
@@ -213,10 +225,14 @@ class MSSQLConnectionManager:
 			encryption=config.get("encryption", "request"),
 		)
 
-		MSSQLConnectionManager._connections[site_key] = connection
-		logger.info(f"Created new MSSQL connection for site: {site_key}")
+	@staticmethod
+	def new_connection() -> MSSQLConnection:
+		"""Create a connection instance that is NOT registered in the per-site cache.
 
-		return connection
+		Raises:
+		    frappe.ValidationError: If configuration is invalid
+		"""
+		return MSSQLConnectionManager._create_connection(MSSQLConnectionManager._get_config_from_settings())
 
 	@staticmethod
 	def _get_config_from_settings() -> dict[str, Any]:

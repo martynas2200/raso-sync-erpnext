@@ -1,12 +1,35 @@
 import frappe
 
-from raso_sync.custom_fields import create_custom_fields
 from raso_sync.raso_sync.doctype.raso_sync_settings.raso_sync_settings import RASOSyncSettings
+
+RASO_ID_FIELD = "raso_id"
 
 
 def run_migrations():
-	create_custom_fields()
+	fill_missing_raso_ids()
 	recreate_scheduler_jobs()
+
+
+def fill_missing_raso_ids():
+	"""Give every Item Group a numeric id; existing values are never renumbered."""
+	if not frappe.get_meta("Item Group").has_field(RASO_ID_FIELD):
+		return
+
+	rows = frappe.get_all("Item Group", fields=["name", RASO_ID_FIELD], order_by="creation asc")
+	values = [str(row.get(RASO_ID_FIELD) or "").strip() for row in rows]
+	next_id = max((int(value) for value in values if value.isdigit()), default=0)
+
+	filled = 0
+	for row, value in zip(rows, values, strict=True):
+		if value:
+			continue
+		next_id += 1
+		frappe.db.set_value("Item Group", row.name, RASO_ID_FIELD, str(next_id), update_modified=False)
+		filled += 1
+
+	if filled:
+		frappe.db.commit()
+		print(f"Filled RASO ID for {filled} Item Groups (last id: {next_id}).")
 
 
 def recreate_scheduler_jobs():
@@ -18,3 +41,22 @@ def recreate_scheduler_jobs():
 		frappe.log_error(
 			"RASO Jobs creation failed during migration", f"Error recreating RASO Sync scheduler jobs: {e!s}"
 		)
+
+
+def remove_custom_fields():
+	"""Clean up custom fields added by RASO."""
+	names = [
+		"Sales Invoice-raso_receipt_no",
+		"Item Group-raso_id",
+		"Item Group-pos_section",
+		"Item Group-pos_department_no",
+		"Item Group-is_refundable",
+		"Item Group-is_visible_in_catalog",
+		"Item Group-column_break_raso",
+	]
+
+	for name in names:
+		if frappe.db.exists("Custom Field", name):
+			frappe.delete_doc("Custom Field", name, ignore_permissions=True)
+			print(f"Deleted custom field: {name}")
+	frappe.db.commit()
