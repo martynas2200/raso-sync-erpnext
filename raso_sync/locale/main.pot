@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: RASO Sync VERSION\n"
 "Report-Msgid-Bugs-To: raso@ekranas.info\n"
-"POT-Creation-Date: 2026-09-28 16:47+0141\n"
-"PO-Revision-Date: 2026-09-28 16:47+0141\n"
+"POT-Creation-Date: 2026-11-12 10:27+0018\n"
+"PO-Revision-Date: 2026-11-12 10:27+0018\n"
 "Last-Translator: raso@ekranas.info\n"
 "Language-Team: raso@ekranas.info\n"
 "MIME-Version: 1.0\n"
@@ -18,367 +18,392 @@ msgstr ""
 
 #. Option for the 'Fiscal Module VAT Code' (Select) field in DocType 'RASO Item
 #. Tax Mapping'
-#: raso_sync/raso_sync/doctype/raso_item_tax_mapping/raso_item_tax_mapping.json
+#: raso_sync/raso_sync/doctype/raso_item_tax_mapping/raso_item_tax_mapping.json:26
 msgid "1 (A)"
 msgstr ""
 
 #. Option for the 'Fiscal Module VAT Code' (Select) field in DocType 'RASO Item
 #. Tax Mapping'
-#: raso_sync/raso_sync/doctype/raso_item_tax_mapping/raso_item_tax_mapping.json
+#: raso_sync/raso_sync/doctype/raso_item_tax_mapping/raso_item_tax_mapping.json:26
 msgid "2 (B)"
 msgstr ""
 
 #. Option for the 'Fiscal Module VAT Code' (Select) field in DocType 'RASO Item
 #. Tax Mapping'
-#: raso_sync/raso_sync/doctype/raso_item_tax_mapping/raso_item_tax_mapping.json
+#: raso_sync/raso_sync/doctype/raso_item_tax_mapping/raso_item_tax_mapping.json:26
 msgid "3 (C)"
 msgstr ""
 
 #. Option for the 'Fiscal Module VAT Code' (Select) field in DocType 'RASO Item
 #. Tax Mapping'
-#: raso_sync/raso_sync/doctype/raso_item_tax_mapping/raso_item_tax_mapping.json
+#: raso_sync/raso_sync/doctype/raso_item_tax_mapping/raso_item_tax_mapping.json:26
 msgid "4 (D)"
 msgstr ""
 
 #. Option for the 'Fiscal Module VAT Code' (Select) field in DocType 'RASO Item
 #. Tax Mapping'
-#: raso_sync/raso_sync/doctype/raso_item_tax_mapping/raso_item_tax_mapping.json
+#: raso_sync/raso_sync/doctype/raso_item_tax_mapping/raso_item_tax_mapping.json:26
 msgid "5 (E)"
-msgstr ""
-
-#. Name of a role
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
-msgid "Account Manager"
 msgstr ""
 
 #. Description of the 'Debit To Account (Returns)' (Link) field in DocType
 #. 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:84
 msgid "Account to use for return transactions. If not set, the default debit account will be used."
 msgstr ""
 
 #. Label of the general_section (Section Break) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:62
 msgid "Accounting Settings"
+msgstr ""
+
+#. Name of a role
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:655
+msgid "Accounts Manager"
+msgstr ""
+
+#. Name of a role
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:664
+msgid "Accounts User"
 msgstr ""
 
 #. Label of the add_payments_to_invoices (Check) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:311
 msgid "Add Payments to Imported Records"
 msgstr ""
 
 #. Label of the additional_counter_1 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:486
 msgid "Additional Counter 1"
 msgstr ""
 
 #. Label of the additional_counter_10 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:540
 msgid "Additional Counter 10"
 msgstr ""
 
 #. Label of the additional_counter_11 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:546
 msgid "Additional Counter 11"
 msgstr ""
 
 #. Label of the additional_counter_12 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:556
 msgid "Additional Counter 12"
 msgstr ""
 
 #. Label of the additional_counter_13 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:562
 msgid "Additional Counter 13"
 msgstr ""
 
 #. Label of the additional_counter_14 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:568
 msgid "Additional Counter 14"
 msgstr ""
 
 #. Label of the additional_counter_15 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:574
 msgid "Additional Counter 15"
 msgstr ""
 
 #. Label of the additional_counter_16 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:580
 msgid "Additional Counter 16"
 msgstr ""
 
 #. Label of the additional_counter_17 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:586
 msgid "Additional Counter 17"
 msgstr ""
 
 #. Label of the additional_counter_18 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:592
 msgid "Additional Counter 18"
 msgstr ""
 
 #. Label of the additional_counter_19 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:598
 msgid "Additional Counter 19"
 msgstr ""
 
 #. Label of the additional_counter_2 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:492
 msgid "Additional Counter 2"
 msgstr ""
 
 #. Label of the additional_counter_20 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:604
 msgid "Additional Counter 20"
 msgstr ""
 
 #. Label of the additional_counter_21 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:610
 msgid "Additional Counter 21"
 msgstr ""
 
 #. Label of the additional_counter_22 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:617
 msgid "Additional Counter 22"
 msgstr ""
 
 #. Label of the additional_counter_3 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:498
 msgid "Additional Counter 3"
 msgstr ""
 
 #. Label of the additional_counter_4 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:504
 msgid "Additional Counter 4"
 msgstr ""
 
 #. Label of the additional_counter_5 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:510
 msgid "Additional Counter 5"
 msgstr ""
 
 #. Label of the additional_counter_6 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:516
 msgid "Additional Counter 6"
 msgstr ""
 
 #. Label of the additional_counter_7 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:522
 msgid "Additional Counter 7"
 msgstr ""
 
 #. Label of the additional_counter_8 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:528
 msgid "Additional Counter 8"
 msgstr ""
 
 #. Label of the additional_counter_9 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:534
 msgid "Additional Counter 9"
 msgstr ""
 
 #. Label of the additional_counters_section (Section Break) field in DocType 'Z
 #. Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:480
 msgid "Additional Counters"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:46
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:67
 msgid "All Data Types"
 msgstr ""
 
 #. Label of the amount_without_vat_1 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:224
 msgid "Amount Without VAT 1"
 msgstr ""
 
 #. Label of the amount_without_vat_2 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:229
 msgid "Amount Without VAT 2"
 msgstr ""
 
 #. Label of the amount_without_vat_3 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:234
 msgid "Amount Without VAT 3"
 msgstr ""
 
 #. Label of the amount_without_vat_4 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:239
 msgid "Amount Without VAT 4"
 msgstr ""
 
 #. Label of the amount_without_vat_5 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:244
 msgid "Amount Without VAT 5"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:370
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:378
 msgid "Are you sure you want to fetch data from RASO POS server?<br>Supported data types: Sales, Returns, Z Reports"
 msgstr ""
 
 #. Label of the submit_sales_documents (Check) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:267
 msgid "Auto Submit Sales Documents"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:195
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:203
 msgid "Automatic sending is disabled."
 msgstr ""
 
+#. Label of Number Card 'RASO Average Ticket Today'
+#: raso_sync/fixtures/number_card.json:46
+msgid "Average Ticket Today"
+msgstr ""
+
 #. Description of the 'Sales Person' (Link) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:144
 msgid "Based on User Code field"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:72
+#. Label of the business_code (Data) field in DocType 'Customer'
+#: raso_sync/fixtures/custom_field.json:514
+msgid "Business Code"
+msgstr ""
+
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:99
 msgid "Cancel"
 msgstr ""
 
+#. Label of Number Card 'Card Share 30 Days'
+#. Label of a number_cards row in Workspace 'RASO Dashboard'
+#: raso_sync/fixtures/number_card.json:113 raso_sync/fixtures/workspace.json:45
+msgid "Card Share 30 Days"
+msgstr ""
+
 #. Label of the cash_deposited_1 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:288
 msgid "Cash Deposited 1"
 msgstr ""
 
 #. Label of the cash_deposited_2 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:300
 msgid "Cash Deposited 2"
 msgstr ""
 
 #. Label of the cash_deposited_times_1 (Int) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:294
 msgid "Cash Deposited Times 1"
 msgstr ""
 
 #. Label of the cash_withdrawn_1 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:306
 msgid "Cash Withdrawn 1"
 msgstr ""
 
 #. Label of the cash_withdrawn_2 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:318
 msgid "Cash Withdrawn 2"
 msgstr ""
 
 #. Label of the cash_withdrawn_times_1 (Int) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:312
 msgid "Cash Withdrawn Times 1"
 msgstr ""
 
 #. Label of the cash_in_register (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:323
 msgid "Cash in Register"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:36
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:48
 msgid "Check Logs"
 msgstr ""
 
 #. Description of the 'Rounding Codes' (Data) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:319
 msgid "Comma-separated list of RASO payment codes that are used to indicate rounding."
 msgstr ""
 
-#: raso_sync/api/manual.py:63
+#: raso_sync/raso_sync/report/raso_reconciliation/raso_reconciliation.py:35
+msgid "Compared {0} to {1}"
+msgstr ""
+
+#: raso_sync/api/manual.py:62
 msgid "Connection successful, database time not retrieved..."
 msgstr ""
 
-#: raso_sync/api/manual.py:61
+#: raso_sync/api/manual.py:60
 msgid "Connection successful. Database time: {0}"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:317
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:325
 msgid "Connection test failed: {0}"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:299
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:307
 msgid "Connection test successful"
 msgstr ""
 
 #. Description of the 'Send Check Interval (Minutes)' (Int) field in DocType
 #. 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:279
 msgid "Cron job interval to check for data to send to RASO. If set to 0, then automatic sending is turned off. If it more than 60 minutes, it will be rounded down to hourly intervals."
 msgstr ""
 
 #. Description of the 'Fetch Sales Interval (Minutes)' (Int) field in DocType
 #. 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:261
 msgid "Cron job interval to fetch sales documents from RASO to ERPNext. If set to 0, then automatic fetching is turned off."
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:50
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:71
 msgid "Customers"
 msgstr ""
 
 #. Label of the daily_turnover (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:184
 msgid "Daily Turnover"
 msgstr ""
 
 #. Label of the daily_turnover_cash (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:254
 msgid "Daily Turnover Cash"
 msgstr ""
 
 #. Label of the daily_turnover_credit_1 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:259
 msgid "Daily Turnover Credit 1"
 msgstr ""
 
 #. Label of the daily_turnover_credit_2 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:264
 msgid "Daily Turnover Credit 2"
 msgstr ""
 
 #. Label of the daily_turnover_credit_3 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:269
 msgid "Daily Turnover Credit 3"
 msgstr ""
 
 #. Label of the daily_turnover_credit_4 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:274
 msgid "Daily Turnover Credit 4"
 msgstr ""
 
 #. Label of the daily_turnover_credit_5 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:279
 msgid "Daily Turnover Credit 5"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:44
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:65
 msgid "Data Type:"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:210
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:218
 msgid "Data should be sent automatically in about"
 msgstr ""
 
-#: raso_sync/api/importer.py:77
+#: raso_sync/api/importer.py:74
 msgid "DataType not specified and could not be inferred from XML."
 msgstr ""
 
 #. Label of the encryption (Select) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:238
 msgid "Database Encryption"
 msgstr ""
 
 #. Label of the database_name (Data) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:215
 msgid "Database Name"
 msgstr ""
 
 #. Label of the database_password (Password) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:232
 msgid "Database Password"
 msgstr ""
 
 #. Label of the database_username (Data) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:226
 msgid "Database Username"
 msgstr ""
 
@@ -386,117 +411,158 @@ msgstr ""
 msgid "Database connection settings are incomplete"
 msgstr ""
 
+#: raso_sync/raso_sync/report/raso_reconciliation/raso_reconciliation.py:41
+msgid "Day"
+msgstr ""
+
+#: raso_sync/raso_sync/report/raso_reconciliation/raso_reconciliation.py:21
+msgid "Days checked"
+msgstr ""
+
+#: raso_sync/raso_sync/report/raso_reconciliation/raso_reconciliation.py:22
+msgid "Days differing"
+msgstr ""
+
 #. Label of the debit_to_account_returns (Link) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:82
 msgid "Debit To Account (Returns)"
 msgstr ""
 
 #. Label of the default_customer (Link) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:101
 msgid "Default Customer"
 msgstr ""
 
 #. Label of the debit_to_account (Link) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:74
 msgid "Default Debit To Account"
 msgstr ""
 
 #. Label of the default_item (Link) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:108
 msgid "Default Item (When Not Found)"
 msgstr ""
 
 #. Label of the default_naming_series (Data) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:115
 msgid "Default Naming Series"
+msgstr ""
+
+#: raso_sync/data_imports/sales.py:323
+msgid "Default currency is not set for company {0}."
+msgstr ""
+
+#. Label of Number Card 'Department 1 Share 30 Days'
+#: raso_sync/fixtures/number_card.json:152
+msgid "Department 1 Share 30 Days"
+msgstr ""
+
+#. Label of Number Card 'Department 2 Share 30 Days'
+#. Label of a number_cards row in Workspace 'RASO Dashboard'
+#: raso_sync/fixtures/number_card.json:139 raso_sync/fixtures/workspace.json:53
+msgid "Department 2 Share 30 Days"
+msgstr ""
+
+#. Description of the 'POS Department No' (Int) field in DocType 'Item Group'
+#: raso_sync/fixtures/custom_field.json:150
+msgid "Department number for POS categorization"
 msgstr ""
 
 #. Description of the 'Additional Counter 21' (Currency) field in DocType 'Z
 #. Report'
 #. Description of the 'Additional Counter 22' (Currency) field in DocType 'Z
 #. Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:611
 msgid "Depending on the configuration, might be used for rounding"
 msgstr ""
 
+#. Label of the deposit_package_count (Int) field in DocType 'Item'
+#: raso_sync/fixtures/custom_field.json:38
+msgid "Deposit Items per Stock UOM"
+msgstr ""
+
+#: raso_sync/raso_sync/report/raso_reconciliation/raso_reconciliation.py:51
+msgid "Difference"
+msgstr ""
+
 #. Label of the discount_amount_items (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:338
 msgid "Discount Amount on Items"
 msgstr ""
 
 #. Label of the discount_amount_receipt (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:333
 msgid "Discount Amount on Receipt"
 msgstr ""
 
 #. Label of the discounts_section (Section Break) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:328
 msgid "Discounts & Errors"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:237
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:245
 msgid "DocType"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:238
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:246
 msgid "Document Name"
 msgstr ""
 
 #. Label of the drawer_opening_times (Int) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:371
 msgid "Drawer Opening Times"
 msgstr ""
 
 #. Label of the employee_mappings (Table) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:335
 msgid "Employee Mappings"
 msgstr ""
 
 #. Label of the employee_mapping_section (Section Break) field in DocType 'RASO
 #. Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:330
 msgid "Employee to Sales Person Mapping"
 msgstr ""
 
 #. Description of the 'Database Encryption' (Select) field in DocType 'RASO
 #. Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:241
 msgid "Encryption mode for database connection (off: disabled, request: use if available, require: encrypted only)"
 msgstr ""
 
 #. Description of the 'Working Hours To' (Time) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:301
 msgid "End time to stop fetching sales documents when business hours end"
 msgstr ""
 
 #. Label of the error_amount (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:361
 msgid "Error Amount"
 msgstr ""
 
 #. Label of the error_count (Int) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:366
 msgid "Error Count"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:239
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:247
 msgid "Event"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:69
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:93
 msgid "Execute Send"
 msgstr ""
 
-#: raso_sync/api/manual.py:67
+#: raso_sync/api/manual.py:66
 msgid "Failed to connect to RASO database: {0}"
 msgstr ""
 
 #. Label of the fetch_sales_interval_minutes (Int) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:259
 msgid "Fetch Sales Interval (Minutes)"
 msgstr ""
 
@@ -504,241 +570,308 @@ msgstr ""
 msgid "Fetch Sales Interval must be either 0 (disabled) or between 10 and 1440 minutes"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:389
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:397
 msgid "Fetch queued failed: "
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:380
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:388
 msgid "Fetch queued successfully"
 msgstr ""
 
 #. Label of the fiscal_vat_code (Select) field in DocType 'RASO Item Tax
 #. Mapping'
-#: raso_sync/raso_sync/doctype/raso_item_tax_mapping/raso_item_tax_mapping.json
+#: raso_sync/raso_sync/doctype/raso_item_tax_mapping/raso_item_tax_mapping.json:25
 msgid "Fiscal Module VAT Code"
 msgstr ""
 
 #. Label of the fiscal_no (Data) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:164
 msgid "Fiscal No"
 msgstr ""
 
 #. Label of the fiscal_receipts_count (Int) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:173
 msgid "Fiscal Receipts Count"
 msgstr ""
 
 #. Label of the frappe_payment_method (Link) field in DocType 'RASO Payment
 #. Mapping'
-#: raso_sync/raso_sync/doctype/raso_payment_mapping/raso_payment_mapping.json
+#: raso_sync/raso_sync/doctype/raso_payment_mapping/raso_payment_mapping.json:24
 msgid "Frappe Payment Method"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:57
+#: raso_sync/raso_sync/report/raso_reconciliation/raso_reconciliation.js:5
+msgid "From Date"
+msgstr ""
+
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:78
 msgid "Full Sync (takes a long time - sends all data)"
 msgstr ""
 
 #. Label of the full_sync_time (Time) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:252
 msgid "Full Sync Time"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:29
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:35
 msgid "Get Data"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:49
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:70
 msgid "Good Groups"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:47
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:68
 msgid "Good Prices"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:48
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:69
 msgid "Goods (Items)"
 msgstr ""
 
 #. Label of the has_delete (Check) field in DocType 'RASO Sync Queue Doc'
-#: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json
+#: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json:52
 msgid "Has Delete"
 msgstr ""
 
 #. Label of the id (Data) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:111
 msgid "ID"
 msgstr ""
 
 #. Description of the 'Add Payments to Imported Records' (Check) field in
 #. DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:313
 msgid "If checked, payments imported from RASO will be linked to their corresponding Sales Invoices in ERPNext."
 msgstr ""
 
 #. Description of the 'Use ShopNo and PosNo' (Check) field in DocType 'RASO
 #. Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:135
 msgid "If checked, receipt_no field will contain ShopNo and PosNo, used in preventing duplicate receipts."
 msgstr ""
 
-#: raso_sync/data_imports/sales.py:353
+#. Text of a paragraph block in Workspace 'RASO Dashboard'
+#: raso_sync/fixtures/workspace.json:14
+msgid "Imported POS receipts, stamped with the RASO receipt number. Refunds are kept out of turnover."
+msgstr ""
+
+#: raso_sync/raso_sync/report/raso_reconciliation/raso_reconciliation.py:58
+msgid "Imported receipts"
+msgstr ""
+
+#. Description of the 'Is Refundable' (Check) field in DocType 'Item Group'
+#: raso_sync/fixtures/custom_field.json:218
+msgid "Indicates if items in this group are refundable"
+msgstr ""
+
+#. Description of the 'Is Visible in Catalog' (Check) field in DocType 'Item
+#. Group'
+#: raso_sync/fixtures/custom_field.json:286
+msgid "Indicates if items in this group are visible in the POS catalog"
+msgstr ""
+
+#: raso_sync/data_imports/sales.py:383
 msgid "Insufficient stock for item"
 msgstr ""
 
-#: raso_sync/data_imports/sales.py:356
+#: raso_sync/data_imports/sales.py:386
 msgid "Invoice Creation Failed"
 msgstr ""
 
 #. Label of the invoice_price_list (Link) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:122
 msgid "Invoice Price List"
 msgstr ""
 
-#: raso_sync/data_imports/sales.py:367
+#: raso_sync/data_imports/sales.py:397
 msgid "Invoice created (not submitted as per settings)"
 msgstr ""
 
-#: raso_sync/data_imports/sales.py:376
+#: raso_sync/data_imports/sales.py:405
 msgid "Invoice created and submitted"
 msgstr ""
 
-#: raso_sync/data_imports/sales.py:361
+#: raso_sync/data_imports/sales.py:391
 msgid "Invoice created but not submitted"
 msgstr ""
 
-#: raso_sync/data_imports/sales.py:386
+#: raso_sync/data_imports/sales.py:419
 msgid "Invoice created but submission failed"
+msgstr ""
+
+#: raso_sync/raso_sync/report/raso_reconciliation/raso_reconciliation.py:49
+msgid "Invoiced"
+msgstr ""
+
+#. Label of the is_refundable (Check) field in DocType 'Item Group'
+#: raso_sync/fixtures/custom_field.json:242
+msgid "Is Refundable"
+msgstr ""
+
+#. Label of the is_visible_in_catalog (Check) field in DocType 'Item Group'
+#: raso_sync/fixtures/custom_field.json:310
+msgid "Is Visible in Catalog"
 msgstr ""
 
 #. Label of the item_section (Section Break) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:140
 msgid "Item Sync Settings"
 msgstr ""
 
 #. Label of the item_tax_template (Link) field in DocType 'RASO Item Tax
 #. Mapping'
-#: raso_sync/raso_sync/doctype/raso_item_tax_mapping/raso_item_tax_mapping.json
+#: raso_sync/raso_sync/doctype/raso_item_tax_mapping/raso_item_tax_mapping.json:17
 msgid "Item Tax Template"
 msgstr ""
 
 #. Label of the item_tax_template_mappings (Table) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:145
 msgid "Item Tax Template to Fiscal Module Mapping"
 msgstr ""
 
 #. Description of the 'Package Deposit Item' (Link) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:171
 msgid "Item used to account for package deposits in RASO. When deposit_package_count is greater than zero, this item will be used."
 msgstr ""
 
 #. Label of the last_data_export (Datetime) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:17
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:191
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:17
 msgid "Last Data Export"
 msgstr ""
 
 #. Label of the last_event (Data) field in DocType 'RASO Sync Queue Doc'
-#: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json
+#: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json:37
 msgid "Last Event"
 msgstr ""
 
 #. Label of the last_sale_import (Datetime) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:13
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:181
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:13
 msgid "Last Sale Import"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:3
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:3
 msgid "Manage and monitor RASO Sync status from this overview page."
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:23
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:23
 msgid "Manual Sync and other actions"
 msgstr ""
 
 #. Label of the marked_at (Datetime) field in DocType 'RASO Sync Queue Doc'
-#: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:240
+#: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json:44
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:248
 msgid "Marked At"
 msgstr ""
 
 #. Label of the markup_amount_items (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:352
 msgid "Markup Amount on Items"
 msgstr ""
 
 #. Label of the markup_amount_receipt (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:347
 msgid "Markup Amount on Receipt"
 msgstr ""
 
 #. Label of the sql_client_section (Section Break) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:197
 msgid "Microsoft SQL Client Connection"
 msgstr ""
 
 #. Description of the 'Default Naming Series' (Data) field in DocType 'RASO
 #. Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:117
 msgid "Naming series for Sales Invoices created from RASO sales (e.g., EKA-.YYYY.- for EKA-2025-0001)"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:135
+#: raso_sync/raso_sync/report/raso_reconciliation/raso_reconciliation.py:24
+msgid "Net turnover difference"
+msgstr ""
+
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:143
 msgid "Never"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:81
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:227
+#: raso_sync/reconciliation.py:109
+msgid "No Z reports yet, so there is nothing to compare against."
+msgstr ""
+
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:108
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:235
 msgid "No pending documents to be sent"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:190
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:198
 msgid "No scheduled job is configured. Save the settings to create a scheduled job for automatic sending."
 msgstr ""
 
 #. Label of the non_fiscal_receipts_count (Int) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:178
 msgid "Non-Fiscal Receipts Count"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:14
+#. Description of the 'Deposit Items per Stock UOM' (Int) field in DocType
+#. 'Item'
+#: raso_sync/fixtures/custom_field.json:14
+msgid "Number of deposit-bearing items (e.g., bottles or cans) in one stock UOM of this item, e.g., 6 for a pack of 6 bottles."
+msgstr ""
+
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:14
 msgid "Open Settings"
 msgstr ""
 
+#. Label of a Sidebar Item
+#: raso_sync/raso_sync/sidebar/raso_sync/raso_sync.json:16
+msgid "Overview"
+msgstr ""
+
+#. Label of the pos_department_no (Int) field in DocType 'Item Group'
+#: raso_sync/fixtures/custom_field.json:174
+msgid "POS Department No"
+msgstr ""
+
 #. Label of the pos_no (Data) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:126
 msgid "POS No"
 msgstr ""
 
-#: raso_sync/data_imports/sales.py:298
+#: raso_sync/data_imports/sales.py:328
 msgid "POS Receipt"
+msgstr ""
+
+#. Label of the pos_section (Section Break) field in DocType 'Item Group'
+#: raso_sync/fixtures/custom_field.json:106
+msgid "POS Section"
 msgstr ""
 
 #. Label of the deposit_package_item (Link) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:169
 msgid "Package Deposit Item"
 msgstr ""
 
 #. Label of the parent_item_group (Link) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:151
 msgid "Parent Item Group"
 msgstr ""
 
 #. Label of the payment_mappings (Table) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:324
 msgid "Payment Mappings"
 msgstr ""
 
 #. Label of the payment_mapping_section (Section Break) field in DocType 'RASO
 #. Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:306
 msgid "Payment Method Mapping"
 msgstr ""
 
@@ -755,488 +888,626 @@ msgid "Payment validation failed: The sum of individual payments does not match 
 msgstr ""
 
 #. Label of the payment_section (Section Break) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:249
 msgid "Payments"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:78
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:105
 msgid "Pending Documents (to be sent)"
 msgstr ""
 
 #. Description of the 'VAT account' (Link) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:92
 msgid "Please note that when importing, by using actual amount of tax, tax breakup per item table shows misleading values."
 msgstr ""
 
 #. Label of the port (Int) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:208
 msgid "Port"
 msgstr ""
 
 #. Label of the price_list (Link) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:162
 msgid "Price List"
 msgstr ""
 
 #. Description of the 'Invoice Price List' (Link) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:124
 msgid "Price list to use for imported Sales Invoices. If left empty, the Selling Settings price list is used."
 msgstr ""
 
-#. Name of a Workspace
-#: raso_sync/raso_sync/workspace/raso_sync/raso_sync.json
-msgid "RASO"
+#. Label of Number Card 'RASO Average Ticket 30 Days'
+#. Label of a number_cards row in Workspace 'RASO Dashboard'
+#: raso_sync/fixtures/number_card.json:125 raso_sync/fixtures/workspace.json:49
+msgid "RASO Average Ticket 30 Days"
+msgstr ""
+
+#. Label of a number_cards row in Workspace 'RASO Dashboard'
+#: raso_sync/fixtures/workspace.json:29
+msgid "RASO Average Ticket Today"
+msgstr ""
+
+#. Label of Workspace 'RASO Dashboard'
+#: raso_sync/fixtures/workspace.json:5
+msgid "RASO Dashboard"
 msgstr ""
 
 #. Label of the raso_employee_code (Data) field in DocType 'RASO Employee
 #. Mapping'
-#: raso_sync/raso_sync/doctype/raso_employee_mapping/raso_employee_mapping.json
+#: raso_sync/raso_sync/doctype/raso_employee_mapping/raso_employee_mapping.json:18
 msgid "RASO Employee Code"
 msgstr ""
 
 #. Name of a DocType
-#: raso_sync/raso_sync/doctype/raso_employee_mapping/raso_employee_mapping.json
+#: raso_sync/raso_sync/doctype/raso_employee_mapping/raso_employee_mapping.json:41
 msgid "RASO Employee Mapping"
 msgstr ""
 
 #. Label of the raso_employee_name (Data) field in DocType 'RASO Employee
 #. Mapping'
-#: raso_sync/raso_sync/doctype/raso_employee_mapping/raso_employee_mapping.json
+#: raso_sync/raso_sync/doctype/raso_employee_mapping/raso_employee_mapping.json:25
 msgid "RASO Employee Name"
 msgstr ""
 
+#. Label of the raso_id (Read Only) field in DocType 'Item Group'
+#: raso_sync/fixtures/custom_field.json:446
+msgid "RASO ID"
+msgstr ""
+
 #. Name of a DocType
-#: raso_sync/raso_sync/doctype/raso_item_tax_mapping/raso_item_tax_mapping.json
+#: raso_sync/raso_sync/doctype/raso_item_tax_mapping/raso_item_tax_mapping.json:35
 msgid "RASO Item Tax Mapping"
 msgstr ""
 
 #. Label of the raso_payment_code (Data) field in DocType 'RASO Payment
 #. Mapping'
-#: raso_sync/raso_sync/doctype/raso_payment_mapping/raso_payment_mapping.json
+#: raso_sync/raso_sync/doctype/raso_payment_mapping/raso_payment_mapping.json:17
 msgid "RASO Payment Code"
 msgstr ""
 
 #. Name of a DocType
-#: raso_sync/raso_sync/doctype/raso_payment_mapping/raso_payment_mapping.json
+#: raso_sync/raso_sync/doctype/raso_payment_mapping/raso_payment_mapping.json:34
 msgid "RASO Payment Mapping"
 msgstr ""
 
-#: raso_sync/utils/system_notifications.py:28
+#. Label of the raso_receipt_no (Data) field in DocType 'Sales Invoice'
+#: raso_sync/fixtures/custom_field.json:582
+msgid "RASO Receipt No"
+msgstr ""
+
+#. Label of a number_cards row in Workspace 'RASO Dashboard'
+#: raso_sync/fixtures/workspace.json:21
+msgid "RASO Receipts Today"
+msgstr ""
+
+#. Name of a report
+#: raso_sync/raso_sync/report/raso_reconciliation/raso_reconciliation.json:19
+msgid "RASO Reconciliation"
+msgstr ""
+
+#. Label of a number_cards row in Workspace 'RASO Dashboard'
+#: raso_sync/fixtures/workspace.json:25
+msgid "RASO Refunds Today"
+msgstr ""
+
+#: raso_sync/utils/system_notifications.py:29
 msgid "RASO Retail server is unavailable"
 msgstr ""
 
-#. Title of a Workspace Sidebar
-#: raso_sync/config/desktop.py:12 raso_sync/workspace_sidebar/raso_sync.json
+#. Title of a Sidebar
+#: raso_sync/raso_sync/sidebar/raso_sync/raso_sync.json:91
 msgid "RASO Sync"
 msgstr ""
 
-#. Label of a Link in the RASO Workspace
-#. Label of a shortcut in the RASO Workspace
-#. Label of a Workspace Sidebar Item
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:4
-#: raso_sync/raso_sync/workspace/raso_sync/raso_sync.json
-#: raso_sync/workspace_sidebar/raso_sync.json
-msgid "RASO Sync Overview"
-msgstr ""
-
 #. Name of a DocType
-#: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json
+#: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json:61
 msgid "RASO Sync Queue Doc"
 msgstr ""
 
 #. Name of a DocType
-#. Label of a Link in the RASO Workspace
-#. Label of a shortcut in the RASO Workspace
-#. Label of a Workspace Sidebar Item
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
-#: raso_sync/raso_sync/workspace/raso_sync/raso_sync.json
-#: raso_sync/workspace_sidebar/raso_sync.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:344
 msgid "RASO Sync Settings"
 msgstr ""
 
-#. Name of a role
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
-msgid "RASO Sync User"
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:4
+msgid "RASO Sync Status"
 msgstr ""
 
-#: raso_sync/data_imports/sales.py:381
+#. Label of a number_cards row in Workspace 'RASO Dashboard'
+#: raso_sync/fixtures/workspace.json:17
+msgid "RASO Turnover Today"
+msgstr ""
+
+#. Chart Name of Dashboard Chart 'RASO Z Turnover Daily'
+#. Label of a charts row in Workspace 'RASO Dashboard'
+#: raso_sync/fixtures/dashboard_chart.json:5
+#: raso_sync/fixtures/workspace.json:60
+msgid "RASO Z Turnover Daily"
+msgstr ""
+
+#: raso_sync/data_imports/sales.py:413
 msgid "RASO sale receipt {} Invoice Submission Failed"
 msgstr ""
 
-#: raso_sync/utils/system_notifications.py:29
+#: raso_sync/utils/system_notifications.py:30
 msgid "Raso Retail server appears to be offline or unreachable."
 msgstr ""
 
 #. Name of a role
-#: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json:80
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:363
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:646
 msgid "Raso Sync User"
 msgstr ""
 
 #. Label of the receipt_cancellation_amount (Currency) field in DocType 'Z
 #. Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:409
 msgid "Receipt Cancellation Amount"
 msgstr ""
 
 #. Label of the receipt_cancellation_count (Int) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:414
 msgid "Receipt Cancellation Count"
 msgstr ""
 
 #. Label of the receipt_no (Data) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:131
 msgid "Receipt No"
 msgstr ""
 
-#: raso_sync/api/importer.py:83
+#: raso_sync/raso_sync/report/raso_reconciliation/raso_reconciliation.py:29
+#: raso_sync/raso_sync/report/raso_reconciliation/raso_reconciliation.py:64
+msgid "Receipt difference"
+msgstr ""
+
+#. Label of Number Card 'RASO Receipts Today'
+#: raso_sync/fixtures/number_card.json:19
+msgid "Receipts Today"
+msgstr ""
+
+#: raso_sync/api/importer.py:80
 msgid "Received unsupported DataType. XML Data:"
 msgstr ""
 
+#. Label of a Sidebar Item
+#: raso_sync/raso_sync/sidebar/raso_sync/raso_sync.json:64
+msgid "Reconciliation"
+msgstr ""
+
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:60
+msgid "Reconciliation Report"
+msgstr ""
+
+#. Label of Number Card 'RASO Refunds Today'
+#: raso_sync/fixtures/number_card.json:32
+msgid "Refunds Today"
+msgstr ""
+
 #. Label of the return_amount (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:381
 msgid "Return Amount"
 msgstr ""
 
 #. Label of the return_amount_without_vat_1 (Currency) field in DocType 'Z
 #. Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:454
 msgid "Return Amount Without VAT 1"
 msgstr ""
 
 #. Label of the return_amount_without_vat_2 (Currency) field in DocType 'Z
 #. Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:459
 msgid "Return Amount Without VAT 2"
 msgstr ""
 
 #. Label of the return_amount_without_vat_3 (Currency) field in DocType 'Z
 #. Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:464
 msgid "Return Amount Without VAT 3"
 msgstr ""
 
 #. Label of the return_amount_without_vat_4 (Currency) field in DocType 'Z
 #. Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:469
 msgid "Return Amount Without VAT 4"
 msgstr ""
 
 #. Label of the return_amount_without_vat_5 (Currency) field in DocType 'Z
 #. Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:474
 msgid "Return Amount Without VAT 5"
 msgstr ""
 
 #. Label of the return_count (Int) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:386
 msgid "Return Count"
 msgstr ""
 
 #. Label of the return_vat_section (Section Break) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:420
 msgid "Return VAT"
 msgstr ""
 
 #. Label of the return_vat_amount_1 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:425
 msgid "Return VAT Amount 1"
 msgstr ""
 
 #. Label of the return_vat_amount_2 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:430
 msgid "Return VAT Amount 2"
 msgstr ""
 
 #. Label of the return_vat_amount_3 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:435
 msgid "Return VAT Amount 3"
 msgstr ""
 
 #. Label of the return_vat_amount_4 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:440
 msgid "Return VAT Amount 4"
 msgstr ""
 
 #. Label of the return_vat_amount_5 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:445
 msgid "Return VAT Amount 5"
 msgstr ""
 
 #. Label of the returns_section (Section Break) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:376
 msgid "Returns & Cancellations"
 msgstr ""
 
 #. Label of the rounding_codes (Data) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:318
 msgid "Rounding Codes"
 msgstr ""
 
 #. Label of the sales_person (Link) field in DocType 'RASO Employee Mapping'
 #. Label of the sales_person (Link) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/raso_employee_mapping/raso_employee_mapping.json
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/raso_employee_mapping/raso_employee_mapping.json:31
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:143
 msgid "Sales Person"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:39
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:54
 msgid "Scheduled Jobs"
+msgstr ""
+
+#. Description of the 'POS Section' (Section Break) field in DocType 'Item
+#. Group'
+#: raso_sync/fixtures/custom_field.json:82
+msgid "Section for POS related fields"
 msgstr ""
 
 #. Description of the 'Parent Item Group' (Link) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:153
 msgid "Select the parent item group for sellable items. Only item groups under this parent will be synced to RASO."
 msgstr ""
 
 #. Description of the 'Price List' (Link) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:164
 msgid "Select the price list to use for syncing item prices to RASO. Only prices from this list will be exported."
 msgstr ""
 
 #. Label of the send_check_interval_minutes (Int) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:277
 msgid "Send Check Interval (Minutes)"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:26
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:29
 msgid "Send Data"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:63
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:84
 msgid "Send all changes of today"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:357
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:365
 msgid "Send queued failed: "
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:346
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:354
 msgid "Send queued successfully"
 msgstr ""
 
 #. Label of the ip (Data) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:202
 msgid "Server IP Address"
 msgstr ""
 
+#. Label of a Sidebar Item
+#: raso_sync/raso_sync/sidebar/raso_sync/raso_sync.json:80
+msgid "Settings"
+msgstr ""
+
 #. Label of the shop_no (Data) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:120
 msgid "Shop No"
 msgstr ""
 
 #. Label of the source_doctype (Link) field in DocType 'RASO Sync Queue Doc'
-#: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json
+#: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json:20
 msgid "Source DocType"
 msgstr ""
 
 #. Label of the source_name (Data) field in DocType 'RASO Sync Queue Doc'
-#: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json
+#: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json:29
 msgid "Source Name"
 msgstr ""
 
 #. Description of the 'Working Hours From' (Time) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:291
 msgid "Start time to fetch sales documents when business hours begin"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:52
+#. Label of a Sidebar Item
+#: raso_sync/raso_sync/sidebar/raso_sync/raso_sync.json:48
+msgid "Status"
+msgstr ""
+
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:73
 msgid "Sync Mode:"
 msgstr ""
 
 #. Label of the sync_status_section (Section Break) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:176
 msgid "Sync Status"
 msgstr ""
 
-#: raso_sync/api/manual.py:82 raso_sync/api/manual.py:117
+#: raso_sync/api/manual.py:81 raso_sync/api/manual.py:116
 msgid "Synchronisation is in queue. Please wait for it to start."
 msgstr ""
 
 #. Label of the sql_client_settings_section (Section Break) field in DocType
 #. 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:246
 msgid "Synchronization Settings"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:8
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:8
 msgid "Synchronization is running"
 msgstr ""
 
 #. Name of a role
-#: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/raso_sync_queue_doc/raso_sync_queue_doc.json:70
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:353
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:636
 msgid "System Manager"
 msgstr ""
 
 #. Label of the tare_amount (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:395
 msgid "Tare Amount"
 msgstr ""
 
 #. Label of the tare_quantity (Int) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:400
 msgid "Tare Quantity"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.html:33
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.html:42
 msgid "Test Connection"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:287
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:295
 msgid "Testing connection to RASO..."
 msgstr ""
 
 #. Description of the 'Synchronization Settings' (Section Break) field in
 #. DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:247
 msgid "These settings define synchronization intervals and behavior on the <b>ERPNext side only</b>. RASO RETAIL (RR) has its own independent schedulers.<br>In other words, ERPNext sends data to the secondary RR database, and RR updates its main database within 10 (default setting) minutes. <br>RR exports new data to the secondary database every 20 (default setting) minutes, meaning if a sale is made in RR, it may take up to 20 minutes before it exported, and then an additional interval defined here before it appears in ERPNext."
 msgstr ""
 
 #. Description of the 'Full Sync Time' (Time) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:254
 msgid "Time of night when full sync is performed with RASO, if set to 00:00, then full sync is turned off."
 msgstr ""
 
+#: raso_sync/raso_sync/report/raso_reconciliation/raso_reconciliation.js:10
+msgid "To Date"
+msgstr ""
+
+#. Text of a header block in Workspace 'RASO Dashboard'
+#: raso_sync/fixtures/workspace.json:14
+msgid "Today"
+msgstr ""
+
+#. Label of Number Card 'RASO Turnover Today'
+#: raso_sync/fixtures/number_card.json:5
+msgid "Turnover Today"
+msgstr ""
+
+#. Description of the 'RASO ID' (Read Only) field in DocType 'Item Group'
+#: raso_sync/fixtures/custom_field.json:422
+msgid "Unique identifier for RASO system"
+msgstr ""
+
 #. Description of the 'ID' (Data) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:114
 msgid "Unique identifier for the Z Report"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:307
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:317
+#. Description of the 'Business Code' (Data) field in DocType 'Customer'
+#: raso_sync/fixtures/custom_field.json:490
+msgid "Unique number assigned to a company by the Lithuanian State"
+msgstr ""
+
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:315
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:325
 msgid "Unknown error"
 msgstr ""
 
-#: raso_sync/api/importer.py:85
+#: raso_sync/api/importer.py:82
 msgid "Unsupported DataType"
 msgstr ""
 
 #. Label of the use_shop_no_and_pos_no (Check) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:133
 msgid "Use ShopNo and PosNo"
 msgstr ""
 
 #. Label of the user_code (Data) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:136
 msgid "User Code"
 msgstr ""
 
 #. Description of the 'Database Name' (Data) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:217
 msgid "Usually MS3_TOPSHOP_IMG"
 msgstr ""
 
 #. Label of the vat_section (Section Break) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:190
 msgid "VAT"
 msgstr ""
 
 #. Label of the vat_amount_1 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:195
 msgid "VAT Amount 1"
 msgstr ""
 
 #. Label of the vat_amount_2 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:200
 msgid "VAT Amount 2"
 msgstr ""
 
 #. Label of the vat_amount_3 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:205
 msgid "VAT Amount 3"
 msgstr ""
 
 #. Label of the vat_amount_4 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:210
 msgid "VAT Amount 4"
 msgstr ""
 
 #. Label of the vat_amount_5 (Currency) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:215
 msgid "VAT Amount 5"
 msgstr ""
 
 #. Label of the vat_account (Link) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:90
 msgid "VAT account"
 msgstr ""
 
 #. Label of the warehouse_name (Link) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:67
 msgid "Warehouse"
 msgstr ""
 
 #. Label of the working_hours_section (Section Break) field in DocType 'RASO
 #. Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:285
 msgid "Working Hours"
 msgstr ""
 
 #. Label of the working_hours_from (Time) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:290
 msgid "Working Hours From"
 msgstr ""
 
 #. Label of the working_hours_to (Time) field in DocType 'RASO Sync Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:300
 msgid "Working Hours To"
 msgstr ""
 
+#. Label of Number Card 'Z Discounts 30 Days'
+#. Label of a number_cards row in Workspace 'RASO Dashboard'
+#: raso_sync/fixtures/number_card.json:101 raso_sync/fixtures/workspace.json:41
+msgid "Z Discounts 30 Days"
+msgstr ""
+
 #. Label of the z_no (Data) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:159
 msgid "Z No"
 msgstr ""
 
 #. Name of a DocType
-#. Label of a Workspace Sidebar Item
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
-#: raso_sync/workspace_sidebar/raso_sync.json
+#. Label of a Sidebar Item
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:626
+#: raso_sync/raso_sync/sidebar/raso_sync/raso_sync.json:32
 msgid "Z Report"
 msgstr ""
 
 #. Label of the date (Datetime) field in DocType 'Z Report'
-#: raso_sync/raso_sync/doctype/z_report/z_report.json
+#: raso_sync/raso_sync/doctype/z_report/z_report.json:150
 msgid "Z Report Date"
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:212
+#. Label of Number Card 'Z Reports 30 Days'
+#: raso_sync/fixtures/number_card.json:74
+msgid "Z Reports 30 Days"
+msgstr ""
+
+#. Label of Number Card 'Z Returns 30 Days'
+#. Label of a number_cards row in Workspace 'RASO Dashboard'
+#: raso_sync/fixtures/number_card.json:87 raso_sync/fixtures/workspace.json:37
+msgid "Z Returns 30 Days"
+msgstr ""
+
+#. Label of Number Card 'Z Turnover 30 Days'
+#. Label of a number_cards row in Workspace 'RASO Dashboard'
+#: raso_sync/fixtures/number_card.json:60 raso_sync/fixtures/workspace.json:33
+msgid "Z Turnover 30 Days"
+msgstr ""
+
+#: raso_sync/raso_sync/report/raso_reconciliation/raso_reconciliation.py:56
+msgid "Z receipts"
+msgstr ""
+
+#: raso_sync/raso_sync/report/raso_reconciliation/raso_reconciliation.py:42
+msgid "Z reports"
+msgstr ""
+
+#. Text of a header block in Workspace 'RASO Dashboard'
+#: raso_sync/fixtures/workspace.json:14
+msgid "Z reports (last 30 days)"
+msgstr ""
+
+#: raso_sync/raso_sync/report/raso_reconciliation/raso_reconciliation.py:44
+msgid "Z turnover"
+msgstr ""
+
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:220
 msgid "min."
 msgstr ""
 
-#: raso_sync/raso_sync/page/raso_sync_overview/raso_sync_overview.js:213
+#: raso_sync/raso_sync/page/raso_sync_status/raso_sync_status.js:221
 msgid "next check"
 msgstr ""
 
 #. Option for the 'Database Encryption' (Select) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:239
 msgid "off"
 msgstr ""
 
 #. Option for the 'Database Encryption' (Select) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:239
 msgid "request"
 msgstr ""
 
 #. Option for the 'Database Encryption' (Select) field in DocType 'RASO Sync
 #. Settings'
-#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json
+#: raso_sync/raso_sync/doctype/raso_sync_settings/raso_sync_settings.json:239
 msgid "require"
 msgstr ""
 
-#: raso_sync/tasks/send.py:324
+#: raso_sync/tasks/send.py:336
 msgid "{0} records of {1} were sent to RASO"
 msgstr ""
 
