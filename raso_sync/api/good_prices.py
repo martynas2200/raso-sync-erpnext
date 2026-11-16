@@ -17,6 +17,7 @@ def good_prices_internal(full_sync, date_from, docnames=None):
 	"""
 	settings = frappe.get_single("RASO Sync Settings")
 	today = datetime.now().date()
+	shop_no = settings.shop_no or "1"
 
 	where_conditions = [
 		"ip.selling = 1",
@@ -80,7 +81,7 @@ def good_prices_internal(full_sync, date_from, docnames=None):
 		goods_code_elem.text = item_price.get("barcode", "")
 
 		shop_no_elem = SubElement(price_elem, "ShopNo")
-		shop_no_elem.text = "01"
+		shop_no_elem.text = shop_no
 
 		#! Do NOT emit DateFrom/DateTo here.
 		# RASO routes each DataType to exactly one import procedure, so dated rows in a DataType 4 packet are silently dropped.
