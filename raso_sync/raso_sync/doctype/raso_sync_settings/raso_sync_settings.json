@@ -25,6 +25,7 @@
     "column_break_10",
     "deposit_package_item",
     "price_list",
+    "shop_no",
     "sync_status_section",
     "last_sale_import",
     "column_break_6",
@@ -169,6 +170,13 @@
       "label": "Package Deposit Item",
       "options": "Item",
       "description": "Item used to account for package deposits in RASO. When deposit_package_count is greater than zero, this item will be used."
+    },
+    {
+      "fieldname": "shop_no",
+      "fieldtype": "Data",
+      "label": "Shop No",
+      "default": "1",
+      "description": "Shop number sent to RASO with synced item prices (GoodsPrices). If left empty, 1 is used."
     },
     {
       "fieldname": "sync_status_section",
