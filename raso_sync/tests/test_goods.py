@@ -50,7 +50,7 @@ def package_row(**overrides):
 		"item_code": "ITEM-1",
 		"uom": "Pack",
 		"conversion_factor": 6,
-		"base_barcode": "BASE-BARCODE",
+		"base_barcode": "7540940854305",
 		"has_active_price": 0,
 	}
 	row.update(overrides)
@@ -78,7 +78,7 @@ def test_package_barcode_gets_base_barcode_and_content_qty(fake_frappe):
 	goods = mod.goods_internal(1, None).find("Goods")
 
 	assert goods.findtext("Unit") == "Pack"
-	assert goods.findtext("PackageContentBarcode") == "BASE-BARCODE"
+	assert goods.findtext("PackageContentBarcode") == "7540940854305"
 	assert goods.findtext("PackageContentQty") == "6"
 	assert calls["package"]["price_list"] == "Retail"
 
@@ -182,3 +182,12 @@ def test_deposit_qty_not_zeroed_without_conversion(fake_frappe):
 	goods = mod.goods_internal(1, None).find("Goods")
 
 	assert goods.findtext("ExtraQty") == "2"
+
+
+def test_short_package_content_barcode_is_zero_padded(fake_frappe):
+	mod = import_goods_module(fake_frappe)
+	install_db(fake_frappe, [goods_row()], [package_row(base_barcode="12345678")])
+
+	goods = mod.goods_internal(1, None).find("Goods")
+
+	assert goods.findtext("PackageContentBarcode") == "0000012345678"

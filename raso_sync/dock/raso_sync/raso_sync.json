@@ -1,0 +1,23 @@
+{
+ "app": "raso_sync",
+ "creation": "2026-11-17 16:40:00",
+ "docstatus": 0,
+ "doctype": "Dock",
+ "idx": 0,
+ "items": [
+  {
+   "added": 0,
+   "hidden": 0,
+   "icon": "git-branch",
+   "link_to": "RASO Sync",
+   "link_type": "Sidebar",
+   "title": "RASO Sync"
+  }
+ ],
+ "modified": "2026-11-17 16:40:00.000000",
+ "modified_by": "Administrator",
+ "name": "raso_sync",
+ "owner": "Administrator",
+ "standard": 1,
+ "user": ""
+}

@@ -34,6 +34,7 @@ def _get_barcode_uom_info(item_names, price_list):
 				WHERE base.parent = ib.parent
 					AND base.uom = i.stock_uom
 					AND base.barcode IS NOT NULL
+					AND base.barcode != ''
 			) AS base_barcode,
 			EXISTS (
 				SELECT 1
@@ -183,7 +184,7 @@ def goods_internal(full_sync, date_from, docnames=None):
 			and not uom_info.has_active_price
 		):
 			package_barcode_elem = SubElement(goods_elem, "PackageContentBarcode")
-			package_barcode_elem.text = uom_info.base_barcode
+			package_barcode_elem.text = uom_info.base_barcode.zfill(13)
 			package_qty_elem = SubElement(goods_elem, "PackageContentQty")
 			package_qty_elem.text = f"{uom_info.conversion_factor:.9g}"
 

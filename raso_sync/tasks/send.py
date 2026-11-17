@@ -209,6 +209,16 @@ def mark_doctype_for_sync(doc, method):
 			logger.debug(
 				"Marked Item Price %s for sync due to barcode change in Item %s", price_doc.name, item_code
 			)
+	# A package price change flips the Item between package content and a custom price, so the Item has to be resent too.
+	if doc.doctype == "Item Price" and doc.has_value_changed("price_list_rate"):
+		item_doc = frappe.get_doc("Item", doc.get("item_code"))
+		if item_doc.get("stock_uom") != doc.get("uom"):
+			_update_or_insert_queue_mark("Item", item_doc.name, method)
+			logger.debug(
+				"Marked Item %s for sync due to price change in Item Price %s with different UOM",
+				item_doc.name,
+				doc.name,
+			)
 
 	_update_or_insert_queue_mark(doc.doctype, doc.name, method)
 	logger.debug("Marked %s %s for sync due to event %s", doc.doctype, doc.name, method)

@@ -4,8 +4,7 @@ Compare RASO Z reports against the POS invoices imported.
 Per day it checks if turnover and count of receipts match.
 The turnover figure check ignores refunds.
 
-The receipt count assumes every imported POS invoice, refunds included, is one
-receipt in the Z report.
+The receipt count assumes every imported POS invoice, refunds included, is one fiscal receipt in the Z report.
 """
 
 import frappe
@@ -120,7 +119,7 @@ def scan(from_date=None, to_date=None) -> dict:
 
 		z_turnover = flt(z.z_turnover) if z else 0.0
 		invoiced = flt(invoiced_row.invoiced) if invoiced_row else 0.0
-		z_receipts = (cint(z.fiscal_receipts) + cint(z.non_fiscal_receipts)) if z else 0
+		z_receipts = cint(z.fiscal_receipts) if z else 0
 		invoiced_receipts = (
 			cint(invoiced_row.sale_receipts) + cint(invoiced_row.refund_receipts) if invoiced_row else 0
 		)
