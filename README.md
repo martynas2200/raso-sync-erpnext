@@ -52,6 +52,7 @@ Python dependencies are installed by bench itself. A custom image (see [Frappe D
 ## Constraints
 
 - Items are not sent to RASO if they do not have a barcode and the UOM for that barcode set.
+- A barcode whose `UOM` differs from the item's stock UOM is exported as a package, so RASO can derive the package price by multiplication. Package content attributes are omitted when the item has no stock-UOM barcode, when the conversion factor is not greater than 1, or when an active selling price (valid today, in the configured `price_list`) exists for the package UOM, in which case that custom price replaces the derived one.
 - Item names are cut off after 80 characters so they fit in two lines on the receipt.
 - When picking the price, if multiple valid prices exist for the same item and price list, the one with the most recent `valid_from` date is selected; if there are ties, the most recently modified price is used (ordered by `ip.valid_from DESC, ip.modified DESC`).
 - Item prices are always sent without `DateFrom`/`DateTo` (DataType 4). ERPNext resolves which price is effective on the current date and RASO receives that single price, so the POS never has to interpret validity windows. Dated rows belong to DataType 7, where the dates are part of the row identity; a packet mixing both date classes is discarded by RASO.

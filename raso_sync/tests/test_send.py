@@ -18,6 +18,7 @@ def import_send_module(fake_frappe, monkeypatch):
 	background_jobs.is_job_enqueued = lambda job_id: False  # type: ignore[attr-defined]
 	frappe_utils = types.ModuleType("frappe.utils")
 	frappe_utils.background_jobs = background_jobs  # type: ignore[attr-defined]
+	frappe_utils.flt = lambda value, precision=None: float(value or 0)  # type: ignore[attr-defined]
 	fake_frappe.utils = frappe_utils
 
 	document = types.ModuleType("frappe.model.document")

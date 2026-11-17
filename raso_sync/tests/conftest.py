@@ -96,9 +96,22 @@ def fake_frappe(monkeypatch: pytest.MonkeyPatch):
 	translate_module = types.ModuleType("frappe.translate")
 	translate_module.get_user_lang = lambda user: "en"  # type: ignore[attr-defined]
 
+	utils_module = types.ModuleType("frappe.utils")
+
+	def flt(value, precision=None):
+		try:
+			number = float(value or 0)
+		except (TypeError, ValueError):
+			number = 0.0
+		return round(number, precision) if precision is not None else number
+
+	utils_module.flt = flt  # type: ignore[attr-defined]
+	module.utils = utils_module  # type: ignore[attr-defined]
+
 	# Make available to imports
 	monkeypatch.setitem(sys.modules, "frappe", module)
 	monkeypatch.setitem(sys.modules, "frappe.translate", translate_module)
+	monkeypatch.setitem(sys.modules, "frappe.utils", utils_module)
 	return module
 
 

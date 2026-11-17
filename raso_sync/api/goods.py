@@ -2,6 +2,64 @@ from datetime import datetime
 from xml.etree.ElementTree import Element, SubElement
 
 import frappe
+from frappe.utils import flt
+
+
+def _get_package_content(item_names, price_list):
+	"""Map (item, uom) to (base barcode, content qty) for barcode UOMs that are packages.
+
+	A barcode UOM that differs from the stock UOM is a package. Its goods row can point
+	RASO at the stock-UOM barcode and at how many base units the package holds, so the
+	package price is derived by multiplication, and shown in the RASO UI.
+	However, if the package UOM already has an active selling price, the price is custom and
+	derivation must not override it.
+	"""
+	if not item_names:
+		return {}
+
+	rows = frappe.db.sql(
+		"""
+		SELECT
+			ib.parent AS item_code,
+			ib.uom AS uom,
+			ucd.conversion_factor AS conversion_factor,
+			(
+				SELECT MIN(base.barcode)
+				FROM `tabItem Barcode` base
+				WHERE base.parent = ib.parent
+					AND base.uom = i.stock_uom
+					AND base.barcode IS NOT NULL
+			) AS base_barcode,
+			EXISTS (
+				SELECT 1
+				FROM `tabItem Price` ip
+				WHERE ip.item_code = ib.parent
+					AND ip.uom = ib.uom
+					AND ip.selling = 1
+					AND (ip.valid_from IS NULL OR ip.valid_from <= %(today)s)
+					AND (ip.valid_upto IS NULL OR ip.valid_upto >= %(today)s)
+					AND (%(price_list)s IS NULL OR ip.price_list = %(price_list)s)
+			) AS has_active_price
+		FROM `tabItem Barcode` ib
+		INNER JOIN `tabItem` i ON i.name = ib.parent
+		LEFT JOIN `tabUOM Conversion Detail` ucd
+			ON ucd.parent = ib.parent AND ucd.uom = ib.uom
+		WHERE ib.parent IN %(item_names)s
+			AND ib.uom IS NOT NULL
+			AND ib.uom != i.stock_uom
+		GROUP BY ib.parent, ib.uom, ucd.conversion_factor, i.stock_uom
+	""",
+		{"item_names": tuple(item_names), "today": datetime.now().date(), "price_list": price_list or None},
+		as_dict=True,
+	)
+
+	packages = {}
+	for row in rows:
+		factor = flt(row.get("conversion_factor"))
+		if row.get("has_active_price") or not row.get("base_barcode") or factor <= 1:
+			continue
+		packages[(row.get("item_code"), row.get("uom"))] = (row.get("base_barcode"), factor)
+	return packages
 
 
 def goods_internal(full_sync, date_from, docnames=None):
@@ -70,6 +128,13 @@ def goods_internal(full_sync, date_from, docnames=None):
 				vat_code_num = vat_code.split()[0]
 				tax_template_vat_map[tax_template] = vat_code_num
 
+	package_items = {
+		row.get("name")
+		for row in results
+		if row.get("name") and row.get("uom") and row.get("uom") != row.get("stock_uom")
+	}
+	package_content = _get_package_content(package_items, settings.get("price_list"))
+
 	for row in results:
 		if row.get("disabled") and full_sync == 1:
 			continue
@@ -102,6 +167,14 @@ def goods_internal(full_sync, date_from, docnames=None):
 
 		unit_elem = SubElement(goods_elem, "Unit")
 		unit_elem.text = row.get("uom") or row.get("stock_uom", "")
+
+		package = package_content.get((row.get("name"), row.get("uom")))
+		if package:
+			base_barcode, content_qty = package
+			package_barcode_elem = SubElement(goods_elem, "PackageContentBarcode")
+			package_barcode_elem.text = base_barcode
+			package_qty_elem = SubElement(goods_elem, "PackageContentQty")
+			package_qty_elem.text = f"{content_qty:.9g}"
 
 		extra_info_elem = SubElement(goods_elem, "ExtraInfo")
 		refundable_elem = SubElement(goods_elem, "Refundable")
