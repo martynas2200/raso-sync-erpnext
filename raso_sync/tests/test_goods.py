@@ -6,19 +6,21 @@ from types import SimpleNamespace
 
 
 class FakeSettings:
-	def __init__(self, price_list=None):
+	def __init__(self, price_list=None, deposit_package_item=None):
 		self.price_list = price_list
-		self.deposit_package_item = None
+		self.deposit_package_item = deposit_package_item
 		self.item_tax_template_mappings = []
 
 	def get(self, key, default=None):
 		return getattr(self, key, default)
 
 
-def import_goods_module(fake_frappe, price_list="Retail"):
+def import_goods_module(fake_frappe, price_list="Retail", deposit_package_item=None):
 	sys.modules.pop("raso_sync.api.goods", None)
 	mod = importlib.import_module("raso_sync.api.goods")
-	fake_frappe.get_single = lambda doctype: FakeSettings(price_list=price_list)
+	fake_frappe.get_single = lambda doctype: FakeSettings(
+		price_list=price_list, deposit_package_item=deposit_package_item
+	)
 	return mod
 
 
@@ -55,7 +57,7 @@ def package_row(**overrides):
 	return row
 
 
-def install_db(fake_frappe, goods_rows, package_rows):
+def install_db(fake_frappe, goods_rows, package_rows, deposit_barcode=None):
 	calls = {}
 
 	def fake_sql(query, params=None, **kwargs):
@@ -65,7 +67,7 @@ def install_db(fake_frappe, goods_rows, package_rows):
 		calls["goods"] = params
 		return goods_rows
 
-	fake_frappe.db = SimpleNamespace(sql=fake_sql, get_value=lambda *args, **kwargs: None)
+	fake_frappe.db = SimpleNamespace(sql=fake_sql, get_value=lambda *args, **kwargs: deposit_barcode)
 	return calls
 
 
@@ -121,3 +123,62 @@ def test_stock_uom_barcode_is_not_a_package(fake_frappe):
 	assert goods.findtext("Unit") == "Nos"
 	assert goods.find("PackageContentBarcode") is None
 	assert "package" not in calls
+
+
+def test_deposit_qty_multiplied_for_package_barcode(fake_frappe):
+	"""deposit_package_count is per stock UOM, so a pack holds factor times as many."""
+	mod = import_goods_module(fake_frappe, deposit_package_item="DEPOSIT")
+	install_db(
+		fake_frappe,
+		[goods_row(deposit_package_count=2)],
+		[package_row()],
+		deposit_barcode="DEP-BARCODE",
+	)
+
+	goods = mod.goods_internal(1, None).find("Goods")
+
+	assert goods.findtext("ExtraQty") == "12"
+	assert goods.findtext("ExtraCode") == "DEP-BARCODE"
+
+
+def test_deposit_qty_unchanged_for_stock_uom_barcode(fake_frappe):
+	mod = import_goods_module(fake_frappe, deposit_package_item="DEPOSIT")
+	install_db(
+		fake_frappe,
+		[goods_row(uom="Nos", barcode="BASE-BARCODE", deposit_package_count=2)],
+		[],
+		deposit_barcode="DEP-BARCODE",
+	)
+
+	goods = mod.goods_internal(1, None).find("Goods")
+
+	assert goods.findtext("ExtraQty") == "2"
+
+
+def test_deposit_qty_multiplied_even_when_package_price_exists(fake_frappe):
+	mod = import_goods_module(fake_frappe, deposit_package_item="DEPOSIT")
+	install_db(
+		fake_frappe,
+		[goods_row(deposit_package_count=2)],
+		[package_row(has_active_price=1)],
+		deposit_barcode="DEP-BARCODE",
+	)
+
+	goods = mod.goods_internal(1, None).find("Goods")
+
+	assert goods.find("PackageContentBarcode") is None
+	assert goods.findtext("ExtraQty") == "12"
+
+
+def test_deposit_qty_not_zeroed_without_conversion(fake_frappe):
+	mod = import_goods_module(fake_frappe, deposit_package_item="DEPOSIT")
+	install_db(
+		fake_frappe,
+		[goods_row(deposit_package_count=2)],
+		[package_row(conversion_factor=None)],
+		deposit_barcode="DEP-BARCODE",
+	)
+
+	goods = mod.goods_internal(1, None).find("Goods")
+
+	assert goods.findtext("ExtraQty") == "2"

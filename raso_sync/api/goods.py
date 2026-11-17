@@ -1,18 +1,23 @@
 from datetime import datetime
+from typing import NamedTuple
 from xml.etree.ElementTree import Element, SubElement
 
 import frappe
 from frappe.utils import flt
 
 
-def _get_package_content(item_names, price_list):
-	"""Map (item, uom) to (base barcode, content qty) for barcode UOMs that are packages.
+class BarcodeUomInfo(NamedTuple):
+	conversion_factor: float
+	base_barcode: str | None
+	has_active_price: bool
 
-	A barcode UOM that differs from the stock UOM is a package. Its goods row can point
-	RASO at the stock-UOM barcode and at how many base units the package holds, so the
-	package price is derived by multiplication, and shown in the RASO UI.
-	However, if the package UOM already has an active selling price, the price is custom and
-	derivation must not override it.
+
+def _get_barcode_uom_info(item_names, price_list):
+	"""Conversion details per (item, uom) for barcode UOMs that differ from the stock UOM.
+
+	The conversion factor drives both the package content and the deposit quantity of a barcode sold in a larger UOM.
+	Base barcode and active price only decide whether package
+	content is emitted as an existing package price is custom and must not be overridden by multiplication.
 	"""
 	if not item_names:
 		return {}
@@ -53,13 +58,14 @@ def _get_package_content(item_names, price_list):
 		as_dict=True,
 	)
 
-	packages = {}
+	info = {}
 	for row in rows:
-		factor = flt(row.get("conversion_factor"))
-		if row.get("has_active_price") or not row.get("base_barcode") or factor <= 1:
-			continue
-		packages[(row.get("item_code"), row.get("uom"))] = (row.get("base_barcode"), factor)
-	return packages
+		info[(row.get("item_code"), row.get("uom"))] = BarcodeUomInfo(
+			conversion_factor=flt(row.get("conversion_factor")),
+			base_barcode=row.get("base_barcode"),
+			has_active_price=bool(row.get("has_active_price")),
+		)
+	return info
 
 
 def goods_internal(full_sync, date_from, docnames=None):
@@ -128,12 +134,12 @@ def goods_internal(full_sync, date_from, docnames=None):
 				vat_code_num = vat_code.split()[0]
 				tax_template_vat_map[tax_template] = vat_code_num
 
-	package_items = {
+	barcode_uom_items = {
 		row.get("name")
 		for row in results
 		if row.get("name") and row.get("uom") and row.get("uom") != row.get("stock_uom")
 	}
-	package_content = _get_package_content(package_items, settings.get("price_list"))
+	barcode_uom_info = _get_barcode_uom_info(barcode_uom_items, settings.get("price_list"))
 
 	for row in results:
 		if row.get("disabled") and full_sync == 1:
@@ -168,13 +174,18 @@ def goods_internal(full_sync, date_from, docnames=None):
 		unit_elem = SubElement(goods_elem, "Unit")
 		unit_elem.text = row.get("uom") or row.get("stock_uom", "")
 
-		package = package_content.get((row.get("name"), row.get("uom")))
-		if package:
-			base_barcode, content_qty = package
+		uom_info = barcode_uom_info.get((row.get("name"), row.get("uom")))
+
+		if (
+			uom_info
+			and uom_info.base_barcode
+			and uom_info.conversion_factor > 1
+			and not uom_info.has_active_price
+		):
 			package_barcode_elem = SubElement(goods_elem, "PackageContentBarcode")
-			package_barcode_elem.text = base_barcode
+			package_barcode_elem.text = uom_info.base_barcode
 			package_qty_elem = SubElement(goods_elem, "PackageContentQty")
-			package_qty_elem.text = f"{content_qty:.9g}"
+			package_qty_elem.text = f"{uom_info.conversion_factor:.9g}"
 
 		extra_info_elem = SubElement(goods_elem, "ExtraInfo")
 		refundable_elem = SubElement(goods_elem, "Refundable")
@@ -189,9 +200,13 @@ def goods_internal(full_sync, date_from, docnames=None):
 			extra_info_elem.text = "1"
 			refundable_elem.text = "0"
 
-		if row.get("deposit_package_count") and row.get("deposit_package_count") > 0 and deposit_barcode:
+		deposit_count = row.get("deposit_package_count") or 0
+		if deposit_count > 0 and deposit_barcode:
+			# deposit_package_count is defined per stock UOM,
+			# so a package barcode holds conversion_factor times as many deposits.
+			multiplier = uom_info.conversion_factor if uom_info and uom_info.conversion_factor > 0 else 1
 			extra_qty_elem = SubElement(goods_elem, "ExtraQty")
-			extra_qty_elem.text = str(row.get("deposit_package_count", 1))
+			extra_qty_elem.text = f"{deposit_count * multiplier:.9g}"
 			extra_code_elem = SubElement(goods_elem, "ExtraCode")
 			extra_code_elem.text = deposit_barcode
 
