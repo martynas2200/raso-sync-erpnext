@@ -32,6 +32,7 @@ Raso Sync is a Frappe app that keeps ERPNext master data and RASO POS sales data
 - Precision of Field `Rate` in `Sales Invoice Item` doctype must be increased to at least 3 decimal places to avoid rounding issues.
 - Consider enabling `Allow Negative Stock` if auto submit of Sales Invoices is desired.
 - Consider making `uom` field in `Item Barcode` doctype mandatory, otherwise item prices might not be sent.
+- In RASO Retail Server: consider setting the value of config 180 to 13 unless the barcodes entered in ERPNext omit the control digits.
 
 Python dependencies are installed by bench itself. A custom image (see [Frappe Docker documentation](https://github.com/frappe/frappe_docker)) is only required when pip cannot find a wheel for the target platform.
 
@@ -53,6 +54,8 @@ Python dependencies are installed by bench itself. A custom image (see [Frappe D
 - Items are not sent to RASO if they do not have a barcode and the UOM for that barcode set.
 - Item names are cut off after 80 characters so they fit in two lines on the receipt.
 - When picking the price, if multiple valid prices exist for the same item and price list, the one with the most recent `valid_from` date is selected; if there are ties, the most recently modified price is used (ordered by `ip.valid_from DESC, ip.modified DESC`).
+- Item prices are always sent without `DateFrom`/`DateTo` (DataType 4). ERPNext resolves which price is effective on the current date and RASO receives that single price, so the POS never has to interpret validity windows. Dated rows belong to DataType 7, where the dates are part of the row identity; a packet mixing both date classes is discarded by RASO.
+- A price change takes effect at the next send. Editing an `Item Price` queues it immediately, but a price that changes purely because a `valid_from`/`valid_upto` window opened or closed fires no document event, so the nightly full sync is what propagates it. Keep `full_sync_time` enabled when using validity windows, otherwise an expiring `valid_upto` never reaches RASO and the discount price stays on the till.
 
 ## Background Jobs & Task Logs
 
@@ -71,6 +74,14 @@ Python dependencies are installed by bench itself. A custom image (see [Frappe D
   - This replaces the earlier approach that used cache marks + a 15-minute recent-modified window. No oversending, and the DB-backed queue is more trustworthy and resilient because pending changes survive process restarts, scheduler delays, worker failures, etc.
 - Full Sync Task `raso_sync.tasks.full_sync.execute_full_sync_task`
   - Run once daily at configured time (`full_sync_time` setting), mostly needed for item price records so the day to day price changes are reflected in RASO (fields of `valid_from`, `valid_to`).
+  - RASO config `65` ("ar naudoti pilną prekių sinchronizaciją") decides what `FullSync=1` does: at `1` it upserts **and** disables, at `0` (the shipped default) it only **inserts** missing rows and **disables** the ones absent from the packet, so existing rows are never refreshed. Despite the "goods only" wording the flag gates the goods import, both price imports and the discount imports — but **not** `GoodsGroups`.
+  - Item prices are sent as two passes, and both are load-bearing at config `65 = 0`. Because prices carry no `DateFrom`/`DateTo`, a barcode keeps **one** RASO row for its whole life, so a row left over from an expired discount is *matched*, never missing:
+    - the `date_from` pass (`FullSync=0`) is the only one that **updates** it to the price that is valid now — that is how a discount ending and the price going back up reaches the till;
+    - the plain pass (`FullSync=1`) **inserts** prices that just became valid and **disables** rows for products ERPNext no longer prices.
+  - Items and prices change price validity by the passage of time alone, which fires no document event, so the nightly run is the only thing that propagates an expiring `valid_upto`.
+  - `GoodsGroups` are sent once. The group import never reads config `65`, so `FullSync=1` always upserts and disables and a `date_from` pass would only write the same groups twice.
+  - Goods (`Item`) are sent twice for the same reason: the `date_from` pass (`FullSync=0`) is the only one that **updates** existing goods and re-enables goods that came back into the assortment, while the plain pass (`FullSync=1`) only inserts goods missing from RASO and **disables** the goods absent from the packet (deleted or `disabled` items).
+  - If RASO config `65` is `1`, the full packet already refreshes existing rows too, so the `date_from` pass is redundant for goods and prices. The app does cannot read or mirror that flag as `ms.ConfigValues` is not present in the database this app connects to. Both passes are therefore always sent, which is correct for `65 = 0` and merely redundant for `65 = 1`.
 - Maintenance Task `raso_sync.tasks.maintenance.execute_maintenance_task`
   - Runs daily to check for previous import errors (RASO export Status 3 "Error" and 4 "Partial Success") and retry processing them.
 

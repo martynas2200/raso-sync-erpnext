@@ -50,7 +50,7 @@ def fake_frappe(monkeypatch: pytest.MonkeyPatch):
 	Exposes:
 	- ValidationError: Exception subclass used by code under test
 	- logger(name): returns a FakeLogger instance per name
-	- log_error(message, title=None): records last error
+	- log_error(title=None, message=None): records (title, message) of each call
 	"""
 
 	module = types.ModuleType("frappe")
@@ -71,8 +71,8 @@ def fake_frappe(monkeypatch: pytest.MonkeyPatch):
 
 	module.logged_errors = []
 
-	def log_error(message: str, title: str | None = None) -> None:
-		module.logged_errors.append((message, title))
+	def log_error(title: str | None = None, message: str | None = None) -> None:
+		module.logged_errors.append((title, message))
 
 	module.log_error = log_error  # type: ignore[attr-defined]
 

@@ -79,10 +79,13 @@ def export_for_raso(data_type, full_sync=1, date_from=None, docnames=None):
 		return handler(full_sync, date_from, docnames)
 
 	except Exception as e:
-		error_root = Element("Error")
 		frappe.log_error(
-			"RASO Sync API Export Error",
-			f"RASO sync API Type {data_type} error: {e!s}",
+			title="RASO Sync API Export Error",
+			message=(
+				f"RASO sync API Type {data_type} error: {e!s}\n"
+				f"full_sync={full_sync} date_from={date_from} "
+				f"docnames={len(docnames) if docnames else 0}\n\n{frappe.get_traceback()}"
+			),
 		)
 
 		# Return error as XML

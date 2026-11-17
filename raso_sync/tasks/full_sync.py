@@ -2,8 +2,6 @@
 Nightly Full Sync Task
 """
 
-import time
-
 import frappe
 from frappe.utils.background_jobs import is_job_enqueued
 
@@ -41,29 +39,15 @@ def execute_full_sync_task_worker():
 	NEEDS TO BE ENQUEUED WITH JOB-ID: raso_sync_full_sync_task_worker
 
 	Worker function that performs the full sync importing and fetching.
-	Task list (just recreating what I see in logs of previous integration, seems like an overkill to me, but no documentation, perhaps there is a reason for that, like deleted records, each send sends full data set):
-	    1. Send: Partners
-	    2. Send: Partners (FullSync)
-	    3. Send: GoodsGroups
-	    4. Send: GoodsGroups (FullSync)
-	    5. Send: Goods
-	    6. Send: Goods (FullSync)
-	    7. Send: GoodsPrices
-	    8. Fetch: Sales
 	"""
 	execute_fetch_task_worker()
-	time.sleep(10)
 	execute_send_task_worker("partners")
-	time.sleep(10)
-	execute_send_task_worker("good_groups", date_from="2000-01-01")
-	time.sleep(10)
+	# GoodsGroups ignores config 65, thus FullSync=1 always upserts and disables
 	execute_send_task_worker("good_groups")
-	time.sleep(10)
 	execute_send_task_worker("goods", date_from="2000-01-01")
-	time.sleep(10)
 	execute_send_task_worker("goods")
-	time.sleep(10)
 	execute_send_task_worker("good_prices", date_from="2000-01-01")
+	execute_send_task_worker("good_prices")
 
 	logger.info("Full Sync Task Completed.")
 	return {"status": "completed"}

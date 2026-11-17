@@ -7,9 +7,11 @@ import frappe
 def good_prices_internal(full_sync, date_from, docnames=None):
 	"""
 	Returns XML document directly of GoodsPrices (Item Prices) - DataType 4
+	ERPNext is the authority for which price applies right now, so rows are always
+	sent undated and only prices valid on the current date are exported.
 
 	Parameters:
-	- FullSync: 1 for full sync, 0 for incremental
+	- full_sync: 1 for full sync, 0 for incremental
 	- date_from: Required when FullSync=0, ISO datetime string
 
 	"""
@@ -80,21 +82,10 @@ def good_prices_internal(full_sync, date_from, docnames=None):
 		shop_no_elem = SubElement(price_elem, "ShopNo")
 		shop_no_elem.text = "01"
 
-		#! Needs to be tested if raso can accept multiple prices, so in that case,
-		#! we would not need a send the list each night, no subquery needed then.
-		# if item_price.get("valid_from"):
-		#     date_from_elem = SubElement(price_elem, "DateFrom")
-		#     valid_from_dt = item_price.get("valid_from")
-		#     if isinstance(valid_from_dt, str):
-		#         valid_from_dt = datetime.fromisoformat(valid_from_dt)
-		#     date_from_elem.text = valid_from_dt.strftime("%Y-%m-%dT%H:%M:%S")
-
-		# if item_price.get("valid_upto"):
-		#     date_to_elem = SubElement(price_elem, "DateTo")
-		#     valid_upto_dt = item_price.get("valid_upto")
-		#     if isinstance(valid_upto_dt, str):
-		#         valid_upto_dt = datetime.fromisoformat(valid_upto_dt)
-		#     date_to_elem.text = valid_upto_dt.strftime("%Y-%m-%dT%H:%M:%S")
+		#! Do NOT emit DateFrom/DateTo here.
+		# RASO routes each DataType to exactly one import procedure, so dated rows in a DataType 4 packet are silently dropped.
+		# DataType 7 prices identify a row by goods + shop + qty + DateFrom + DateTo, so changing a validity window inserts a new row and leaves the old one enabled, where overlapping windows resolve to the cheapest price.
+		# ERPNext is the authority instead: it decides which price applies today and that single undated row is what we send.
 
 		qty_elem = SubElement(price_elem, "Qty")
 		qty_elem.text = str(item_price.get("packing_unit", 0))

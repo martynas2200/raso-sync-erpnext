@@ -392,6 +392,9 @@ def export_and_send_type(
 	else:
 		export_data = export_for_raso(export_type, full_sync=0 if date_from else 1, date_from=date_from)
 
+	if export_data.tag == "Error":
+		raise Exception(export_data.findtext("Message") or "unknown error")
+
 	logger.debug("Exporting type %s...", export_type)
 
 	record_count = len(export_data)
