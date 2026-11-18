@@ -3,11 +3,11 @@
 import traceback
 import xml.etree.ElementTree as ET
 from collections import defaultdict
-from datetime import datetime
 
 import frappe
+from erpnext.stock.get_item_details import get_conversion_factor
 from frappe import _
-from frappe.utils import flt
+from frappe.utils import flt, get_time, getdate
 
 from raso_sync.raso_sync.doctype.raso_sync_settings.raso_sync_settings import RASOSyncSettings
 
@@ -103,10 +103,7 @@ def get_payment_code(payment_node):
 	Tries 'CODE' first, then 'PAYMETHOD'.
 	Raises ValueError if both are missing or empty.
 	"""
-	code = payment_node.find("CODE").text if payment_node.find("CODE") is not None else None
-	if not code:
-		code = payment_node.find("PAYMETHOD").text if payment_node.find("PAYMETHOD") is not None else None
-
+	code = payment_node.findtext("CODE") or payment_node.findtext("PAYMETHOD")
 	if not code:
 		raise ValueError("Missing or empty CODE and PAYMETHOD in Payment node.")
 
@@ -136,7 +133,7 @@ def validate_sales_payments(root):
 					"valid": False,
 					"error": _("Payment validation failed: ") + str(e),
 				}
-			amount = flt(payment.find("AMOUNT").text)
+			amount = flt(payment.findtext("AMOUNT"))
 			sales_payments[code] += amount
 
 	# Get the totals from Payments nodes
@@ -150,7 +147,7 @@ def validate_sales_payments(root):
 				"valid": False,
 				"error": _("Payment validation failed: ") + str(e),
 			}
-		amount = flt(payment.find("AMOUNT").text)
+		amount = flt(payment.findtext("AMOUNT"))
 		total_payments[code] += amount
 
 	# Validate that sums match for each payment code
@@ -277,8 +274,10 @@ def process_sales(sales_node, type=0):
 	"""
 	try:
 		receipt_no = sales_node.get("ReceiptNo")
-		posting_date = datetime.strptime(sales_node.get("SaleDate"), "%Y-%m-%d").date()
-		posting_time = datetime.strptime(sales_node.get("SaleTime"), "%H:%M:%S").time()
+		sale_date = sales_node.get("SaleDate")
+		sale_time = sales_node.get("SaleTime")
+		posting_date = getdate(sale_date) if sale_date else None
+		posting_time = get_time(sale_time) if sale_time else None
 		user_id = sales_node.get("UserId")
 		shop_no = sales_node.get("ShopNo") or ""
 		pos_no = sales_node.get("PosNo") or ""
@@ -333,11 +332,7 @@ def process_sales(sales_node, type=0):
 		if settings.vat_account:
 			vat = 0.00
 			for sale in sales_node.findall("Sale"):
-				vatsum = flt(sale.find("VATSUM").text) if sale.find("VATSUM") is not None else 0
-				vatsum_manual = (
-					flt(sale.find("VATSUMMANUAL").text) if sale.find("VATSUMMANUAL") is not None else 0
-				)
-				vat += vatsum + vatsum_manual
+				vat += flt(sale.findtext("VATSUM")) + flt(sale.findtext("VATSUMMANUAL"))
 			invoice.append(
 				"taxes",
 				{
@@ -368,22 +363,21 @@ def process_sales(sales_node, type=0):
 
 		# Checks before submission
 		# - Verify stock levels if negative stock not allowed
-		# - Verify if all items were found
-		error_list = ""
-
-		if hasattr(invoice, "_item_lookup_errors") and invoice._item_lookup_errors:
-			error_list = "<br>".join(invoice._item_lookup_errors)
+		# - Verify if all items and barcode UOMs could be resolved
+		error_list = list(getattr(invoice, "_import_errors", None) or [])
 
 		for item in invoice.items:
+			# stock_qty is the quantity expressed in the item's stock UOM, which is what stock holds
+			required_qty = flt(item.get("stock_qty")) or flt(item.qty)
 			if (
 				not company_uses_negative_stock
-				and flt(item.actual_qty) < flt(item.qty)
+				and flt(item.actual_qty) < required_qty
 				and frappe.get_cached_value("Item", item.item_code, "is_stock_item")
 			):
-				error_list += _("Insufficient stock for item") + f"- {item.item_code}"
+				error_list.append(_("Insufficient stock for item") + f" - {item.item_code}")
 
 		if error_list:
-			add_comment(invoice, _("Invoice Creation Failed") + f" {receipt_no}", error_list)
+			add_comment(invoice, _("Invoice Creation Failed") + f" {receipt_no}", "<br>".join(error_list))
 
 			return {
 				"receipt_no": receipt_no,
@@ -427,81 +421,72 @@ def process_sales(sales_node, type=0):
 		}
 
 
+def add_invoice_error(invoice, message):
+	"""Record a problem that must keep an otherwise created invoice from being submitted."""
+	if getattr(invoice, "_import_errors", None) is None:
+		invoice._import_errors = []
+	invoice._import_errors.append(message)
+
+
 def add_item_to_invoice(invoice, sale_node):
 	"""
 	Add an item to the sales invoice
 	"""
 	settings = RASOSyncSettings.get_settings()
-	code = sale_node.find("CODE").text
-	vcode = sale_node.find("VCODE").text
-	name_element = sale_node.find("NAME")
-	if name_element is None:  # Check for alternate field name
-		name_element = sale_node.find("n")
+	code = (sale_node.findtext("CODE") or "").strip()
+	vcode = (sale_node.findtext("VCODE") or "").strip()
 
-	qty = flt(sale_node.find("QTY").text) if sale_node.find("QTY") is not None else 0
-	amount = flt(sale_node.find("AMOUNT").text) if sale_node.find("AMOUNT") is not None else 0
-
-	qty_manual = flt(sale_node.find("QTYMANUAL").text) if sale_node.find("QTYMANUAL") is not None else 0
-	amount_manual = (
-		flt(sale_node.find("AMOUNTMANUAL").text) if sale_node.find("AMOUNTMANUAL") is not None else 0
-	)
-	vat = flt(sale_node.find("VATSUM").text) if sale_node.find("VATSUM") is not None else 0
-	vat_manual = flt(sale_node.find("VATSUMMANUAL").text) if sale_node.find("VATSUMMANUAL") is not None else 0
-	discount = flt(sale_node.find("DISCOUNT").text) if sale_node.find("DISCOUNT") is not None else 0
-	vat += vat_manual
-	final_qty = qty + qty_manual
-	final_amount = amount + amount_manual
+	final_qty = flt(sale_node.findtext("QTY")) + flt(sale_node.findtext("QTYMANUAL"))
+	final_amount = flt(sale_node.findtext("AMOUNT")) + flt(sale_node.findtext("AMOUNTMANUAL"))
+	vat = flt(sale_node.findtext("VATSUM")) + flt(sale_node.findtext("VATSUMMANUAL"))
+	discount = flt(sale_node.findtext("DISCOUNT"))
 
 	if final_qty == 0:
 		return
 
-	rate = abs((final_amount - vat) / final_qty) if final_qty != 0 else 0
+	rate = abs((final_amount - vat) / final_qty)
 
 	# Determine item - lookup priority: barcode (stripped) > barcode (full) > VCODE
 	item_code = None
 	barcode_uom = None
+	stripped_code = code.lstrip("0")
 
 	# 1. Barcode lookup by stripped code (no leading zeros)
-	stripped_code = code.lstrip("0")
-	barcode_record = frappe.db.get_value("Item Barcode", {"barcode": stripped_code}, ["parent", "uom"])
-	if barcode_record:
-		item_code = barcode_record[0]
-		barcode_uom = barcode_record[1]
+	if stripped_code:
+		barcode_record = frappe.db.get_value("Item Barcode", {"barcode": stripped_code}, ["parent", "uom"])
+		if barcode_record:
+			item_code = barcode_record[0]
+			barcode_uom = barcode_record[1]
 
-		# 2. Barcode lookup by full code
-	if not item_code:
+	# 2. Barcode lookup by full code
+	if not item_code and code and code != stripped_code:
 		barcode_record = frappe.db.get_value("Item Barcode", {"barcode": code}, ["parent", "uom"])
 		if barcode_record:
 			item_code = barcode_record[0]
 			barcode_uom = barcode_record[1]
 
 	# 3. Fall back to VCODE
-	if not item_code and vcode and vcode[0].isalpha():
+	if not item_code and vcode and vcode[0].isalpha() and frappe.db.exists("Item", vcode):
 		item_code = vcode
-		item_exists = frappe.db.exists("Item", item_code)
-		if not item_exists:
-			item_code = None
 
 	if not item_code:
 		# Use default item
 		error_msg = f"Item not found: CODE={code}, VCODE={vcode}. Using default item: {settings.default_item}"
 		frappe.log_error("RASO Import - No item", error_msg)
 
-		if settings.default_item:
-			item_code = settings.default_item
-		else:
+		if not settings.default_item:
 			raise ValueError("No item found and no default item set in RASO Sync Settings.")
 
-	# Determine UOM - use barcode's UOM if found via barcode, otherwise Item's stock UOM
-	if barcode_uom:
-		stock_uom = barcode_uom
-	else:
-		item_doc = frappe.get_doc("Item", item_code)
-		stock_uom = item_doc.stock_uom if item_doc and item_doc.stock_uom else "Nos"
-		if not item_doc:
-			raise ValueError(f"Item {item_code} does not exist.")
-		if not stock_uom:
-			raise ValueError(f"Item {item_code} does not have a stock UOM defined.")
+		item_code = settings.default_item
+		add_invoice_error(invoice, f"Item not found with a barcode {code}, kodu {vcode}")
+
+	# The barcode tells us the UOM the item was scanned in, the item keeps its own stock UOM
+	stock_uom = frappe.get_cached_value("Item", item_code, "stock_uom")
+	if not stock_uom:
+		raise ValueError(f"Item {item_code} does not have a stock UOM defined.")
+
+	uom = barcode_uom or stock_uom
+	conversion_factor = get_conversion_factor(item_code, uom).get("conversion_factor")
 
 	if discount > 0:
 		enhanced_description = f"Discount: {discount:.2f} EUR"
@@ -520,8 +505,9 @@ def add_item_to_invoice(invoice, sale_node):
 	item_dict = {
 		"item_code": item_code,
 		"qty": final_qty,
+		"uom": uom,
 		"stock_uom": stock_uom,
-		"uom": stock_uom,
+		"conversion_factor": conversion_factor,
 		"rate": rate,
 		"amount": abs(final_amount),
 		"description": enhanced_description,
@@ -536,12 +522,6 @@ def add_item_to_invoice(invoice, sale_node):
 		item_dict["discount_amount"] = discount
 
 	invoice.append("items", item_dict)
-
-	# Forward the comment
-	if "settings" in locals() and settings.default_item and item_code == settings.default_item:
-		if not hasattr(invoice, "_item_lookup_errors"):
-			invoice._item_lookup_errors = []
-		invoice._item_lookup_errors.append(f"Item not found with a barcode {code}, kodu {vcode}")
 
 
 def get_payment_account(payment_method_name, company):
@@ -571,7 +551,7 @@ def add_payment_to_invoice(settings, invoice, payment_node, code=None):
 	if not code:
 		code = get_payment_code(payment_node)
 
-	amount = flt(payment_node.find("AMOUNT").text)
+	amount = flt(payment_node.findtext("AMOUNT"))
 
 	payment_method = RASOSyncSettings.get_payment_method_mapping(code)
 
@@ -605,9 +585,6 @@ def get_sales_type(sales_node):
 	Determine the sales type (0 for Sales, 3 for Returns) based on Sale items
 	"""
 	for sale in sales_node.findall("Sale"):
-		qty = flt(sale.find("QTY").text) if sale.find("QTY") is not None else 0
-		qty_manual = flt(sale.find("QTYMANUAL").text) if sale.find("QTYMANUAL") is not None else 0
-		final_qty = qty + qty_manual
-		if final_qty < 0:
+		if flt(sale.findtext("QTY")) + flt(sale.findtext("QTYMANUAL")) < 0:
 			return 3  # Return
 	return 0  # Sale

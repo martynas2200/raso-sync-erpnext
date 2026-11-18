@@ -4,6 +4,7 @@ import importlib
 import sys
 import types
 import xml.etree.ElementTree as ET
+from datetime import date, time
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -20,8 +21,21 @@ def import_sales_module(fake_frappe, monkeypatch):
 
 	frappe_utils = types.ModuleType("frappe.utils")
 	frappe_utils.flt = lambda value: float(value)
+	frappe_utils.getdate = date.fromisoformat
+	frappe_utils.get_time = time.fromisoformat
 	monkeypatch.setitem(sys.modules, "frappe.utils", frappe_utils)
 	fake_frappe.utils = frappe_utils
+
+	# The module imports ERPNext's conversion-factor resolver at import time
+	erpnext_module = types.ModuleType("erpnext")
+	erpnext_stock = types.ModuleType("erpnext.stock")
+	erpnext_get_item_details = types.ModuleType("erpnext.stock.get_item_details")
+	erpnext_get_item_details.get_conversion_factor = lambda item_code, uom: {"conversion_factor": 1.0}
+	erpnext_module.stock = erpnext_stock
+	erpnext_stock.get_item_details = erpnext_get_item_details
+	monkeypatch.setitem(sys.modules, "erpnext", erpnext_module)
+	monkeypatch.setitem(sys.modules, "erpnext.stock", erpnext_stock)
+	monkeypatch.setitem(sys.modules, "erpnext.stock.get_item_details", erpnext_get_item_details)
 
 	settings_module = types.ModuleType("raso_sync.raso_sync.doctype.raso_sync_settings.raso_sync_settings")
 	settings_module.RASOSyncSettings = type(
@@ -90,26 +104,35 @@ class SalesDbSpy:
 
 
 @pytest.mark.parametrize(
-	("barcode_values", "existing_items", "expected_item", "expected_uom", "expected_queries"),
+	(
+		"barcode_values",
+		"existing_items",
+		"expected_item",
+		"expected_uom",
+		"expected_factor",
+		"expected_queries",
+	),
 	[
-		({"2201100": ("ITEM-STRIPPED", "Kg")}, set(), "ITEM-STRIPPED", "Kg", ["2201100"]),
+		({"2201100": ("ITEM-STRIPPED", "Kg")}, set(), "ITEM-STRIPPED", "Kg", 2.0, ["2201100"]),
 		(
 			{"0000002201100": ("ITEM-FULL", "Nos")},
 			set(),
 			"ITEM-FULL",
 			"Nos",
+			1.0,
 			["2201100", "0000002201100"],
 		),
-		({}, {"P0001"}, "P0001", "Nos", ["2201100", "0000002201100"]),
+		({}, {"P0001"}, "P0001", "Nos", 1.0, ["2201100", "0000002201100"]),
 	],
 )
-def test_add_item_to_invoice_selects_item_by_priority(
+def test_add_item_to_invoice_respects_barcode_uom(
 	fake_frappe,
 	monkeypatch,
 	barcode_values,
 	existing_items,
 	expected_item,
 	expected_uom,
+	expected_factor,
 	expected_queries,
 ):
 	mod = import_sales_module(fake_frappe, monkeypatch)
@@ -120,13 +143,23 @@ def test_add_item_to_invoice_selects_item_by_priority(
 		"get_settings",
 		staticmethod(lambda: SimpleNamespace(default_item="DEFAULT-ITEM")),
 	)
-	fake_frappe.get_doc = lambda doctype, item_code: SimpleNamespace(stock_uom="Nos")
+	# The item master keeps its own stock UOM; the barcode UOM never replaces it.
+	fake_frappe.get_cached_value = lambda doctype, name, field: "Nos"
+
+	def fake_get_conversion_factor(item_code, uom):
+		# ERPNext resolves the factor from the item's UOM Conversion Detail table
+		return {"conversion_factor": 2.0 if uom == "Kg" else 1.0}
+
+	monkeypatch.setattr(mod, "get_conversion_factor", fake_get_conversion_factor)
 	invoice = InvoiceSpy()
 
 	mod.add_item_to_invoice(invoice, fixture_sale_by_code("0000002201100"))
 
-	assert invoice.items[0]["item_code"] == expected_item
-	assert invoice.items[0]["stock_uom"] == expected_uom
+	item = invoice.items[0]
+	assert item["item_code"] == expected_item
+	assert item["uom"] == expected_uom
+	assert item["stock_uom"] == "Nos"
+	assert item["conversion_factor"] == expected_factor
 	assert db.barcode_queries == expected_queries
 
 
@@ -139,11 +172,14 @@ def test_add_item_to_invoice_uses_default_item_when_lookup_fails(fake_frappe, mo
 		"get_settings",
 		staticmethod(lambda: SimpleNamespace(default_item="DEFAULT-ITEM")),
 	)
-	fake_frappe.get_doc = lambda doctype, item_code: SimpleNamespace(stock_uom="Nos")
+	fake_frappe.get_cached_value = lambda doctype, name, field: "Nos"
 	invoice = InvoiceSpy()
 
 	mod.add_item_to_invoice(invoice, fixture_sale_by_code("0000002201100"))
 
-	assert invoice.items[0]["item_code"] == "DEFAULT-ITEM"
-	assert hasattr(invoice, "_item_lookup_errors")
+	item = invoice.items[0]
+	assert item["item_code"] == "DEFAULT-ITEM"
+	assert item["uom"] == "Nos"
+	assert item["conversion_factor"] == 1.0
+	assert invoice._import_errors == ["Item not found with a barcode 0000002201100, kodu P0001"]
 	assert fake_frappe.logged_errors[0][0] == "RASO Import - No item"

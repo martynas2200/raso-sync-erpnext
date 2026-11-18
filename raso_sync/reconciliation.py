@@ -21,6 +21,7 @@ _Z_SQL = """
 select date(z.date) as day,
 	sum(z.daily_turnover) as z_turnover,
 	sum(z.fiscal_receipts_count) as fiscal_receipts,
+	sum(z.return_count) as return_count,
 	sum(z.non_fiscal_receipts_count) as non_fiscal_receipts,
 	count(*) as z_count
 from `tabZ Report` z
@@ -69,21 +70,13 @@ def _invoice_rows(from_date, to_date) -> list[dict]:
 	return frappe.db.sql(_INVOICE_SQL.format(conditions=conditions), values, as_dict=True)
 
 
-def _z_window() -> tuple:
-	"""First and last day that has a Z report, or (None, None)."""
-	row = frappe.db.sql(
-		"select min(date(date)) as start, max(date(date)) as end from `tabZ Report`",
-		as_dict=True,
-	)[0]
-	return row.start, row.end
-
-
 def _resolve_window(from_date, to_date) -> tuple:
 	"""Fill missing bounds from the Z report range"""
-	z_start, z_end = _z_window()
+	last_month_first_day = frappe.utils.add_months(frappe.utils.nowdate(), -1)
+	today = frappe.utils.nowdate()
 
-	start = getdate(from_date) if from_date else z_start
-	end = getdate(to_date) if to_date else z_end
+	start = getdate(from_date) if from_date else last_month_first_day
+	end = getdate(to_date) if to_date else today
 
 	if start and end and start > end:
 		start, end = end, start
@@ -119,7 +112,7 @@ def scan(from_date=None, to_date=None) -> dict:
 
 		z_turnover = flt(z.z_turnover) if z else 0.0
 		invoiced = flt(invoiced_row.invoiced) if invoiced_row else 0.0
-		z_receipts = cint(z.fiscal_receipts) if z else 0
+		z_receipts = cint(z.fiscal_receipts) + cint(z.return_count) if z else 0
 		invoiced_receipts = (
 			cint(invoiced_row.sale_receipts) + cint(invoiced_row.refund_receipts) if invoiced_row else 0
 		)
