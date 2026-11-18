@@ -13,7 +13,7 @@
   "type": "Line",
   "filters_json": "[]",
   "is_public": 1,
-  "module": "RASO Sync",
+  "module": "Raso Sync",
   "color": "#2490ef",
   "empty_state_message": "No Z reports received yet."
  }

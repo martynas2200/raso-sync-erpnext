@@ -6,7 +6,7 @@
   "title": "RASO Dashboard",
   "type": "Workspace",
   "public": 1,
-  "module": "RASO Sync",
+  "module": "Raso Sync",
   "icon": "layout-dashboard",
   "indicator_color": "blue",
   "sequence_id": 900.0,

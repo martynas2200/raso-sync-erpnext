@@ -29,9 +29,9 @@ fixtures = [
 			],
 		],
 	},
-	{"dt": "Number Card", "filters": [["module", "=", "RASO Sync"]]},
-	{"dt": "Dashboard Chart", "filters": [["module", "=", "RASO Sync"]]},
-	{"dt": "Workspace", "filters": [["module", "=", "RASO Sync"]]},
+	{"dt": "Number Card", "filters": [["module", "=", "Raso Sync"]]},
+	{"dt": "Dashboard Chart", "filters": [["module", "=", "Raso Sync"]]},
+	{"dt": "Workspace", "filters": [["module", "=", "Raso Sync"]]},
 ]
 
 after_sync = "raso_sync.migrations.fill_missing_raso_ids"

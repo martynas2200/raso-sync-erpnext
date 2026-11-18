@@ -11,7 +11,7 @@
   "is_public": 1,
   "show_percentage_stats": 0,
   "stats_time_interval": "Daily",
-  "module": "RASO Sync"
+  "module": "Raso Sync"
  },
  {
   "doctype": "Number Card",
@@ -24,7 +24,7 @@
   "is_public": 1,
   "show_percentage_stats": 0,
   "stats_time_interval": "Daily",
-  "module": "RASO Sync"
+  "module": "Raso Sync"
  },
  {
   "doctype": "Number Card",
@@ -38,7 +38,7 @@
   "is_public": 1,
   "show_percentage_stats": 0,
   "stats_time_interval": "Daily",
-  "module": "RASO Sync"
+  "module": "Raso Sync"
  },
  {
   "doctype": "Number Card",
@@ -52,7 +52,7 @@
   "is_public": 1,
   "show_percentage_stats": 0,
   "stats_time_interval": "Daily",
-  "module": "RASO Sync"
+  "module": "Raso Sync"
  },
  {
   "doctype": "Number Card",
@@ -66,7 +66,7 @@
   "is_public": 1,
   "show_percentage_stats": 0,
   "stats_time_interval": "Daily",
-  "module": "RASO Sync"
+  "module": "Raso Sync"
  },
  {
   "doctype": "Number Card",
@@ -79,7 +79,7 @@
   "is_public": 1,
   "show_percentage_stats": 0,
   "stats_time_interval": "Daily",
-  "module": "RASO Sync"
+  "module": "Raso Sync"
  },
  {
   "doctype": "Number Card",
@@ -93,7 +93,7 @@
   "is_public": 1,
   "show_percentage_stats": 0,
   "stats_time_interval": "Daily",
-  "module": "RASO Sync"
+  "module": "Raso Sync"
  },
  {
   "doctype": "Number Card",
@@ -105,7 +105,7 @@
   "is_public": 1,
   "show_percentage_stats": 0,
   "stats_time_interval": "Daily",
-  "module": "RASO Sync"
+  "module": "Raso Sync"
  },
  {
   "doctype": "Number Card",
@@ -117,7 +117,7 @@
   "is_public": 1,
   "show_percentage_stats": 0,
   "stats_time_interval": "Daily",
-  "module": "RASO Sync"
+  "module": "Raso Sync"
  },
  {
   "doctype": "Number Card",
@@ -131,7 +131,7 @@
   "is_public": 1,
   "show_percentage_stats": 0,
   "stats_time_interval": "Daily",
-  "module": "RASO Sync"
+  "module": "Raso Sync"
  },
  {
   "doctype": "Number Card",
@@ -144,7 +144,7 @@
   "is_public": 1,
   "show_percentage_stats": 0,
   "stats_time_interval": "Daily",
-  "module": "RASO Sync"
+  "module": "Raso Sync"
  },
  {
   "doctype": "Number Card",
@@ -157,6 +157,6 @@
   "is_public": 1,
   "show_percentage_stats": 0,
   "stats_time_interval": "Daily",
-  "module": "RASO Sync"
+  "module": "Raso Sync"
  }
 ]
